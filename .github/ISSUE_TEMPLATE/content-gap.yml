@@ -1,0 +1,26 @@
+name: Content gap
+description: Report a missing or thin SAA-C03 topic.
+title: "[gap] "
+labels: ["content-gap"]
+body:
+  - type: textarea
+    id: gap
+    attributes:
+      label: What is missing?
+      description: Name the topic, service, or exam decision that needs better coverage.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Official source
+      description: Link to official AWS documentation if scope or behavior is involved.
+    validations:
+      required: false
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested fix
+      description: Share the decision rule, scenario, or explanation you think would help.
+    validations:
+      required: false

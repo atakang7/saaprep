@@ -1,0 +1,26 @@
+name: Correction
+description: Report outdated, unclear, or inaccurate content.
+title: "[correction] "
+labels: ["correction"]
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Link or path to the file and section.
+    validations:
+      required: true
+  - type: textarea
+    id: issue
+    attributes:
+      label: What should change?
+      description: Explain what is wrong or unclear.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Official source
+      description: Link official AWS docs or public source material.
+    validations:
+      required: false

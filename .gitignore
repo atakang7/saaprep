@@ -1,0 +1,23 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Local scratch files
+tmp/
+temp/
+*.tmp
+*.log
+
+# Generated archives
+*.zip
+*.tar
+*.tar.gz
+
+# Local environment files
+.env
+.env.*
+!.env.example

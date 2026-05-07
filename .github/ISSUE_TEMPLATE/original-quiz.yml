@@ -1,0 +1,19 @@
+name: Original quiz idea
+description: Suggest an original practice question or scenario.
+title: "[quiz] "
+labels: ["quiz"]
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Scenario
+      description: Write an original scenario. Do not submit real exam questions or copied paid practice questions.
+    validations:
+      required: true
+  - type: textarea
+    id: answer
+    attributes:
+      label: Correct answer and explanation
+      description: Include why the correct answer is right and why likely distractors are wrong.
+    validations:
+      required: true

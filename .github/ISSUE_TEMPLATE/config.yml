@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Official AWS SAA-C03 exam guide
+    url: https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03/solutions-architect-associate-03.html
+    about: Verify current exam scope with the official AWS guide.
