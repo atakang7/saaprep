@@ -282,13 +282,13 @@ The exam usually narrows to two plausible answers. One detail flips it. Memorize
 | SQS | 14-day max retention, 256 KB message (or S3 pointer), 12h max visibility timeout |
 | SNS | 256 KB message, FIFO 300 TPS without batching |
 | S3 | Object 5 TB max, 5 GB single PUT, multipart >100 MB, Standard-IA/One Zone-IA 30-day min, Glacier Flexible 90-day, Deep Archive 180-day |
-| EBS | gp3 16k IOPS / 1000 MB/s baseline; io2 Block Express up to 256k IOPS; snapshots are incremental to S3 |
-| RDS | Up to 5 read replicas (15 for Aurora), Multi-AZ failover ~60-120s, Aurora failover typically <30s |
+| EBS | gp3 baseline 3,000 IOPS / 125 MiB/s, max 80,000 IOPS / 2,000 MiB/s; io2 Block Express up to 256k IOPS; snapshots are incremental to S3 |
+| RDS | Up to 15 read replicas per primary (Aurora 15 replicas in cluster), Multi-AZ failover ~60-120s, Aurora failover typically <30s |
 | DynamoDB | 400 KB item, BatchGet 100 / BatchWrite 25, partition 3000 RCU / 1000 WCU before split |
 | VPC | /16 to /28 CIDR, 5 reserved IPs per subnet, 5 VPCs per Region soft limit |
 | Route 53 | TTL in seconds, health check 30s default / 10s fast |
 | KMS | Key rotation yearly for AWS-managed CMKs (automatic); customer-managed optional |
-| API Gateway | 29s integration timeout, 10 MB payload |
+| API Gateway | Default integration timeout 29s (increasable for Regional and private REST APIs since 2024); 10 MB payload |
 
 ## Reference Architectures (Composition Patterns)
 

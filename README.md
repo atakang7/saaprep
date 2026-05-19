@@ -42,6 +42,7 @@ Browsable web version: published via GitHub Pages (enable in repo Settings -> Pa
 
 ## Repository Map
 
+- **[START-HERE.md](START-HERE.md): one-page study path — read this first**
 - [study-plan.md](study-plan.md): default 6-week plan
 - [notes/index.md](notes/index.md): map of domains and repeated decision patterns
 - [field-guide/README.md](field-guide/README.md): story-style guide with all 14 official task topics and 10 high-yield explanations per topic
