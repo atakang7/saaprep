@@ -11,6 +11,8 @@ The SAA exam is less about memorizing every AWS service and more about selecting
 
 ## Recurring Decision Patterns
 
+For a visual version of these patterns, use [../field-guide/cloud-concept-map.md](../field-guide/cloud-concept-map.md).
+
 - Least privilege: prefer roles, scoped policies, and temporary credentials.
 - High availability: spread across Availability Zones before jumping to multi-Region.
 - Fault tolerance: remove single points of failure and automate recovery.

@@ -21,7 +21,7 @@ The official exam outline has 4 domains and 14 task topics. Each task topic in t
 
 For a clean scope checklist before you study the stories, use [official-topic-checklist.md](official-topic-checklist.md).
 
-For service-choice questions, use [service-decision-matrix.md](service-decision-matrix.md). For a final pre-exam pass, use [final-cram-sheet.md](final-cram-sheet.md). For the honest status of the study pack, use [readiness-audit.md](readiness-audit.md).
+For a concept-first shortcut, use [cloud-concept-map.md](cloud-concept-map.md). For service-choice questions, use [service-decision-matrix.md](service-decision-matrix.md). For a final pre-exam pass, use [final-cram-sheet.md](final-cram-sheet.md). For the honest status of the study pack, use [readiness-audit.md](readiness-audit.md).
 
 ## Official Topic Map
 

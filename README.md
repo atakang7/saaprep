@@ -41,12 +41,16 @@ This project is built for practical exam readiness: learn the official domains, 
 - [study-plan.md](study-plan.md): default 6-week plan
 - [notes/index.md](notes/index.md): map of domains and repeated decision patterns
 - [field-guide/README.md](field-guide/README.md): story-style guide with all 14 official task topics and 10 high-yield explanations per topic
+- [field-guide/cloud-concept-map.md](field-guide/cloud-concept-map.md): visual cloud concept tree for fast service pattern matching
 - [field-guide/official-topic-checklist.md](field-guide/official-topic-checklist.md): scope checklist from the AWS exam guide
 - [field-guide/service-decision-matrix.md](field-guide/service-decision-matrix.md): in-scope service recognition and exam clue words
 - [field-guide/readiness-audit.md](field-guide/readiness-audit.md): honest gap analysis and pass-readiness checklist
 - [field-guide/final-cram-sheet.md](field-guide/final-cram-sheet.md): last-48-hours decision sheet
 - [quizzes/quiz-001-security-and-resilience.md](quizzes/quiz-001-security-and-resilience.md): first original mini-quiz
 - [quizzes/quiz-002-mixed-scenarios.md](quizzes/quiz-002-mixed-scenarios.md): mixed service-choice scenario drill
+- [quizzes/quiz-003-original-mock-exam.md](quizzes/quiz-003-original-mock-exam.md): original 30-question SAA-C03 mock exam with answer key
+- [quizzes/practice-source-index.md](quizzes/practice-source-index.md): curated official and popular third-party practice sources
+- [quizzes/sample-exams/README.md](quizzes/sample-exams/README.md): official sample PDFs and practice-test links
 - [labs/lab-index.md](labs/lab-index.md): optional hands-on labs
 - [resources/official-links.md](resources/official-links.md): source links to keep us honest
 - [CONTRIBUTING.md](CONTRIBUTING.md): contribution rules and style guide
