@@ -8,7 +8,7 @@ This project is built for practical exam readiness: learn the official domains, 
 
 **New here? Start with [START-HERE.md](START-HERE.md) — the one-page study path.**
 
-Browsable web version: published via GitHub Pages (enable in repo Settings -> Pages -> Source: "Deploy from a branch", Branch: `main` / root).
+**Browsable web version:** https://atakang7.github.io/saaprep/ (MkDocs Material — search, dark mode, mobile-friendly).
 
 > Independent study material. Not affiliated with or endorsed by AWS. No exam dumps, real exam questions, or confidential exam content.
 

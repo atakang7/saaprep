@@ -1,0 +1,149 @@
+site_name: SAA-C03 Field Guide
+site_description: Concept-first study guide for the AWS Certified Solutions Architect Associate exam (SAA-C03)
+site_url: https://atakang7.github.io/saaprep/
+repo_url: https://github.com/atakang7/saaprep
+repo_name: atakang7/saaprep
+edit_uri: edit/main/
+
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  language: en
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/cloud-outline
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+    - content.tooltips
+
+plugins:
+  - search:
+      lang: en
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Anchor link to this section
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/atakang7/saaprep
+      name: SaaPrep on GitHub
+
+nav:
+  - Home: index.md
+  - Start Here: START-HERE.md
+  - Study Plan: study-plan.md
+  - Field Guide:
+      - Overview: field-guide/README.md
+      - Cloud Concept Map: field-guide/cloud-concept-map.md
+      - Domain 1 - Security: field-guide/domain-1-security.md
+      - Domain 2 - Resilience: field-guide/domain-2-resilience.md
+      - Domain 3 - Performance: field-guide/domain-3-performance.md
+      - Domain 4 - Cost: field-guide/domain-4-cost.md
+      - Service Decision Matrix: field-guide/service-decision-matrix.md
+      - Official Topic Checklist: field-guide/official-topic-checklist.md
+      - Final Cram Sheet: field-guide/final-cram-sheet.md
+      - Readiness Audit: field-guide/readiness-audit.md
+  - Notes:
+      - Index: notes/index.md
+      - Domain 1 - Security: notes/domain-1-security.md
+      - Domain 2 - Resilience: notes/domain-2-resilience.md
+      - Domain 3 - Performance: notes/domain-3-performance.md
+      - Domain 4 - Cost: notes/domain-4-cost.md
+  - Quizzes:
+      - Index: quizzes/practice-source-index.md
+      - Quiz 1 - Security & Resilience: quizzes/quiz-001-security-and-resilience.md
+      - Quiz 2 - Mixed Scenarios: quizzes/quiz-002-mixed-scenarios.md
+      - Quiz 3 - Mock Exam: quizzes/quiz-003-original-mock-exam.md
+      - Official Sample Exams: quizzes/sample-exams/README.md
+      - Official Sample Answer Key: quizzes/sample-exams/aws-official-saa-c03-sample-questions-answer-key.md
+  - Practice:
+      - Flashcards: flashcards.md
+      - Mistakes Log: mistakes.md
+      - Practice Log: practice-log.md
+  - Labs: labs/lab-index.md
+  - Resources: resources/official-links.md
+  - Project:
+      - Changelog: CHANGELOG.md
+      - Disclaimer: DISCLAIMER.md
+      - Contributing: CONTRIBUTING.md
+      - Code of Conduct: CODE_OF_CONDUCT.md
+      - Security: SECURITY.md
+
+exclude_docs: |
+  /README.md
+  site/
+  _site/
+  .github/

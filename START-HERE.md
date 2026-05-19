@@ -23,7 +23,7 @@ Skip a layer and you will either freeze on novel scenarios (skipped 1-2) or pick
 | Mistakes journal | [mistakes.md](mistakes.md) | After every practice set |
 | Practice log | [practice-log.md](practice-log.md) | After every practice set |
 | Flashcards | [flashcards.md](flashcards.md) | 10 min/day Anki-style |
-| Quizzes | [quizzes/](quizzes/) | See plan below |
+| Quizzes | [quizzes/](quizzes/practice-source-index.md) | See plan below |
 
 ## A Concrete Study Plan (~3 weeks, ~1.5h/day)
 
@@ -32,7 +32,7 @@ Skip a layer and you will either freeze on novel scenarios (skipped 1-2) or pick
 - **Day 3**: Re-read the 6 concept table + service cards. Cover the right column and try to recall the 3 facts per service.
 - **Day 4-5**: Read [domain-1-security.md](field-guide/domain-1-security.md) and [domain-2-resilience.md](field-guide/domain-2-resilience.md). Add anything surprising to [flashcards.md](flashcards.md).
 - **Day 6**: Read [domain-3-performance.md](field-guide/domain-3-performance.md) and [domain-4-cost.md](field-guide/domain-4-cost.md).
-- **Day 7**: First 20-question practice quiz from [quizzes/](quizzes/). Log score, log every miss in [mistakes.md](mistakes.md).
+- **Day 7**: First 20-question practice quiz from [quizzes/](quizzes/practice-source-index.md). Log score, log every miss in [mistakes.md](mistakes.md).
 
 ### Week 2 - Drill discriminators + composition
 - **Daily warm-up (10 min)**: Discriminators table + Numbers table.
