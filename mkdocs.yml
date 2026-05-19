@@ -11,6 +11,7 @@ site_dir: site
 theme:
   name: material
   language: en
+  favicon: assets/images/favicon.svg
   font:
     text: Inter
     code: JetBrains Mono
@@ -56,6 +57,16 @@ theme:
 plugins:
   - search:
       lang: en
+  - social:
+      cards_layout_options:
+        background_color: "#3f51b5"
+        color: "#ffffff"
+  - git-revision-date-localized:
+      type: iso_date
+      enable_creation_date: false
+      fallback_to_build_date: true
+      exclude:
+        - 404.md
 
 markdown_extensions:
   - abbr
@@ -87,12 +98,16 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+          format: !!python/name:pymdownx.superfences.fence_div_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10.9.1/dist/mermaid.min.js
+  - assets/javascripts/mermaid-init.js
 
 extra:
   generator: false
@@ -100,6 +115,10 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/atakang7/saaprep
       name: SaaPrep on GitHub
+
+copyright: >
+  Independent study material. Not affiliated with or endorsed by AWS.
+  Verify limits against the <a href="https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03/solutions-architect-associate-03.html">official SAA-C03 exam guide</a> before relying on them.
 
 nav:
   - Home: index.md
@@ -141,6 +160,9 @@ nav:
       - Contributing: CONTRIBUTING.md
       - Code of Conduct: CODE_OF_CONDUCT.md
       - Security: SECURITY.md
+
+not_in_nav: |
+  404.md
 
 exclude_docs: |
   /README.md
