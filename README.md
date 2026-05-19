@@ -6,6 +6,10 @@ Last checked against AWS sources: 2026-05-07.
 
 This project is built for practical exam readiness: learn the official domains, understand the service tradeoffs, practice scenario questions, and turn mistakes into rules.
 
+**New here? Start with [START-HERE.md](START-HERE.md) — the one-page study path.**
+
+Browsable web version: published via GitHub Pages (enable in repo Settings -> Pages -> Source: "Deploy from a branch", Branch: `main` / root).
+
 > Independent study material. Not affiliated with or endorsed by AWS. No exam dumps, real exam questions, or confidential exam content.
 
 ## Exam Snapshot
