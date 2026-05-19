@@ -51,11 +51,11 @@ Skip a layer and you will either freeze on novel scenarios (skipped 1-2) or pick
 2. Name the **concept** (one of 6).
 3. Eliminate answers that solve the wrong concept.
 4. Use **discriminators** to pick between the two survivors.
-5. If still stuck: pick the **smaller, more managed** option.
+5. If still stuck: pick the **smallest managed option that still satisfies the strictest requirement** (this tiebreaker does not apply when the question demands dedicated bandwidth, OS control, specialized performance, or specific compliance — honor those first).
 
 ## How To Know You Are Ready
 
-- Scoring **75%+** on two consecutive full-length practice exams (not the same one twice).
+- Scoring on two consecutive full-length practice exams (not the same one twice): **75% is the minimum confidence threshold; 80%+ is the safer target** before booking.
 - Can recite the 6 concepts and 3+ services in each, cold.
 - Can sketch all 8 reference architectures from memory.
 - [mistakes.md](mistakes.md) entries are no longer repeating - new misses are genuinely new.

@@ -252,7 +252,7 @@ The exam usually narrows to two plausible answers. One detail flips it. Memorize
 | Step Functions vs EventBridge | Ordered multi-step workflow with retries/branching -> Step Functions. Loose event routing between independent services -> EventBridge. |
 | RDS Multi-AZ vs Read Replica | Availability and failover (synchronous, same Region) -> Multi-AZ. Scale read traffic (asynchronous, can be cross-Region) -> Read Replica. |
 | RDS vs Aurora | Standard engines, lowest cost -> RDS. Higher performance, faster failover, global database, 15 replicas -> Aurora. |
-| Aurora Global vs DynamoDB Global Tables | Relational, single writer Region, <1s cross-Region replication -> Aurora Global. Multi-Region active-active key-value -> DynamoDB Global Tables. |
+| Aurora Global vs DynamoDB Global Tables | Relational, one primary write Region + read-only secondary Regions, <1s replication, fast regional DR (write forwarding still forwards writes to primary) -> Aurora Global. True multi-Region active-active writes on key-value -> DynamoDB Global Tables. |
 | DynamoDB vs RDS | Key-value/document, single-digit ms at any scale, serverless -> DynamoDB. Joins, transactions across tables, SQL -> RDS. |
 | ElastiCache Redis vs Memcached | Persistence, replication, pub/sub, sorted sets -> Redis. Simple, multi-threaded, sharded cache only -> Memcached. |
 | Gateway vs Interface VPC Endpoint | S3 or DynamoDB only, free, route-table entry -> Gateway. Any other AWS service or PrivateLink, ENI in subnet, hourly + data -> Interface. |
@@ -280,14 +280,14 @@ The exam usually narrows to two plausible answers. One detail flips it. Memorize
 | --- | --- |
 | Lambda | 15 min max, 10 GB memory, 10 GB ephemeral /tmp, 250 MB unzipped package (50 MB zipped direct), 6 MB sync payload |
 | SQS | 14-day max retention, 256 KB message (or S3 pointer), 12h max visibility timeout |
-| SNS | 256 KB message, FIFO 300 TPS without batching |
+| SNS | 256 KB message |
 | S3 | Object 5 TB max, 5 GB single PUT, multipart >100 MB, Standard-IA/One Zone-IA 30-day min, Glacier Flexible 90-day, Deep Archive 180-day |
 | EBS | gp3 baseline 3,000 IOPS / 125 MiB/s, max 80,000 IOPS / 2,000 MiB/s; io2 Block Express up to 256k IOPS; snapshots are incremental to S3 |
 | RDS | Up to 15 read replicas per primary (Aurora 15 replicas in cluster), Multi-AZ failover ~60-120s, Aurora failover typically <30s |
 | DynamoDB | 400 KB item, BatchGet 100 / BatchWrite 25, partition 3000 RCU / 1000 WCU before split |
 | VPC | /16 to /28 CIDR, 5 reserved IPs per subnet, 5 VPCs per Region soft limit |
 | Route 53 | TTL in seconds, health check 30s default / 10s fast |
-| KMS | Key rotation yearly for AWS-managed CMKs (automatic); customer-managed optional |
+| KMS | AWS managed KMS keys rotate automatically yearly; customer managed symmetric KMS keys can opt in to automatic rotation with a configurable period |
 | API Gateway | Default integration timeout 29s (increasable for Regional and private REST APIs since 2024); 10 MB payload |
 
 ## Reference Architectures (Composition Patterns)
@@ -314,21 +314,24 @@ Key choices: WAF on CloudFront, ALB for HTTP, ASG for elasticity, Multi-AZ for H
 ### 2. Serverless Web/API
 
 ```text
-Users -> CloudFront -> API Gateway -> Lambda -> DynamoDB
-                                         \--> S3 (assets)
-                                         \--> Secrets Manager (DB creds)
+Users
+  |--> CloudFront --> S3 (static assets: HTML/JS/CSS/images)
+  \--> CloudFront --> API Gateway --> Lambda --> DynamoDB
+                                          \--> Secrets Manager (DB creds)
 Cognito User Pool authorizes API Gateway.
 ```
-Key choices: pay-per-request, no servers, DynamoDB for single-digit ms scale, Cognito for auth.
+Key choices: static assets served from S3 via CloudFront; dynamic API path is CloudFront -> API Gateway -> Lambda -> DynamoDB; Cognito for auth.
 
 ### 3. Event-Driven / Decoupled Workers
 
 ```text
-Producer -> SNS topic -> SQS queue(s) -> Lambda or ECS workers -> DynamoDB / S3
-                     \-> SQS DLQ on failure
+Producer -> SNS topic --> SQS queue A -> Lambda/ECS workers -> DynamoDB / S3
+                                  \--> SQS DLQ A (queue-owned redrive policy)
+                      \-> SQS queue B -> different workers
+                                  \--> SQS DLQ B
 EventBridge can replace SNS for filtered/routed events.
 ```
-Key choices: SNS fanout + SQS buffer = classic durable async; DLQ for poison messages.
+Key choices: SNS fanout to one SQS queue per consumer; each SQS queue owns its own redrive policy and DLQ for poison messages.
 
 ### 4. Hybrid Connectivity
 
@@ -348,7 +351,7 @@ Sources -> Kinesis Data Streams or Firehose -> S3 (raw zone)
                                                  v
                                               Athena (ad hoc SQL) / Redshift Spectrum (warehouse)
                                                  v
-                                              QuickSight (dashboards)
+                                              QuickSuite (dashboards)
 ```
 Key choices: S3 as the lake, Glue for catalog/ETL, Athena for serverless query, Redshift for heavy BI.
 
@@ -359,7 +362,8 @@ Key choices: S3 as the lake, Glue for catalog/ETL, Athena for serverless query, 
 | Hours / Hours | Backup & Restore: AWS Backup cross-Region copies |
 | 10s of min / 10s of min | Pilot Light: minimal infra running, scale up on failover |
 | Minutes / Minutes | Warm Standby: scaled-down full stack in second Region |
-| Seconds / Seconds | Active-Active: Route 53 latency/failover + DynamoDB Global Tables or Aurora Global |
+| Seconds / Seconds (active-active writes) | Route 53 latency/failover + DynamoDB Global Tables (multi-Region active-active writes) |
+| Seconds / ~1 min (global reads + fast regional DR) | Aurora Global Database: one primary write Region, read-only secondary Regions, cross-Region replication typically <1s; promote a secondary on Region failure (write forwarding still forwards writes to the primary) |
 
 ### 7. Private Service Access (No Internet)
 
