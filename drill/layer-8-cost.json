@@ -1,0 +1,271 @@
+[
+  {
+    "id": "L8-001",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "moderate",
+    "trap_fact": "NAT gateway charges per hour ($0.045) + per GB ($0.045) — VPC endpoint eliminates this for S3",
+    "constraint_terms": [
+      "reduce data transfer cost",
+      "private access to S3",
+      "high-volume traffic"
+    ],
+    "scenario": "A company's EC2 instances in private subnets transfer 10TB per month to S3 for log storage. Traffic routes through a NAT gateway. The monthly NAT gateway cost is $450 (processing) + $45 (hourly) = $495 just for S3 traffic. The architect wants to eliminate this cost.",
+    "question": "Which solution removes the NAT gateway cost for S3 traffic?",
+    "options": {
+      "A": "Create an S3 interface VPC endpoint (PrivateLink) — provides private access with elastic network interfaces",
+      "B": "Create an S3 gateway VPC endpoint — S3 traffic routes directly from the VPC to S3 using private AWS network at no additional charge",
+      "C": "Move the instances to public subnets with an internet gateway — direct internet access bypasses NAT",
+      "D": "Configure S3 Transfer Acceleration to route traffic more efficiently"
+    },
+    "answer": "B",
+    "reasoning": "S3 gateway endpoint is FREE — no hourly charge, no per-GB processing charge. It adds a route table entry that directs S3-destined traffic directly through the AWS private network, completely BYPASSING the NAT gateway. The $495/month disappears entirely. Interface endpoint (B) has hourly charges + per-GB charges (not free). Public subnets (C) solve cost but expose instances to internet (security violation). Transfer Acceleration (D) ADDS cost ($0.04-$0.08/GB) rather than removing it. The gateway endpoint is the #1 cost optimization answer for NAT + S3.",
+    "eliminated": {
+      "A": "Interface VPC endpoint charges both per-hour ($0.01/AZ/hour) AND per-GB processed ($0.01/GB) — for 10TB/month that's ~$100/month plus hourly fees. Cheaper than NAT but NOT free like the gateway endpoint",
+      "C": "Moving to public subnets removes NAT cost but makes instances internet-accessible — violates the 'private subnet' security architecture and requires security group hardening that could be misconfigured",
+      "D": "Transfer Acceleration adds a per-GB charge on TOP of normal transfer — it speeds up long-distance uploads but makes S3 access MORE expensive, not less"
+    }
+  },
+  {
+    "id": "L8-002",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "hard",
+    "trap_fact": "Cross-AZ data transfer costs ~$0.01/GB each way — chatty multi-AZ adds up",
+    "constraint_terms": [
+      "reduce cross-AZ costs",
+      "microservices communicating heavily",
+      "multi-AZ"
+    ],
+    "scenario": "A microservices application has 12 services distributed across 3 AZs. Services make frequent synchronous calls to each other — approximately 50TB of inter-service traffic per month. The data transfer bill shows $1,000/month in cross-AZ charges (traffic crossing AZ boundaries at $0.01/GB each direction).",
+    "question": "Which architectural change reduces cross-AZ data transfer costs while maintaining multi-AZ resilience?",
+    "options": {
+      "A": "Collapse all services into a single AZ to eliminate cross-AZ traffic entirely",
+      "B": "Switch all synchronous calls to asynchronous SQS messaging to avoid direct cross-AZ communication",
+      "C": "Deploy VPC peering between AZs to get free inter-AZ data transfer",
+      "D": "Use AZ-aware service discovery so services prefer calling instances in their OWN AZ first (AZ-affinity routing) — only cross-AZ when local instance is unavailable"
+    },
+    "answer": "D",
+    "reasoning": "AZ-affinity routing (same-AZ first preference) keeps MOST traffic within the same AZ ($0/GB intra-AZ) while maintaining multi-AZ resilience for failover. Services in AZ-A prefer calling AZ-A peers. If AZ-A peer is down, they fall back to AZ-B. AWS supports this natively via: ECS Service Connect with AZ affinity, App Mesh with locality-based routing, or ALB with cross-zone load balancing DISABLED so traffic stays local. Result: 70-90% of traffic stays intra-AZ (free), only failover/overflow crosses AZs. Collapsing to 1 AZ (B) destroys HA.",
+    "eliminated": {
+      "A": "Single AZ eliminates cross-AZ cost but destroys high availability — if that AZ fails, the entire application goes down. Never trade resilience for cost optimization at the availability layer",
+      "B": "Switching to SQS doesn't eliminate cross-AZ traffic — SQS itself is a Regional service and messages still traverse AZs. Plus, it changes the application architecture from synchronous to asynchronous (major refactor with different behavior)",
+      "C": "VPC peering is for inter-VPC communication — you don't peer AZs within the same VPC, they're already connected. Cross-AZ data transfer costs apply regardless of the routing mechanism used within a VPC"
+    }
+  },
+  {
+    "id": "L8-003",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "moderate",
+    "trap_fact": "CloudFront data transfer from origin is cheaper than direct internet egress from EC2/S3",
+    "constraint_terms": [
+      "high data egress",
+      "reduce transfer costs",
+      "global users"
+    ],
+    "scenario": "A company serves 100TB per month of video content from S3 directly to global users. The standard S3 data egress rate is approximately $0.09/GB, resulting in a $9,000/month data transfer bill. The architect looks for ways to reduce egress costs.",
+    "question": "Which architecture reduces the data transfer cost?",
+    "options": {
+      "A": "Enable S3 Requester Pays to pass the cost to end users",
+      "B": "Compress all videos to reduce their file size and therefore egress volume",
+      "C": "Move the S3 bucket to a cheaper Region with lower data transfer rates",
+      "D": "Serve content through CloudFront — CloudFront's data transfer pricing is lower than direct S3 egress, AND cached content reduces origin fetches"
+    },
+    "answer": "D",
+    "reasoning": "CloudFront's per-GB data transfer price is LOWER than S3/EC2 direct egress ($0.085/GB vs $0.09/GB at volume). But the real savings come from CACHING: popular content served from cache means the S3 origin is hit ONCE, then CloudFront serves it thousands of times without re-fetching. If cache hit ratio is 80%, origin transfer drops by 80%. Combined: cheaper per-GB rate + massive reduction in origin fetches = significant cost reduction. AWS explicitly positions CloudFront as a cost optimization tool for high-egress workloads.",
+    "eliminated": {
+      "C": "S3 data egress pricing is largely the same across most commercial Regions — there's no significantly 'cheaper Region' for egress. Moving the bucket also doesn't reduce the volume of data transferred to users",
+      "A": "Requester Pays means the downloader's AWS account pays — this only works for S3 API access by other AWS accounts, not for end users downloading via browsers. End users accessing via HTTPS don't have AWS accounts to charge",
+      "B": "Video files are already compressed (H.264, H.265, VP9 are compressed codecs) — further compression either degrades quality or provides minimal size reduction. Good practice but won't achieve the 50%+ savings that CloudFront caching provides"
+    }
+  },
+  {
+    "id": "L8-004",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "hard",
+    "trap_fact": "S3 retrieval fees make IA classes more expensive than Standard for frequently accessed data",
+    "constraint_terms": [
+      "frequent access",
+      "chose wrong storage class",
+      "unexpected high costs"
+    ],
+    "scenario": "A team moved 5TB of log data to S3 Standard-IA expecting savings because logs are 'old.' However, their monitoring dashboard queries these logs 50 times per day. The monthly bill INCREASED compared to Standard because retrieval fees ($0.01/GB per retrieval) now dominate. 5TB × 50 retrievals × $0.01 = $2,500/month in retrieval alone.",
+    "question": "What should the team do to reduce costs given the actual access pattern?",
+    "options": {
+      "A": "Move to Intelligent-Tiering — if access is frequent, IT will keep data in the frequent-access tier (equivalent to Standard pricing) with no retrieval fees",
+      "B": "Move to S3 One Zone-IA for the lowest per-GB rate among IA classes",
+      "C": "Move data back to S3 Standard — for frequently-accessed data, Standard's lack of retrieval fees makes it CHEAPER overall despite higher per-GB storage rate",
+      "D": "Configure a lifecycle rule to move to Glacier after 30 days to reduce storage costs"
+    },
+    "answer": "A",
+    "reasoning": "Intelligent-Tiering is BEST here because access patterns might change again. If logs are queried frequently NOW (monitoring), IT keeps them in frequent-access tier (same price as Standard, no retrieval fees). If querying stops later, IT automatically moves them to infrequent tier (same price as IA, no retrieval fees either!). Standard (A) is also correct for current state but if access drops later, you stay paying Standard rates. IT adapts in both directions. The monitoring fee is ~$0.0025/1000 objects — negligible. For 5TB that might flip between frequent/infrequent, IT is optimal.",
+    "eliminated": {
+      "C": "Standard works for the current high-access pattern but doesn't help if access frequency drops in the future — you'd need to manually re-evaluate and transition. Intelligent-Tiering handles BOTH directions automatically",
+      "B": "One Zone-IA still has retrieval fees ($0.01/GB) — the SAME problem. Lower storage rate doesn't offset 50 retrievals/day. Also risks data loss if the single AZ fails",
+      "D": "Glacier has HIGHER retrieval fees and minutes-to-hours retrieval latency — this would make the monitoring dashboard unusable. Moving frequently-accessed data to Glacier is the opposite of cost optimization here"
+    }
+  },
+  {
+    "id": "L8-005",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "moderate",
+    "trap_fact": "Reserved Instance — use it or lose it, committed cost regardless of usage",
+    "constraint_terms": [
+      "variable workload",
+      "right-sizing",
+      "reduce waste"
+    ],
+    "scenario": "A company purchased 20 Reserved Instances (m5.2xlarge) for 1 year. Six months in, utilization reports show: 12 instances at 80-100% utilization, 5 instances at 20-30% utilization, and 3 instances completely unused. The team is locked into the RI commitment for 6 more months.",
+    "question": "What can the team do NOW to reduce waste for the remaining term?",
+    "options": {
+      "A": "Contact AWS Support to cancel the unused Reserved Instances for a full refund",
+      "B": "Sell the 3 unused Reserved Instances on the EC2 Reserved Instance Marketplace AND right-size the 5 underutilized instances to a smaller type (RI size flexibility covers this)",
+      "C": "Terminate the unused instances — the RI charges automatically stop when instances are terminated",
+      "D": "Convert all 20 RIs to Convertible RIs so they can be exchanged for different instance types"
+    },
+    "answer": "B",
+    "reasoning": "Two actions: (1) RI Marketplace lets you SELL (re-sell) unused commitments to other AWS customers — you recover partial cost for the remaining term of those 3 unused RIs. (2) EC2 instance size flexibility (for Regional/Linux RIs) means a m5.2xlarge RI can cover 2× m5.xlarge or 4× m5.large — right-sizing underutilized instances to smaller types within the same family still uses the RI benefit. You cannot cancel RIs for refund. Cannot convert Standard to Convertible. RI charges continue whether instances run or not (it's a billing discount, not a resource).",
+    "eliminated": {
+      "C": "RI is a BILLING commitment — charges continue for the full term regardless of whether you run matching instances. Terminating the instance means you pay the RI AND get nothing for it. The discount applies automatically to any matching running instance in the account",
+      "D": "Standard RIs CANNOT be converted to Convertible RIs — this is a one-way classification made at purchase time. Convertible RIs can be exchanged but Standard cannot become Convertible",
+      "A": "AWS does NOT provide refunds for Reserved Instances — they are a contractual commitment. The ONLY option for Standard RIs you don't need is to sell them on the RI Marketplace"
+    }
+  },
+  {
+    "id": "L8-006",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "moderate",
+    "trap_fact": "Interface VPC endpoint charges hourly + per GB — can be expensive at scale",
+    "constraint_terms": [
+      "private access",
+      "cost comparison",
+      "many services"
+    ],
+    "scenario": "A company uses interface VPC endpoints for private access to 15 different AWS services. Each endpoint is deployed in 3 AZs ($0.01/AZ/hour per endpoint). The monthly endpoint cost alone is: 15 endpoints × 3 AZs × $0.01 × 720 hours = $324/month. Data processing charges add another $200/month. The architect must justify whether this $524/month cost is appropriate.",
+    "question": "When is the interface endpoint cost justified versus other approaches?",
+    "options": {
+      "A": "Interface endpoints are never justified — always use NAT gateway for all AWS service access from private subnets",
+      "B": "Replace all interface endpoints with gateway endpoints since gateway endpoints are free for all AWS services",
+      "C": "Interface endpoints are justified when: (1) compliance requires no internet traffic path even through NAT, or (2) the alternative NAT gateway cost would be higher ($0.045/GB processing is 4.5× endpoint's $0.01/GB), or (3) security requires VPC-level network isolation",
+      "D": "Deploy all 15 endpoints in a single AZ to reduce costs by 66% with no availability impact"
+    },
+    "answer": "C",
+    "reasoning": "Interface endpoints cost money but provide: (1) traffic NEVER leaves AWS private network (compliance), (2) lower per-GB rate than NAT ($0.01 vs $0.045), (3) security — restrict S3/service access to specific VPC via endpoint policies. If you'd otherwise route 20TB/month through NAT gateway ($900/month in processing alone), interface endpoints at $524 are cheaper. For services with low traffic but strict compliance requirements, the $324 hourly baseline is the cost of compliance. The decision is always: compare endpoint cost vs NAT cost vs compliance requirement.",
+    "eliminated": {
+      "A": "NAT gateway at $0.045/GB is 4.5× more expensive per GB than interface endpoint at $0.01/GB — for high-traffic services, NAT is far more expensive. NAT also introduces a single point of failure. Blanket 'never use endpoints' is wrong",
+      "D": "Single-AZ endpoints mean if that AZ fails, ALL private connectivity to those 15 services is lost — the application can't reach any AWS service privately. The $216 savings is not worth losing HA for critical service connectivity",
+      "B": "Gateway endpoints are FREE but only support S3 and DynamoDB — the other 13 services (SQS, KMS, EC2 API, CloudWatch, etc.) REQUIRE interface endpoints for private access. Gateway endpoints can't replace them"
+    }
+  },
+  {
+    "id": "L8-007",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "hard",
+    "trap_fact": "Intelligent-Tiering monitoring fee per object — millions of tiny objects adds up",
+    "constraint_terms": [
+      "millions of small objects",
+      "automated tiering",
+      "unexpected monitoring cost"
+    ],
+    "scenario": "A company stores 500 million objects averaging 1KB each (total ~500GB) in S3 Intelligent-Tiering. They expected cost savings from automatic tiering. Instead, the monitoring fee alone is: 500M objects × $0.0025/1000 = $1,250/month — more than the $12/month storage would cost in S3 Standard. The monitoring fee exceeds the storage cost by 100×.",
+    "question": "What is the correct storage strategy for this dataset?",
+    "options": {
+      "A": "Switch to S3 Express One Zone for lowest per-request cost on small objects",
+      "B": "Consolidate the 500M objects into larger files to reduce the object count and monitoring fees",
+      "C": "Enable the Intelligent-Tiering Archive tier to offset the monitoring cost with deeper tiering savings",
+      "D": "Use S3 Standard (or IA with lifecycle rules) — Intelligent-Tiering's per-object monitoring fee makes it COST-PROHIBITIVE for many tiny objects. Use lifecycle rules for predictable patterns instead."
+    },
+    "answer": "D",
+    "reasoning": "Intelligent-Tiering's monitoring fee is PER OBJECT, not per GB. With 500M tiny (1KB) objects: total storage is only 500GB but monitoring fee is $1,250/month. S3 Standard for 500GB = ~$12/month. Even IA = ~$6.25/month. The monitoring fee is 100× the storage cost — a catastrophic mismatch. IT is designed for larger objects where the storage cost per-object justifies the monitoring fee. Rule of thumb: if the object is smaller than ~128KB, the monitoring fee per-object often exceeds the per-object storage savings from tiering. Use lifecycle rules for predictable patterns.",
+    "eliminated": {
+      "C": "Archive tier saves on storage cost but the monitoring fee applies to ALL objects regardless of tier — it doesn't decrease with deeper tiering. $1,250/month monitoring fee remains unchanged",
+      "B": "Object consolidation is a valid approach (merge 1KB objects into larger files) but requires application changes, impacts access patterns, and may not be feasible depending on how objects are queried individually. It's a redesign, not a storage class change",
+      "A": "S3 Express One Zone is for low-latency access to frequently-used small objects — it's MORE expensive per-GB than Standard. It doesn't solve the cost problem; it solves a latency problem"
+    }
+  },
+  {
+    "id": "L8-008",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "moderate",
+    "trap_fact": "Compute Savings Plans cover EC2 + Fargate + Lambda — broadest commitment discount",
+    "constraint_terms": [
+      "commit to spend",
+      "multiple compute types",
+      "maximum discount"
+    ],
+    "scenario": "A company spends $10,000/month on compute: $6,000 on EC2 (various families across Regions), $2,500 on Fargate containers, and $1,500 on Lambda functions. They want to commit for 1 year to reduce costs. Their workload mix shifts between EC2 and Fargate as they modernize.",
+    "question": "Which Savings Plan covers all three compute types as the mix evolves?",
+    "options": {
+      "A": "Savings Plans for each service separately — EC2 SP for instances, a separate Fargate SP, and a Lambda SP",
+      "B": "Three separate Reserved Instance commitments — one for each compute type for maximum discount per service",
+      "C": "Compute Savings Plans — applies to EC2, Fargate, AND Lambda regardless of instance type, Region, or OS with ~66% discount on 1-year all-upfront",
+      "D": "EC2 Instance Savings Plans — highest discount rate applicable to all EC2, Fargate, and Lambda"
+    },
+    "answer": "C",
+    "reasoning": "Compute Savings Plans are the BROADEST commitment: they apply to EC2 (any instance family, any Region, any size, any OS, any tenancy), Fargate, AND Lambda. As the company shifts workloads from EC2 to Fargate, the commitment still applies — the savings follow wherever compute runs. EC2 Instance Savings Plans (B) only cover EC2 (locked to one family+Region). There are no separate Fargate or Lambda Savings Plans. The discount is slightly less than EC2 SP (~66% vs ~72%) but the flexibility across compute types is what's needed here.",
+    "eliminated": {
+      "D": "EC2 Instance Savings Plans provide the highest discount but ONLY apply to EC2 in a specific instance family AND Region — they don't cover Fargate or Lambda. As workloads shift to Fargate, that portion loses discount",
+      "B": "Reserved Instances exist only for EC2 (and RDS/ElastiCache/Redshift, not Fargate/Lambda). There's no RI concept for Fargate or Lambda workloads. You can't buy 'Fargate Reserved Instances'",
+      "A": "There are no service-specific Savings Plans for Fargate or Lambda — only Compute SP (covers all) and EC2 Instance SP (covers EC2 only). This option describes plans that don't exist"
+    }
+  },
+  {
+    "id": "L8-009",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "hard",
+    "trap_fact": "Data transfer between AZs, Regions, and internet all have different pricing — architecture decisions affect cost",
+    "constraint_terms": [
+      "minimize total data transfer cost",
+      "multi-tier architecture"
+    ],
+    "scenario": "A three-tier application has: web tier (public subnets) → app tier (private subnets) → database tier (private subnets). Architecture A puts each tier in a different AZ for 'resilience.' Architecture B co-locates tiers that communicate heavily within the same AZ with cross-AZ replicas for HA. Traffic between app and DB tier is 20TB/month.",
+    "question": "What is the cost difference between these architectures for the app-to-DB communication?",
+    "options": {
+      "A": "Architecture A costs more but only $20/month ($0.001/GB for intra-VPC traffic)",
+      "B": "Architecture A (cross-AZ app→DB) costs $400/month ($0.01/GB × 20TB × 2 directions). Architecture B (same-AZ primary) costs ~$0/month for primary path. $400/month savings.",
+      "C": "Architecture B is more expensive because same-AZ placement requires larger instances",
+      "D": "No cost difference — intra-VPC traffic is free regardless of AZ placement"
+    },
+    "answer": "B",
+    "reasoning": "Cross-AZ data transfer within the same Region costs $0.01/GB in EACH direction. App calling DB (request + response) = $0.02/GB round-trip effective cost. For 20TB/month of app↔DB traffic: ~$400/month. Same-AZ communication is FREE. Architecture B keeps the chatty app↔DB path within the same AZ (free) while using cross-AZ REPLICATION for HA (lower traffic volume). This is the correct pattern: co-locate chatty tiers, replicate for resilience on a separate lower-volume path. The exam loves testing whether candidates understand that 'multi-AZ everything' has a cost.",
+    "eliminated": {
+      "D": "Intra-VPC traffic is NOT free when it crosses AZ boundaries — $0.01/GB per direction applies for any cross-AZ traffic within the same VPC. Only INTRA-AZ traffic within the same VPC is free",
+      "A": "The rate is $0.01/GB (1 cent), not $0.001/GB (0.1 cent). For 20TB = 20,000 GB × $0.01 × 2 directions = $400/month. This is significant and should influence architecture decisions",
+      "C": "Same-AZ placement doesn't require larger instances — the application architecture is the same, just the network topology is optimized. Instance sizing is based on compute needs, not AZ placement"
+    }
+  },
+  {
+    "id": "L8-010",
+    "layer": 8,
+    "category": "cost",
+    "difficulty": "moderate",
+    "trap_fact": "AWS Cost Explorer and Trusted Advisor identify unused/underutilized resources",
+    "constraint_terms": [
+      "identify waste",
+      "cost visibility",
+      "optimization recommendations"
+    ],
+    "scenario": "A company suspects they're wasting money on unused resources across 20 AWS accounts but has no visibility into what's idle. They need to identify: unattached EBS volumes, idle EC2 instances, unused Elastic IPs, and underutilized RDS instances.",
+    "question": "Which combination of tools provides this waste identification?",
+    "options": {
+      "A": "AWS Trusted Advisor (checks for idle resources) + AWS Cost Explorer (right-sizing recommendations) + AWS Compute Optimizer (instance type recommendations based on utilization)",
+      "B": "AWS Organizations consolidated billing report with per-account breakdowns",
+      "C": "CloudWatch dashboards showing utilization metrics across all accounts",
+      "D": "AWS Budgets with alerts when spending exceeds thresholds"
+    },
+    "answer": "A",
+    "reasoning": "Three tools form the cost optimization observability stack: (1) Trusted Advisor checks identify specific waste: unattached EBS volumes, low-utilization EC2, idle load balancers, unused EIPs — with specific resource IDs to act on. (2) Cost Explorer's right-sizing recommendations analyze 14 days of CloudWatch metrics to suggest smaller instance types. (3) Compute Optimizer uses ML on utilization data to recommend optimal instance families/sizes. Together they answer: 'what's wasted?' + 'what should be smaller?' + 'what's the optimal configuration?'",
+    "eliminated": {
+      "D": "AWS Budgets alerts when you EXCEED a spending threshold — it doesn't identify WHICH specific resources are idle or underutilized. It tells you 'you're spending too much' but not 'this specific EBS volume is unused'",
+      "C": "CloudWatch has the raw metrics but doesn't automatically identify waste — you'd need to build custom dashboards and interpret utilization yourself. Trusted Advisor and Compute Optimizer do this analysis FOR you",
+      "B": "Consolidated billing shows total spend per account but doesn't identify specific idle resources — knowing Account X spends $5,000 doesn't tell you which EC2 instances are idle within that account"
+    }
+  }
+]

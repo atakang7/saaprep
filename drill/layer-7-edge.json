@@ -1,0 +1,221 @@
+[
+  {
+    "id": "L7-001",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "moderate",
+    "trap_fact": "CloudFront caches HTTP/HTTPS content — not for TCP/UDP gaming or non-HTTP protocols",
+    "constraint_terms": [
+      "global users",
+      "static content",
+      "reduce latency",
+      "cache at edge"
+    ],
+    "scenario": "A company serves a web application with large JavaScript bundles (5MB), images, and CSS files to users across 40 countries. Origin servers are in us-east-1. Users in Asia and Africa experience 3-5 second page load times due to geographic distance from the origin.",
+    "question": "Which service reduces latency for these static assets globally?",
+    "options": {
+      "A": "AWS Global Accelerator — routes traffic over the AWS backbone to the nearest Regional endpoint",
+      "B": "Enable S3 Transfer Acceleration for the origin bucket",
+      "C": "Deploy the application in multiple Regions with Route 53 latency-based routing",
+      "D": "Amazon CloudFront — caches static content at 400+ edge locations worldwide, serving subsequent requests from the nearest edge without reaching the origin"
+    },
+    "answer": "D",
+    "reasoning": "CloudFront is a CDN (Content Delivery Network) — it CACHES content at edge locations close to users. First request fetches from origin; subsequent requests serve from cache (milliseconds, no origin round-trip). For static assets (JS, CSS, images) that rarely change, cache hit rates are very high. Global Accelerator (B) speeds the PATH but doesn't CACHE — every request still hits the origin server. Multi-Region (C) works but is much more expensive and complex. Transfer Acceleration (D) speeds S3 downloads but without caching, every request still hits origin.",
+    "eliminated": {
+      "A": "Global Accelerator provides stable anycast IPs and routes over AWS backbone, but does NOT cache content — every request still travels to the origin. It reduces latency but doesn't eliminate origin round-trips for cacheable content",
+      "C": "Multi-Region deployment puts the application closer to users but requires running full infrastructure in multiple Regions (expensive) and adds data synchronization complexity. CloudFront achieves the same latency benefit for static content at a fraction of the cost",
+      "B": "Transfer Acceleration speeds individual S3 downloads via edge network but without caching — each user still downloads from origin (just via a faster path). CloudFront caches so only the first user pays the origin download"
+    }
+  },
+  {
+    "id": "L7-002",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "hard",
+    "trap_fact": "Global Accelerator — no caching, provides 2 static anycast IPs, for TCP/UDP applications",
+    "constraint_terms": [
+      "static IP required",
+      "TCP application",
+      "global performance",
+      "non-HTTP"
+    ],
+    "scenario": "A gaming company operates a real-time multiplayer game using custom TCP protocol on ports 7000-8000. Players worldwide experience packet loss and high jitter over the public internet. The company needs: (1) stable static IP addresses for DNS configuration and firewall whitelisting, (2) improved network performance globally, (3) automatic failover between Regions if one becomes unhealthy.",
+    "question": "Which service provides static IPs with global network optimization for this TCP application?",
+    "options": {
+      "A": "AWS Direct Connect from each major player market to the closest AWS Region",
+      "B": "AWS Global Accelerator — provides 2 static anycast IPs, routes TCP/UDP traffic over AWS backbone to the nearest healthy Regional endpoint with automatic failover",
+      "C": "Amazon CloudFront with custom TCP origin — caches game state at edge locations for faster response",
+      "D": "Network Load Balancer with Elastic IPs in each Region, using Route 53 latency-based routing"
+    },
+    "answer": "B",
+    "reasoning": "Global Accelerator gives you 2 STATIC ANYCAST IPs (same IPs worldwide) that automatically route players to the nearest healthy AWS Regional endpoint via AWS's backbone (bypassing congested public internet). It supports TCP and UDP on any port. Static IPs = easy DNS/firewall config. Anycast = player connects to nearest edge automatically. Backbone routing = lower jitter/packet loss than public internet. Health checks = automatic Regional failover. CloudFront (B) is HTTP/HTTPS only with caching — doesn't support custom TCP gaming protocols. NLB+Route53 (C) works but no backbone optimization between player and Region.",
+    "eliminated": {
+      "C": "CloudFront processes HTTP/HTTPS only — it cannot proxy or cache custom TCP protocols on arbitrary ports. Gaming applications using custom binary protocols over TCP/UDP are outside CloudFront's scope",
+      "D": "NLB with Route 53 provides the endpoint but traffic still traverses the PUBLIC internet from player to Region — this doesn't solve the packet loss and jitter problem. Global Accelerator intercepts at the edge and uses AWS backbone",
+      "A": "Direct Connect requires physical connections at specific locations — you can't have Direct Connect from millions of players' homes. DC is for site-to-site (datacenter to AWS), not end-user to AWS"
+    }
+  },
+  {
+    "id": "L7-003",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "moderate",
+    "trap_fact": "CloudFront origin can be S3, ALB, custom HTTP — NOT NLB directly",
+    "constraint_terms": [
+      "CloudFront",
+      "origin configuration",
+      "dynamic content from API"
+    ],
+    "scenario": "A company uses CloudFront to serve both static assets (from S3 bucket origin) and dynamic API responses (from their application). The application runs on EC2 instances behind a load balancer. The team needs to configure CloudFront with a second origin for the API path /api/*.",
+    "question": "Which load balancer type can serve as a CloudFront custom origin for the API?",
+    "options": {
+      "A": "Any load balancer type works as a CloudFront origin without configuration differences",
+      "B": "Network Load Balancer (NLB) — for lowest latency between CloudFront and the application",
+      "C": "Application Load Balancer (ALB) — CloudFront supports ALB as a custom origin with HTTP/HTTPS protocol",
+      "D": "Classic Load Balancer only — CloudFront requires the original AWS load balancer type"
+    },
+    "answer": "C",
+    "reasoning": "CloudFront origins MUST speak HTTP/HTTPS. ALB naturally serves HTTP/HTTPS — it's the standard CloudFront origin for dynamic content. NLB operates at Layer 4 (TCP/UDP) — while it CAN pass through HTTP traffic (to TCP targets), CloudFront specifically lists ALB (and custom HTTP endpoints) as supported origins. NLB can technically work as a custom origin (since it has a DNS name serving HTTP), but ALB is the intended and documented pattern. The exam always pairs CloudFront with ALB for application origins, never NLB.",
+    "eliminated": {
+      "B": "NLB is Layer 4 (TCP) — while HTTP traffic CAN pass through NLB, CloudFront's integration is designed around HTTP/HTTPS-speaking origins. ALB provides HTTP-level features (host-based routing, path routing) that complement CloudFront's behavior caching",
+      "D": "Classic Load Balancers are deprecated — while they can serve as origins, they're not recommended for new architectures. The 'only' qualifier makes this wrong since ALB is the primary supported origin type",
+      "A": "Load balancer types have different characteristics as origins — ALB provides HTTP-level health checks, header forwarding, and routing that intregrate cleanly with CloudFront. Not all types are equivalent"
+    }
+  },
+  {
+    "id": "L7-004",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "hard",
+    "trap_fact": "CloudFront signed URLs/cookies restrict access to paid/private content",
+    "constraint_terms": [
+      "paid subscribers only",
+      "restrict content access",
+      "time-limited access"
+    ],
+    "scenario": "A video streaming platform stores premium content in S3, served through CloudFront. Only paid subscribers should access the content. URLs must expire after 24 hours so shared links stop working. The platform has millions of videos and thousands of concurrent subscribers.",
+    "question": "Which CloudFront feature controls access to premium content?",
+    "options": {
+      "A": "S3 pre-signed URLs that bypass CloudFront — generate directly from the application for each video request",
+      "B": "CloudFront signed cookies — authenticate the user's subscription, generate a signed cookie granting access to all premium paths for 24 hours",
+      "C": "CloudFront signed URLs — generate a unique signed URL per video per user with 24-hour expiration",
+      "D": "CloudFront Origin Access Control with S3 bucket policy restricting access by IP address"
+    },
+    "answer": "B",
+    "reasoning": "Signed COOKIES vs signed URLS: Use signed cookies when granting access to MULTIPLE files (an entire path like /premium/*) because one cookie covers ALL resources under that path. Use signed URLs when restricting access to INDIVIDUAL specific files. With millions of videos and continuing access over 24 hours, generating a per-video signed URL for every request is impractical. One signed cookie = access to all premium content for the session. S3 pre-signed URLs (C) bypass CloudFront's caching (every request hits S3 origin). OAC (D) restricts CloudFront→S3 path, not user→CloudFront access.",
+    "eliminated": {
+      "C": "Signed URLs work but are per-object — a subscriber browsing thousands of videos would need a new signed URL generated for EACH video click. With millions of videos, this creates enormous application-side URL generation overhead. Cookies are one-time grant for the path",
+      "A": "S3 pre-signed URLs bypass CloudFront entirely — each request goes directly to S3, losing all CDN benefits (caching, edge delivery, reduced latency). Also adds S3 request costs vs serving from CloudFront cache",
+      "D": "Origin Access Control restricts S3 to only allow requests from CloudFront (prevents direct S3 access) — it doesn't control which END USERS can access the content through CloudFront. It's an origin lock, not a user access control"
+    }
+  },
+  {
+    "id": "L7-005",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "moderate",
+    "trap_fact": "Route 53 latency routing picks Region with lowest measured latency from resolver's perspective",
+    "constraint_terms": [
+      "multi-Region application",
+      "route users to nearest Region",
+      "lowest latency"
+    ],
+    "scenario": "A company runs the same application in us-east-1, eu-west-1, and ap-southeast-1. Each Region has its own ALB and full application stack. Users should be automatically routed to the Region that provides the lowest latency for their location.",
+    "question": "Which Route 53 routing policy directs users to the lowest-latency Region?",
+    "options": {
+      "A": "Weighted routing policy with equal weights across all three Regions",
+      "B": "Geolocation routing policy — route users to the geographically closest Region",
+      "C": "Geoproximity routing policy with default bias — route based on physical distance to the Region",
+      "D": "Latency-based routing policy — Route 53 resolves to the Region with the lowest measured network latency from the user's DNS resolver location"
+    },
+    "answer": "D",
+    "reasoning": "Latency-based routing uses AWS's MEASURED network latency data (continuously collected) to determine which Region responds fastest to each DNS resolver location. This is actual network performance, not geographic assumption. Geolocation (B) routes based on the user's COUNTRY/CONTINENT — a user in Turkey might be geographically close to EU but have lower latency to a Region via different network paths. Geoproximity (C) uses physical distance (can be biased). Weighted (D) distributes traffic by percentage across all Regions regardless of user location.",
+    "eliminated": {
+      "B": "Geolocation routing maps users by GEOGRAPHIC location (country/continent) to specific endpoints — it doesn't measure actual latency. Useful for compliance (EU users → EU Region) but not optimal for pure performance routing",
+      "C": "Geoproximity uses approximate physical distance which doesn't perfectly correlate with network latency — underwater cable routes, ISP peering, and network topology mean the nearest physical location isn't always the lowest-latency one",
+      "A": "Weighted routing distributes a PERCENTAGE of traffic to each endpoint (33/33/33) regardless of where users are — a user in Tokyo might be sent to us-east-1. This is for gradual migration/testing, not performance optimization"
+    }
+  },
+  {
+    "id": "L7-006",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "hard",
+    "trap_fact": "CloudFront Origin Access Control (OAC) replaces OAI — restricts S3 access to only CloudFront",
+    "constraint_terms": [
+      "S3 static website",
+      "prevent direct S3 access",
+      "only via CloudFront"
+    ],
+    "scenario": "A company hosts a static website on S3 and serves it through CloudFront. Security requires that users CANNOT access S3 directly — all requests must go through CloudFront (for WAF protection, signed URLs, and geographic restrictions). Currently, the S3 bucket URL is publicly accessible.",
+    "question": "Which configuration restricts the S3 bucket to only allow access from CloudFront?",
+    "options": {
+      "A": "Remove S3 Static Website Hosting and use the S3 REST API endpoint as the origin with OAC",
+      "B": "Enable S3 Block Public Access — this automatically restricts access to only authenticated CloudFront requests",
+      "C": "Configure CloudFront Origin Access Control (OAC) and update the S3 bucket policy to allow only the CloudFront distribution's service principal",
+      "D": "Add a bucket policy that denies all access except from CloudFront's IP ranges using aws:SourceIp"
+    },
+    "answer": "C",
+    "reasoning": "Origin Access Control (OAC) is the current mechanism (replacing the legacy Origin Access Identity/OAI). It creates a way for CloudFront to authenticate to S3 using the distribution's service principal. The S3 bucket policy is updated to: (1) allow s3:GetObject from the CloudFront service principal, (2) deny all other access. This means: direct S3 URL → denied. CloudFront distribution → allowed (CloudFront signs the request with its identity). OAC supports all S3 features including KMS-encrypted objects (which OAI didn't support). Note: S3 website endpoint with OAC works differently from REST endpoint.",
+    "eliminated": {
+      "A": "This is partially correct (REST endpoint is preferred with OAC) but the key action is configuring OAC itself + the bucket policy. Removing static website hosting alone doesn't prevent direct access — you still need OAC as the enforcement mechanism",
+      "D": "CloudFront uses a LARGE and changing set of IP addresses — maintaining a bucket policy based on IP ranges requires constant updates and is unreliable. The aws:SourceIp approach is fragile. OAC uses identity-based authentication, not IP-based",
+      "B": "S3 Block Public Access prevents anonymous/public access but ALSO blocks CloudFront if the bucket policy doesn't specifically allow the CloudFront principal. Block Public Access alone doesn't create the allow-CloudFront mechanism — OAC does"
+    }
+  },
+  {
+    "id": "L7-007",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "moderate",
+    "trap_fact": "Global Accelerator provides instant Regional failover vs Route 53's TTL-dependent failover",
+    "constraint_terms": [
+      "instant failover",
+      "no DNS caching delay",
+      "multi-Region"
+    ],
+    "scenario": "A critical financial application runs in two AWS Regions with active-passive configuration. During failover, the team discovered that Route 53 DNS-based failover left some users pointing to the failed Region for up to 60 seconds (the TTL duration). The business requires failover to be near-instant with no DNS caching delays.",
+    "question": "Which service provides near-instant failover without DNS TTL delays?",
+    "options": {
+      "A": "NLB cross-Region load balancing with automatic target health checks",
+      "B": "Route 53 with TTL set to 0 seconds — eliminates caching entirely for instant failover",
+      "C": "AWS Global Accelerator — uses anycast IPs to route at the network layer. Failover happens at the Global Accelerator edge (within seconds) without requiring clients to re-resolve DNS",
+      "D": "CloudFront with origin failover groups — automatically switches origins when primary returns errors"
+    },
+    "answer": "C",
+    "reasoning": "Global Accelerator's static anycast IPs are the SAME regardless of which Region serves traffic. Clients resolve DNS ONCE (to the static GA IPs) and never re-resolve. Failover happens at the Global Accelerator edge: when a Regional endpoint fails health checks, GA immediately routes traffic to the healthy Region — no DNS change needed, no TTL wait, no client cache staling. The client's TCP connection simply gets routed to a different backend within seconds. Route 53 TTL=0 (B) isn't honored by all resolvers. CloudFront origin failover (C) works for HTTP/CloudFront content. NLB (D) doesn't operate cross-Region.",
+    "eliminated": {
+      "B": "TTL=0 is a REQUEST to resolvers to not cache — many recursive resolvers impose a minimum TTL (some use 30s-300s regardless of what you set). You cannot guarantee all resolvers honor TTL=0. Client OS caches also apply",
+      "D": "CloudFront origin failover switches between origin servers when the primary returns 5xx — this works for CloudFront-served content but doesn't help for applications not using CloudFront, and adds the origin request latency during failover detection",
+      "A": "NLB operates within a SINGLE Region — it cannot load-balance across Regions. Cross-Region architecture requires Global Accelerator or Route 53, not NLB alone"
+    }
+  },
+  {
+    "id": "L7-008",
+    "layer": 7,
+    "category": "edge",
+    "difficulty": "hard",
+    "trap_fact": "CloudFront with WAF protects against DDoS and application attacks at the edge",
+    "constraint_terms": [
+      "DDoS protection",
+      "SQL injection",
+      "rate limiting",
+      "global"
+    ],
+    "scenario": "A company's web application experiences DDoS attacks, SQL injection attempts, and credential stuffing from global sources. They need multi-layer protection: absorb volumetric attacks, block malicious request patterns, and rate-limit by IP — all before traffic reaches the origin.",
+    "question": "Which combination provides comprehensive edge protection?",
+    "options": {
+      "A": "CloudFront + AWS WAF + AWS Shield Advanced — CloudFront absorbs volumetric DDoS, WAF rules block SQL injection and rate-limit IPs, Shield Advanced provides DDoS response team and cost protection",
+      "B": "Global Accelerator with NACLs blocking known attacker CIDR ranges",
+      "C": "ALB with security groups blocking malicious IPs identified by GuardDuty",
+      "D": "AWS Shield Standard alone — it automatically protects against all DDoS and application-layer attacks"
+    },
+    "answer": "A",
+    "reasoning": "Three-layer defense: (1) CloudFront as CDN absorbs volumetric attacks at 400+ edge locations — automatic with Shield Standard (free, included). (2) WAF attached to CloudFront inspects EVERY request for SQL injection, XSS, and custom rules (rate-limiting by IP, geo-blocking, bot detection) — blocks bad requests at the edge BEFORE they reach origin. (3) Shield Advanced adds: DDoS cost protection (you don't pay for attack traffic scale), 24/7 DDoS Response Team (DRT), and advanced detection. This is the full edge protection stack.",
+    "eliminated": {
+      "D": "Shield Standard protects against infrastructure (L3/L4) DDoS automatically but does NOT inspect application-layer (L7) traffic — it can't detect SQL injection or credential stuffing. It's free and automatic but insufficient alone",
+      "C": "ALB with security groups at the origin means attack traffic has already traversed the internet to your infrastructure — you're paying for bandwidth. Security groups can't inspect request content (no SQL injection detection). GuardDuty detects but doesn't block in real-time",
+      "B": "Global Accelerator provides network-level routing but NACLs are static IP-based rules — they can't detect SQL injection, credential stuffing, or rate-limit by request pattern. Attack sources constantly change IP addresses"
+    }
+  }
+]

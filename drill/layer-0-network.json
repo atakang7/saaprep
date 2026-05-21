@@ -1,0 +1,502 @@
+[
+  {
+    "id": "L0-001",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Route table — no route = no traffic regardless of SG/NACL",
+    "constraint_terms": [
+      "private subnet",
+      "prevent internet access"
+    ],
+    "scenario": "A company launches a database on EC2 in a subnet that has no internet gateway route. A junior administrator reports that despite configuring the security group to deny all internet traffic and adding a NACL deny rule for 0.0.0.0/0, the security audit tool still flags the instance as 'potentially internet-accessible' because the subnet is labeled public in their CMDB. The team wants to confirm the instance is truly isolated from the internet.",
+    "question": "Which factor is the definitive control that prevents this instance from communicating with the internet?",
+    "options": {
+      "A": "The security group has no inbound rules allowing internet source ranges",
+      "B": "The network ACL explicitly denies all inbound and outbound internet traffic",
+      "C": "The instance has no public IP address or Elastic IP assigned",
+      "D": "The subnet's route table has no route to an internet gateway"
+    },
+    "answer": "D",
+    "reasoning": "Route table is the DEFINITIVE control. Without a route to an IGW, packets have no path to the internet — full stop. NACLs and SGs are filters on traffic that already HAS a path. No public IP is close — but if you add one later AND a route exists, traffic flows. The route table's absence of an IGW route is the one thing that makes the subnet architecturally private regardless of any other configuration. Filters can be misconfigured; no route cannot be accidentally bypassed.",
+    "eliminated": {
+      "B": "NACLs are a filter — if someone adds an IGW route and modifies the NACL, traffic flows. The NACL is a gate, not the absence of road",
+      "A": "Security groups filter at instance level — same issue: if a route exists and SG is changed, traffic flows. Not the definitive architectural control",
+      "C": "Close but not definitive — even without a public IP, if a route to IGW exists and a public IP is later assigned, the path opens. The route is the deeper control"
+    }
+  },
+  {
+    "id": "L0-002",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "NAT gateway lives in public subnet, serves private subnet outbound",
+    "constraint_terms": [
+      "private subnet outbound internet",
+      "must not allow inbound connections",
+      "least operational overhead"
+    ],
+    "scenario": "A company runs EC2 instances in private subnets that must download security patches from third-party repositories on the internet. The instances must not be directly reachable from the internet. The company wants a managed solution with the least operational overhead.",
+    "question": "Which solution allows outbound internet access from private subnets while meeting these requirements?",
+    "options": {
+      "A": "Add a route to the internet gateway in the private subnet route table and use security groups to block inbound",
+      "B": "Create a VPC gateway endpoint for the third-party patch repositories",
+      "C": "Deploy a NAT gateway in a public subnet and route private subnet internet-bound traffic to it",
+      "D": "Deploy a NAT instance from an AMI in a public subnet with source/destination check disabled"
+    },
+    "answer": "C",
+    "reasoning": "NAT gateway is MANAGED — AWS handles scaling, patching, HA within an AZ. NAT instance is self-managed (you patch it, size it, handle failover). Both provide outbound-only internet access, but 'least operational overhead' kills the NAT instance. Gateway endpoints only work for S3/DynamoDB, not arbitrary internet hosts. Adding an IGW route makes the subnet public — the security group blocks inbound but the architecture is wrong (SG can be misconfigured).",
+    "eliminated": {
+      "D": "NAT instance works but requires you to manage the instance, patching, scaling, and failover — violates 'least operational overhead'",
+      "B": "Gateway endpoints only reach S3 and DynamoDB — third-party internet repositories are not AWS services, endpoint can't reach them",
+      "A": "Adding an IGW route to a private subnet makes it architecturally public — relying on SGs to block inbound is fragile, not a proper private subnet design"
+    }
+  },
+  {
+    "id": "L0-003",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Gateway VPC endpoint only supports S3 and DynamoDB",
+    "constraint_terms": [
+      "private access",
+      "must not traverse the public internet"
+    ],
+    "scenario": "A company runs an application on EC2 instances in private subnets. The application must send messages to an Amazon SQS queue. Company policy requires that traffic between the application and SQS must not traverse the public internet.",
+    "question": "Which solution meets this requirement?",
+    "options": {
+      "A": "Create a gateway VPC endpoint for SQS and update the route table",
+      "B": "Create a VPC peering connection to the SQS service VPC",
+      "C": "Configure a NAT gateway and route SQS traffic through it",
+      "D": "Create an interface VPC endpoint for SQS in the private subnets"
+    },
+    "answer": "D",
+    "reasoning": "Gateway endpoints only exist for two services: S3 and DynamoDB. Everything else — SQS, KMS, Secrets Manager, Systems Manager, all other AWS APIs — requires an interface endpoint (PrivateLink). Interface endpoints create an ENI in your subnet with a private IP, so traffic stays entirely on the AWS network without touching the internet. This is the most common gateway-vs-interface trap: people remember 'VPC endpoint' and forget which TYPE applies to which service.",
+    "eliminated": {
+      "A": "Gateway endpoints only support S3 and DynamoDB — SQS is not supported, this option doesn't exist",
+      "C": "NAT gateway routes traffic OUT to the internet and back — violates 'must not traverse the public internet'",
+      "B": "You cannot peer with AWS service VPCs — SQS is not a customer VPC, VPC peering is between VPCs you control"
+    }
+  },
+  {
+    "id": "L0-004",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "NAT gateway charges per hour AND per GB processed",
+    "constraint_terms": [
+      "reduce cost",
+      "private access to S3"
+    ],
+    "scenario": "A company's application in private subnets transfers 5 TB of data daily to Amazon S3. The traffic currently routes through a NAT gateway. The company's monthly AWS bill shows significant NAT gateway data processing charges. A solutions architect needs to reduce these costs while maintaining private network access to S3.",
+    "question": "Which solution reduces cost while keeping S3 traffic private?",
+    "options": {
+      "A": "Increase the NAT gateway size to handle traffic more efficiently",
+      "B": "Create an interface VPC endpoint for S3 in each Availability Zone",
+      "C": "Create an S3 gateway VPC endpoint and update the private subnet route tables",
+      "D": "Move the EC2 instances to public subnets with Elastic IP addresses"
+    },
+    "answer": "C",
+    "reasoning": "S3 gateway endpoints are FREE — no hourly charge, no data processing charge. They add a route table entry that directs S3-bound traffic through the endpoint instead of the NAT gateway. This eliminates the NAT data processing cost ($0.045/GB × 5TB/day = ~$225/day gone). The traffic never touches the internet — it stays on the AWS network backbone. Interface endpoints for S3 also work but COST money (hourly + per-GB), which defeats the purpose when the gateway option is available and free.",
+    "eliminated": {
+      "A": "NAT gateway doesn't have a 'size' — it scales automatically, and the per-GB charge remains regardless",
+      "B": "Interface endpoints for S3 have hourly and data processing charges — cheaper than NAT but not free like gateway endpoints",
+      "D": "Public subnets with Elastic IPs expose instances to internet and don't reduce transfer cost — the problem gets worse"
+    }
+  },
+  {
+    "id": "L0-005",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Security groups have no deny rules, allow only",
+    "constraint_terms": [
+      "block specific IP range"
+    ],
+    "scenario": "A company's web application running on EC2 instances behind an Application Load Balancer is receiving malicious requests from a known IP address range (203.0.113.0/24). The security team needs to immediately block all traffic from this range at the network level before it reaches the instances.",
+    "question": "Which action blocks traffic from the malicious IP range?",
+    "options": {
+      "A": "Remove the allow rule for 203.0.113.0/24 from the security group attached to the instances",
+      "B": "Add a deny rule to the security group attached to the EC2 instances",
+      "C": "Update the route table to route 203.0.113.0/24 to a black hole",
+      "D": "Add a deny rule to the network ACL on the application subnets for the source CIDR 203.0.113.0/24"
+    },
+    "answer": "D",
+    "reasoning": "Security groups ONLY have allow rules — there is no such thing as a deny rule in a security group. You cannot 'block' a specific source in a SG; you can only NOT allow it. But since most web apps allow 0.0.0.0/0 on port 80/443, removing a specific IP from a security group does nothing — it's already allowed by the broader rule. NACLs are the ONLY VPC-native tool that can explicitly DENY specific traffic. They work at the subnet boundary, evaluated before security groups, and support both allow and deny rules with priority ordering.",
+    "eliminated": {
+      "A": "Security groups likely allow all HTTP inbound (0.0.0.0/0) — removing a specific range does nothing when the wildcard already includes it",
+      "B": "Security groups do not support deny rules — this option literally cannot be implemented",
+      "C": "Route tables route outbound traffic by destination, not inbound traffic by source — you can't route table-block an incoming source IP"
+    }
+  },
+  {
+    "id": "L0-006",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "NACLs are stateless — must allow return traffic",
+    "constraint_terms": [
+      "stateless",
+      "network filtering"
+    ],
+    "scenario": "A solutions architect added a network ACL rule to allow inbound HTTPS traffic (port 443) from the internet to a public subnet. Users report they still cannot access the web application. The security group on the instances correctly allows inbound port 443 and all outbound traffic.",
+    "question": "What is the most likely cause?",
+    "options": {
+      "A": "The instances do not have public IP addresses",
+      "B": "The route table is missing a route to the internet gateway",
+      "C": "The security group needs an explicit outbound rule for port 443",
+      "D": "The network ACL does not have an outbound rule allowing traffic on ephemeral ports (1024-65535) to the internet"
+    },
+    "answer": "D",
+    "reasoning": "NACLs are STATELESS. This means they evaluate inbound and outbound traffic INDEPENDENTLY — they don't remember that inbound port 443 was allowed and therefore outbound response should pass. The server responds on a random ephemeral port (1024-65535). If the NACL outbound rules don't explicitly allow that port range, the response is silently dropped. Security groups are stateful (return traffic is automatic), but NACLs are not. This is the classic NACL trap — you allow inbound, everything looks right, but responses die on the way out.",
+    "eliminated": {
+      "A": "If instances had no public IPs, the issue would be reachability (no traffic at all), but the question implies traffic arrives and SG allows it",
+      "C": "Security groups are stateful — return traffic is automatically allowed, no explicit outbound rule needed for responses",
+      "B": "Without an IGW route, no traffic would arrive at all — the question says a NACL rule was added for inbound, implying routing works"
+    }
+  },
+  {
+    "id": "L0-007",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "VPC peering is non-transitive",
+    "constraint_terms": [
+      "many VPCs",
+      "transitive routing"
+    ],
+    "scenario": "A company has three VPCs: VPC-A (shared services), VPC-B (production), and VPC-C (development). VPC-A is peered with VPC-B, and VPC-A is peered with VPC-C. The development team in VPC-C reports they cannot reach services in VPC-B.",
+    "question": "Why can VPC-C not reach VPC-B, and what is the correct fix?",
+    "options": {
+      "A": "A NAT gateway in VPC-A must be configured to translate traffic between VPC-B and VPC-C",
+      "B": "The route tables in VPC-A need to be updated to forward traffic between VPC-B and VPC-C",
+      "C": "VPC peering is non-transitive — traffic cannot pass A→B through A. Create a direct peering connection between VPC-B and VPC-C, or use a Transit Gateway",
+      "D": "The security groups in VPC-A must allow forwarding between the two peered connections"
+    },
+    "answer": "C",
+    "reasoning": "VPC peering is STRICTLY non-transitive. A↔B and A↔C does NOT create a path B↔C through A. This is by design — AWS will not route traffic through a VPC that is not the source or destination. No amount of route table manipulation in VPC-A can make it a transit point between its peers. You either peer every VPC pair directly (doesn't scale) or use Transit Gateway (hub-and-spoke, transitive by design). This is a fundamental VPC networking fact that the exam loves because it feels counterintuitive.",
+    "eliminated": {
+      "B": "Even with perfect route tables in VPC-A, AWS blocks transitive routing through peering connections — it's architecturally impossible",
+      "A": "NAT gateway translates private-to-public for internet access — it does not bridge two peering connections",
+      "D": "Security groups and NACLs filter traffic, but the traffic cannot physically exist in the transitive path — there's nothing to filter"
+    }
+  },
+  {
+    "id": "L0-008",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Direct Connect takes weeks/months to establish",
+    "constraint_terms": [
+      "quickly establish connectivity",
+      "encrypted"
+    ],
+    "scenario": "A company has just signed a contract requiring immediate hybrid connectivity between its on-premises data center and a new AWS VPC. The connection must be encrypted and operational within days. Bandwidth requirements are moderate (under 500 Mbps).",
+    "question": "Which connectivity option meets the timeline and encryption requirements?",
+    "options": {
+      "A": "Order an AWS Direct Connect connection with MACsec encryption",
+      "B": "Create a Transit Gateway and attach a Direct Connect gateway",
+      "C": "Configure an AWS Site-to-Site VPN connection",
+      "D": "Set up VPC peering between the on-premises network and the AWS VPC"
+    },
+    "answer": "C",
+    "reasoning": "Direct Connect requires physical cross-connect provisioning at a colocation facility — this takes WEEKS to MONTHS (ordering port, LOA, cross-connect, circuit testing). Site-to-Site VPN runs over the public internet with IPsec encryption and can be operational in MINUTES to HOURS. When the question says 'immediately' or 'within days,' Direct Connect is automatically disqualified by timeline alone. VPN also natively provides encryption (IPsec), which Direct Connect does NOT by default (MACsec is optional and separate). For moderate bandwidth where consistency isn't critical, VPN handles it.",
+    "eliminated": {
+      "A": "Direct Connect takes weeks/months to provision — violates the 'within days' timeline requirement",
+      "D": "VPC peering connects VPCs within AWS, not on-premises networks — architecturally wrong",
+      "B": "Transit Gateway + Direct Connect gateway still requires the Direct Connect physical link — same timeline problem"
+    }
+  },
+  {
+    "id": "L0-009",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "hard",
+    "trap_fact": "NAT gateway is per-AZ resource, not cross-AZ",
+    "constraint_terms": [
+      "highly available",
+      "private subnet outbound internet",
+      "survive AZ failure"
+    ],
+    "scenario": "A company runs a critical application across three Availability Zones in a Region. EC2 instances in private subnets must access the internet for third-party API calls. The architecture must remain operational if any single Availability Zone fails. Currently, all private subnets route outbound traffic through a single NAT gateway in one AZ.",
+    "question": "What should a solutions architect change to meet the availability requirement?",
+    "options": {
+      "A": "Deploy a NAT gateway in each Availability Zone and update each private subnet's route table to use the NAT gateway in its own AZ",
+      "B": "Replace the NAT gateway with a NAT instance in an Auto Scaling group spanning all three AZs",
+      "C": "Add a second NAT gateway in one other AZ for redundancy",
+      "D": "Enable cross-zone load balancing on the NAT gateway"
+    },
+    "answer": "A",
+    "reasoning": "NAT gateways are AZ-scoped resources. If the single AZ hosting the NAT gateway fails, ALL private subnets in ALL other AZs lose internet access — because their route tables all point to a dead NAT in the failed AZ. The fix is one NAT per AZ, each private subnet routing to ITS OWN AZ's NAT. This way, an AZ failure only affects that AZ's resources, not cross-AZ dependencies. Two NATs in two AZs would leave the third exposed. NAT gateways don't have 'cross-zone load balancing' — that's an ELB concept. The exam tests whether you understand that NAT is zonal and must match your multi-AZ design.",
+    "eliminated": {
+      "C": "Two NATs in two AZs means the third AZ still depends on a NAT in another AZ — partial fix, not full HA",
+      "B": "NAT instances are self-managed, less performant, and Auto Scaling doesn't solve the route-table-per-AZ problem cleanly",
+      "D": "NAT gateways don't have cross-zone load balancing — that's an Elastic Load Balancing feature, not applicable to NAT"
+    }
+  },
+  {
+    "id": "L0-010",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "hard",
+    "trap_fact": "Transit Gateway has data processing charges; VPC peering is cheaper for simple cases",
+    "constraint_terms": [
+      "two VPCs",
+      "most cost-effective",
+      "connectivity"
+    ],
+    "scenario": "A company has exactly two VPCs in the same Region that need to communicate. One VPC hosts a web application and the other hosts a shared database cluster. Traffic between them is moderate and predictable. The company wants the most cost-effective connectivity solution with the least ongoing charges.",
+    "question": "Which connectivity option is most cost-effective for this use case?",
+    "options": {
+      "A": "Create interface VPC endpoints in each VPC using AWS PrivateLink",
+      "B": "Route traffic between VPCs through a Site-to-Site VPN connection",
+      "C": "Create a VPC peering connection between the two VPCs",
+      "D": "Deploy a Transit Gateway and attach both VPCs"
+    },
+    "answer": "C",
+    "reasoning": "VPC peering between two VPCs is the simplest and cheapest option: no hourly attachment fees, no per-GB data processing charges beyond standard cross-AZ/Region transfer. Transit Gateway adds hourly attachment charges ($0.05/hr per attachment = ~$72/month for two VPCs) PLUS $0.02/GB data processing. For exactly two VPCs in the same Region, Transit Gateway is over-engineering and over-paying. Transit Gateway makes sense at scale (tens/hundreds of VPCs, hub-and-spoke), but for a simple bilateral connection it's a cost trap. The exam uses 'two VPCs' as the signal that peering wins on cost.",
+    "eliminated": {
+      "D": "Transit Gateway charges per attachment per hour + per GB — unnecessary cost for a simple 2-VPC scenario",
+      "A": "PrivateLink/interface endpoints expose specific services, not full network connectivity — wrong pattern and has hourly + per-GB charges",
+      "B": "VPN adds encryption overhead, bandwidth limitations, hourly charges, and complexity — completely wrong tool for VPC-to-VPC in the same Region"
+    }
+  },
+  {
+    "id": "L0-011",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "hard",
+    "trap_fact": "Interface VPC endpoint costs money (per hour + per GB); gateway is free for S3/DynamoDB",
+    "constraint_terms": [
+      "private access to S3",
+      "most cost-effective",
+      "must not traverse the public internet"
+    ],
+    "scenario": "A company has hundreds of EC2 instances in private subnets that access Amazon S3 frequently. The security team requires that S3 traffic must not traverse the public internet. The finance team wants the most cost-effective solution for private S3 access.",
+    "question": "Which solution satisfies both the security and cost requirements?",
+    "options": {
+      "A": "Deploy a NAT gateway and restrict its routing to only allow S3 traffic",
+      "B": "Create an interface VPC endpoint for S3 in each Availability Zone",
+      "C": "Configure an AWS Direct Connect connection dedicated to S3 traffic",
+      "D": "Create an S3 gateway VPC endpoint"
+    },
+    "answer": "D",
+    "reasoning": "Both gateway and interface endpoints keep S3 traffic off the public internet. But they have completely different cost models. Gateway endpoint: FREE — zero hourly, zero per-GB. Interface endpoint: ~$0.01/hr per AZ + $0.01/GB processed. For hundreds of instances accessing S3 frequently, the interface endpoint bill adds up fast. Gateway endpoints add a prefix-list route to the route table and traffic goes directly to S3 over the AWS backbone. When both security (private) and cost (cheapest) are constraints, gateway endpoint is the only answer that satisfies both. Interface endpoints for S3 exist for specific use cases (on-premises access via Direct Connect) but are NOT the cost-effective choice within a VPC.",
+    "eliminated": {
+      "B": "Interface endpoints cost hourly per AZ + per GB — satisfies security but fails the cost requirement when gateway is free",
+      "A": "NAT gateway routes traffic to the internet (S3 public endpoint) — violates 'must not traverse the public internet' even if restricted",
+      "C": "Direct Connect is for on-premises connectivity to AWS — massively overengineered and expensive for VPC-to-S3 within AWS"
+    }
+  },
+  {
+    "id": "L0-012",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "hard",
+    "trap_fact": "Direct Connect provides consistent bandwidth; VPN uses internet (variable performance)",
+    "constraint_terms": [
+      "consistent performance",
+      "dedicated private connection",
+      "large data transfers"
+    ],
+    "scenario": "A company transfers 10 TB of data nightly from its on-premises data center to AWS. The transfers currently use a Site-to-Site VPN but often fail to complete within the maintenance window due to inconsistent internet throughput. The company needs a connectivity solution that provides predictable, consistent bandwidth for these large nightly transfers.",
+    "question": "Which solution provides the required consistent bandwidth?",
+    "options": {
+      "A": "Use AWS DataSync over the existing VPN with task scheduling",
+      "B": "Enable VPN acceleration on the existing Site-to-Site VPN connection",
+      "C": "Add a second Site-to-Site VPN connection with ECMP to double throughput",
+      "D": "Establish an AWS Direct Connect connection with sufficient port capacity"
+    },
+    "answer": "D",
+    "reasoning": "VPN runs over the PUBLIC INTERNET. Internet bandwidth is shared, variable, and subject to congestion — you cannot guarantee consistent throughput regardless of how many tunnels you add. Direct Connect is a DEDICATED physical fiber connection that bypasses the internet entirely. You get the bandwidth you pay for (1 Gbps, 10 Gbps, 100 Gbps) consistently every night because no one else shares your circuit. When the question says 'consistent', 'predictable', 'dedicated', or complains about internet variability — it's screaming Direct Connect. The timeline concern (weeks to provision) isn't relevant here because the question doesn't say 'immediately.'",
+    "eliminated": {
+      "C": "Multiple VPN tunnels still run over the internet — doubling inconsistent throughput gives you inconsistent throughput times two",
+      "B": "VPN acceleration improves routing to AWS edge but doesn't fix internet congestion between the company and AWS edge locations",
+      "A": "DataSync optimizes transfer logic but runs over the same underlying connection — if the pipe is unreliable, DataSync suffers too"
+    }
+  },
+  {
+    "id": "L0-013",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "PrivateLink exposes a service privately without broad network sharing",
+    "constraint_terms": [
+      "private service exposure",
+      "without VPC peering"
+    ],
+    "scenario": "A company operates a payment processing service in VPC-A. Multiple partner companies in separate AWS accounts need to consume this service. The company must not expose its entire VPC network to partners and must not route traffic over the public internet.",
+    "question": "Which solution allows partners to consume the service privately without exposing the company's full network?",
+    "options": {
+      "A": "Set up a Transit Gateway and attach all partner VPCs and VPC-A",
+      "B": "Create VPC peering connections between VPC-A and each partner VPC",
+      "C": "Create a Network Load Balancer in front of the service, configure a VPC endpoint service (AWS PrivateLink), and have partners create interface endpoints in their VPCs",
+      "D": "Deploy an internet-facing Application Load Balancer with IP allowlisting for partner IPs"
+    },
+    "answer": "C",
+    "reasoning": "PrivateLink is surgical exposure. It creates an interface endpoint in the consumer's VPC that connects to YOUR service through a private link — no internet, no network-wide access. The consumer only sees the endpoint, not your CIDR, not your other workloads, not your route table. VPC peering exposes BOTH entire networks to each other (routes, CIDR visibility). Transit Gateway creates full transitive connectivity. Both violate 'must not expose entire VPC network.' PrivateLink = expose ONE service. Peering/TGW = expose THE NETWORK.",
+    "eliminated": {
+      "B": "VPC peering exposes full network CIDR ranges between VPCs — violates 'must not expose entire VPC network'",
+      "D": "Internet-facing ALB routes over public internet — violates 'must not route traffic over the public internet'",
+      "A": "Transit Gateway gives transitive full-network access between all attached VPCs — even broader exposure than peering"
+    }
+  },
+  {
+    "id": "L0-014",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Direct Connect + VPN combined for resilience",
+    "constraint_terms": [
+      "resilient hybrid connectivity",
+      "consistent bandwidth",
+      "encrypted backup"
+    ],
+    "scenario": "A company uses a 10 Gbps AWS Direct Connect connection for its primary hybrid connectivity between on-premises and AWS. The company needs a resilient backup connection that provides encryption. If the Direct Connect link fails, the company can tolerate reduced bandwidth temporarily but must maintain connectivity.",
+    "question": "Which backup connectivity solution meets the resilience and encryption requirements?",
+    "options": {
+      "A": "Create a VPC peering connection to an on-premises VPC",
+      "B": "Deploy a NAT gateway as a failover path for hybrid traffic",
+      "C": "Order a second Direct Connect connection from the same location",
+      "D": "Configure an AWS Site-to-Site VPN as a backup path over the internet"
+    },
+    "answer": "D",
+    "reasoning": "Direct Connect does NOT encrypt traffic by default — it's a private link but the bits are unencrypted on the fiber. VPN provides NATIVE IPsec encryption. The classic AWS resilience pattern is: Direct Connect for primary (consistent bandwidth, no encryption) + VPN for backup (encrypted, internet-based, lower bandwidth). This gives you two DIVERSE paths — DC goes through a physical cross-connect, VPN goes through the internet. Different failure domains. A second DC from the same location shares failure domain (same building, same router). The exam tests: diverse path = different infrastructure, not more of the same.",
+    "eliminated": {
+      "C": "Same location = same failure domain (same building, same fiber path) — doesn't provide true resilience + no encryption",
+      "A": "VPC peering connects VPCs within AWS, cannot connect to on-premises infrastructure",
+      "B": "NAT gateway provides outbound internet access for private subnets — it's not a hybrid connectivity mechanism at all"
+    }
+  },
+  {
+    "id": "L0-015",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Security group can reference another security group instead of IP ranges",
+    "constraint_terms": [
+      "least administrative effort",
+      "scales automatically"
+    ],
+    "scenario": "A company runs a three-tier application. The ALB is in public subnets across three AZs. The application tier runs in private subnets with Auto Scaling. A security audit requires that application instances accept inbound traffic ONLY from the load balancer on port 8443. The solution must require no manual updates as the environment scales or ALB nodes change.",
+    "question": "Which configuration meets the security requirement with the least administrative effort?",
+    "options": {
+      "A": "Configure the application SG to allow port 8443 from the ALB's security group ID",
+      "B": "Configure the application SG to allow port 8443 from the three ALB subnet CIDR ranges",
+      "C": "Configure the application SG to allow port 8443 from the VPC CIDR",
+      "D": "Configure a NACL on the application subnets to allow port 8443 from the ALB subnet CIDRs"
+    },
+    "answer": "A",
+    "reasoning": "SG-to-SG reference means 'allow anything wearing this security group badge' — no IPs involved, no updates needed when ALB scales, shifts IPs, or spans new AZs. Subnet CIDRs (option B) actually work and are static, which makes it tempting. But if ALB subnets ever change, expand, or if you add AZs, you'd need to update manually — violates 'no manual updates as environment scales.' Also, CIDR allows ANY resource in those subnets, not just the ALB. VPC CIDR is over-broad. NACL can't reference security groups and has same CIDR over-breadth problem.",
+    "eliminated": {
+      "B": "Subnet CIDRs work today but require updates if subnets change or new AZs are added — also allows ANY resource in those subnets, not just the ALB",
+      "D": "NACLs cannot reference security groups, use IPs only, and subnet CIDRs allow more than just the ALB — same problems as B plus less targeted",
+      "C": "VPC CIDR allows every resource in the entire VPC to reach the app tier on 8443 — violates 'ONLY from the load balancer'"
+    }
+  },
+  {
+    "id": "L0-016",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "NACL rules are evaluated in number order, first match wins",
+    "constraint_terms": [
+      "block specific traffic",
+      "allow all other traffic"
+    ],
+    "scenario": "A network ACL on a public subnet currently has these inbound rules: Rule 100 allows all traffic from 0.0.0.0/0. A security engineer adds Rule 200 to deny traffic from a malicious CIDR 198.51.100.0/24. The malicious traffic continues to reach the instances.",
+    "question": "Why does the deny rule not take effect?",
+    "options": {
+      "A": "The deny rule must be applied to the outbound rules, not inbound",
+      "B": "Rule 100 (allow all) is evaluated before Rule 200 (deny specific) because NACLs process rules in ascending number order and stop at the first match",
+      "C": "The NACL is not associated with the correct subnet",
+      "D": "Network ACLs cannot deny traffic — they only support allow rules like security groups"
+    },
+    "answer": "B",
+    "reasoning": "NACLs evaluate rules by rule NUMBER in ascending order. The FIRST rule that matches the traffic is applied, and evaluation STOPS — there's no 'most specific wins' or 'deny overrides allow' logic. Rule 100 matches ALL traffic (0.0.0.0/0), so it fires BEFORE Rule 200 even gets evaluated. The fix: the deny rule must have a LOWER number than the allow-all rule. Set deny to Rule 50 and it fires before Rule 100's allow-all. This ordering trap is specifically how AWS tests NACL understanding — it's not like IAM policies where explicit deny always wins.",
+    "eliminated": {
+      "D": "NACLs DO support both allow and deny rules — this is what makes them different from security groups",
+      "C": "The question states the NACL is on the public subnet and other rules work — association is fine",
+      "A": "Malicious INBOUND traffic must be blocked INBOUND — outbound rules filter responses, not incoming requests"
+    }
+  },
+  {
+    "id": "L0-017",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "hard",
+    "trap_fact": "VPC CIDR overlap blocks peering",
+    "constraint_terms": [
+      "VPC connectivity",
+      "overlapping CIDR"
+    ],
+    "scenario": "A company has two VPCs that need to communicate. VPC-A uses CIDR 10.0.0.0/16 and VPC-B also uses CIDR 10.0.0.0/16. A solutions architect attempts to create a VPC peering connection but receives an error.",
+    "question": "Why does the peering connection fail, and what is the correct solution?",
+    "options": {
+      "A": "The route tables need to be updated before the peering connection can be created",
+      "B": "The security groups must allow the peer VPC's CIDR range before the peering connection can be created",
+      "C": "VPC peering requires both VPCs to be in the same Region — move one VPC",
+      "D": "VPC peering cannot be established between VPCs with overlapping CIDR ranges — one VPC must be recreated with a non-overlapping CIDR, or use PrivateLink for specific service access"
+    },
+    "answer": "D",
+    "reasoning": "VPC peering and Transit Gateway cannot route between VPCs with overlapping CIDRs because the route table cannot distinguish where traffic should go — both networks claim the same address space. This is an ARCHITECTURAL constraint, not a configuration one. You cannot fix it with rules, routes, or settings. You either re-IP one VPC (painful) or use PrivateLink to expose specific services without full network routing. This is why CIDR planning matters at VPC creation time. The exam uses this to test whether you understand that networking constraints are physical (routing) not logical (permissions).",
+    "eliminated": {
+      "A": "Route tables are configured AFTER peering is established — the peering creation itself fails before you reach route table configuration",
+      "C": "VPC peering works cross-Region — Region is not the blocker here; overlapping CIDR is",
+      "B": "Security groups control traffic flow, not peering establishment — the Connection object itself cannot be created"
+    }
+  },
+  {
+    "id": "L0-018",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "hard",
+    "trap_fact": "Transit Gateway for hub-and-spoke at scale, transitive routing",
+    "constraint_terms": [
+      "hundreds of VPCs",
+      "hub-and-spoke",
+      "centralized inspection"
+    ],
+    "scenario": "A large enterprise has 200 VPCs across 15 AWS accounts in a single Region. All VPCs must communicate through a centralized network inspection appliance for security compliance. The company needs a scalable hub-and-spoke network topology with transitive routing.",
+    "question": "Which architecture provides scalable hub-and-spoke connectivity with centralized inspection?",
+    "options": {
+      "A": "Create VPC peering connections between all VPCs and route traffic through a central inspection instance",
+      "B": "Deploy NAT gateways in each VPC and route traffic through a shared internet gateway for inspection",
+      "C": "Deploy a Transit Gateway, attach all 200 VPCs, and route inter-VPC traffic through an inspection VPC with a Gateway Load Balancer and network appliance",
+      "D": "Use AWS PrivateLink to connect all 200 VPCs to a central inspection service"
+    },
+    "answer": "C",
+    "reasoning": "200 VPCs with peering = 19,900 peering connections (n×(n-1)/2). Impossible to manage, and peering is NON-TRANSITIVE so traffic can't pass through an inspection VPC — it goes directly peer-to-peer. Transit Gateway is THE solution for scale: one attachment per VPC, transitive routing native, and you can route all inter-VPC traffic through an inspection VPC using TGW route tables. Gateway Load Balancer handles the inspection appliance scaling. This is the only architecture that gives you: scale + transitivity + centralized inspection point. The exam uses high VPC counts as the unmistakable signal for TGW.",
+    "eliminated": {
+      "A": "200 VPCs = ~19,900 peering connections to manage, peering is non-transitive so traffic can't pass through an inspection VPC",
+      "D": "PrivateLink exposes specific services, not full network connectivity — can't build a routed network topology with it",
+      "B": "NAT gateways provide internet access from private subnets — they don't create inter-VPC routing or inspection points"
+    }
+  },
+  {
+    "id": "L0-019",
+    "layer": 0,
+    "category": "network",
+    "difficulty": "moderate",
+    "trap_fact": "Route table most-specific-route-wins when gateway endpoint is added",
+    "constraint_terms": [
+      "VPC endpoint routing",
+      "S3 traffic path"
+    ],
+    "scenario": "A company creates a gateway VPC endpoint for S3 and associates it with the private subnet route table. The route table already has a default route (0.0.0.0/0) pointing to a NAT gateway. A solutions architect needs to confirm that S3 traffic uses the endpoint instead of the NAT gateway.",
+    "question": "How does the route table determine the path for S3 traffic after the endpoint is added?",
+    "options": {
+      "A": "Both routes are used simultaneously with traffic split between endpoint and NAT for S3",
+      "B": "The route table requires manual priority configuration to prefer the endpoint over NAT",
+      "C": "All traffic continues through the NAT gateway because the default route was added first",
+      "D": "The gateway endpoint adds a more-specific route (S3 prefix list) that takes priority over the less-specific default route to NAT — S3 traffic goes through the endpoint automatically"
+    },
+    "answer": "D",
+    "reasoning": "Route tables use MOST-SPECIFIC-MATCH routing. When you add a gateway endpoint, AWS inserts a route for the S3 prefix list (a set of S3's IP ranges — much more specific than 0.0.0.0/0). For S3-bound traffic, the prefix list route is more specific than the /0 default route, so it wins AUTOMATICALLY. No priority configuration needed, no ordering. This is standard IP routing behavior: longer prefix = more specific = wins. The default route (0.0.0.0/0) only catches traffic that doesn't match ANY more-specific route. This is why adding a gateway endpoint immediately diverts S3 traffic without touching the NAT route.",
+    "eliminated": {
+      "C": "Route tables don't use first-added-wins — they use most-specific-prefix-wins. Order of creation is irrelevant",
+      "B": "AWS route tables don't have manual priority — specificity IS the priority mechanism",
+      "A": "Route tables don't load-balance — exactly one route matches per packet, the most specific one"
+    }
+  }
+]

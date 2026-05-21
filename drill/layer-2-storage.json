@@ -1,0 +1,434 @@
+[
+  {
+    "id": "L2-001",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "EBS is single-instance, single-AZ attachment",
+    "constraint_terms": [
+      "shared file storage",
+      "multiple instances",
+      "Linux"
+    ],
+    "scenario": "A company runs a content management system on multiple EC2 Linux instances behind an Application Load Balancer. All instances must read and write to the same file system simultaneously. The application uses a POSIX-compatible file interface and the data must survive instance termination.",
+    "question": "Which storage solution meets these requirements?",
+    "options": {
+      "A": "Amazon EFS mounted by all instances across multiple Availability Zones",
+      "B": "Amazon S3 mounted as a file system using s3fs-fuse on each instance",
+      "C": "Amazon EBS io2 volume with Multi-Attach enabled, shared across all instances",
+      "D": "An EBS volume in one AZ with a scheduled snapshot replicated to other AZs"
+    },
+    "answer": "A",
+    "reasoning": "EFS is a managed NFS file system designed for shared concurrent access across multiple instances and multiple AZs. It's POSIX-compatible and scales automatically. EBS Multi-Attach exists but ONLY within the same AZ and requires a cluster-aware file system (like GFS2) — it's not a general-purpose shared filesystem. S3 is object storage, not a POSIX file system — s3fs is fragile and not supported. EBS single-volume can't span AZs and doesn't handle concurrent writes.",
+    "eliminated": {
+      "C": "EBS Multi-Attach only works within a SINGLE AZ and requires a cluster-aware filesystem to manage concurrent writes — not a drop-in shared filesystem for multi-AZ workloads",
+      "B": "s3fs-fuse is a community tool that emulates file semantics on object storage — it's slow, inconsistent for writes, and not supported for production workloads requiring true POSIX compliance",
+      "D": "Snapshots are point-in-time copies for backup, not for real-time sharing — this doesn't provide simultaneous read/write access across instances"
+    }
+  },
+  {
+    "id": "L2-002",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "EFS is Linux/NFS only — not Windows",
+    "constraint_terms": [
+      "Windows instances",
+      "shared file storage",
+      "SMB protocol"
+    ],
+    "scenario": "A company migrates a Windows-based rendering farm to AWS. Multiple Windows EC2 instances need shared access to the same file system using the SMB protocol. The farm scales up to 50 instances during peak hours. Data must persist across instance scaling events.",
+    "question": "Which AWS storage service provides shared file access for this Windows workload?",
+    "options": {
+      "A": "Amazon EFS with the Windows NFS client enabled on each instance",
+      "B": "Amazon FSx for Windows File Server configured with an SMB file share",
+      "C": "Amazon FSx for Lustre mounted on the Windows instances for high-performance access",
+      "D": "Amazon S3 accessed via the AWS CLI file sync command on a schedule"
+    },
+    "answer": "B",
+    "reasoning": "FSx for Windows File Server is a FULLY MANAGED Windows-native file system built on Windows Server. It speaks SMB natively, supports Windows ACLs, Active Directory integration, DFS namespaces — it's Windows through and through. EFS is NFS (Linux) only — Windows cannot natively mount NFS without feature compromise. S3 is object storage, not a file share. FSx for Lustre is a Linux HPC filesystem — it doesn't support Windows or SMB.",
+    "eliminated": {
+      "A": "EFS uses the NFS protocol exclusively — Windows has limited NFS support that doesn't provide the SMB semantics, ACLs, or Windows compatibility the workload needs",
+      "D": "S3 is object storage without file system semantics — CLI sync creates copies, not shared access. Changes by one instance aren't visible to others in real-time",
+      "C": "FSx for Lustre is a high-performance POSIX filesystem for Linux HPC workloads — it does not support Windows or the SMB protocol"
+    }
+  },
+  {
+    "id": "L2-003",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "S3 Standard-IA has 30-day minimum charge and retrieval fee",
+    "constraint_terms": [
+      "cost optimization",
+      "unpredictable access patterns",
+      "no retrieval delays"
+    ],
+    "scenario": "A company stores millions of user-generated images in S3. Access patterns are unpredictable — some images are accessed daily for weeks after upload, then never again, while others are rarely accessed from day one. The company wants to minimize storage cost without risking retrieval delays or incurring unexpected retrieval fees. Objects range from 200KB to 5MB.",
+    "question": "Which storage configuration minimizes cost without retrieval penalties?",
+    "options": {
+      "A": "S3 One Zone-IA for all objects to get the lowest storage rate",
+      "B": "S3 Standard-IA from day one — lower storage cost for all objects since most are infrequently accessed",
+      "C": "S3 Standard with a lifecycle rule transitioning to Standard-IA after 30 days",
+      "D": "S3 Intelligent-Tiering — automatically moves objects between frequent and infrequent tiers based on access patterns"
+    },
+    "answer": "D",
+    "reasoning": "Intelligent-Tiering is designed EXACTLY for unpredictable access patterns. It monitors each object and moves it between tiers automatically — no retrieval fees when it auto-promotes back to frequent access. The monitoring fee (~$0.0025/1000 objects/month) is the cost. Standard-IA from day one is wrong because objects accessed within 30 days STILL get charged the 30-day minimum — if they're accessed frequently in the first month, IA costs MORE than Standard. Lifecycle to IA after 30 days is safer but still charges retrieval if objects ARE accessed later. IT handles both directions.",
+    "eliminated": {
+      "B": "Standard-IA charges a 30-day minimum storage + retrieval fee per GB retrieved. For objects accessed frequently in early days, you pay MORE than Standard would cost. Unpredictable access makes this risky",
+      "C": "Lifecycle to IA after 30 days avoids the minimum-duration problem but still charges retrieval fees if objects are accessed after transition — doesn't handle the 'accessed again unexpectedly' case",
+      "A": "One Zone-IA stores data in a single AZ — if that AZ has an infrastructure failure, data is lost. Fine for recreatable data, but user-generated images are typically not recreatable"
+    }
+  },
+  {
+    "id": "L2-004",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "S3 One Zone-IA — single AZ, data lost if AZ destroyed",
+    "constraint_terms": [
+      "cost reduction",
+      "recreatable data",
+      "acceptable to lose"
+    ],
+    "scenario": "A company generates daily thumbnail versions of original high-resolution images stored durably in S3 Standard. The thumbnails are served via CloudFront and can be regenerated from originals in about 2 minutes if lost. The company wants to reduce storage costs for the thumbnails.",
+    "question": "Which storage class is MOST cost-effective for the thumbnails?",
+    "options": {
+      "A": "S3 Standard — keep the same class as the originals for consistency",
+      "B": "S3 Standard-IA — lower cost than Standard with cross-AZ redundancy",
+      "C": "S3 One Zone-Infrequent Access — single AZ storage at the lowest cost for recreatable data",
+      "D": "S3 Glacier Instant Retrieval — lowest cost archival with millisecond access"
+    },
+    "answer": "C",
+    "reasoning": "One Zone-IA is the cheapest storage class for data that is infrequently accessed AND can be recreated if lost. Thumbnails meet BOTH criteria: they're served from CloudFront cache (infrequent origin fetch) and can be regenerated from originals in 2 minutes. The key constraint is 'recreatable' — One Zone-IA risks data loss if the single AZ fails, so it's ONLY appropriate when loss is acceptable. Standard-IA is more expensive because it replicates cross-AZ (unnecessary for recreatable data). Glacier adds retrieval latency.",
+    "eliminated": {
+      "B": "Standard-IA provides cross-AZ durability which costs more — this redundancy is wasted on data that can be regenerated in 2 minutes",
+      "D": "Glacier Instant Retrieval has a 90-day minimum storage charge and higher retrieval fee — thumbnails may be regenerated or changed more frequently than 90 days",
+      "A": "S3 Standard is the most expensive option — no reason to pay premium price for recreatable, infrequently-accessed data"
+    }
+  },
+  {
+    "id": "L2-005",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "Glacier Flexible Retrieval: 90-day minimum, minutes-to-hours retrieval",
+    "constraint_terms": [
+      "compliance archive",
+      "7 years retention",
+      "data needed within 12 hours if audit"
+    ],
+    "scenario": "A healthcare company must retain patient records for 7 years to meet regulatory compliance. Records are written once and never accessed unless a compliance audit occurs (approximately once per year). During an audit, specific records must be retrievable within 12 hours. Cost must be minimized — this is a large multi-petabyte archive.",
+    "question": "Which S3 storage class is most cost-effective for this archive?",
+    "options": {
+      "A": "S3 Glacier Instant Retrieval — millisecond access ensures fastest audit response",
+      "B": "S3 Glacier Deep Archive — lowest cost archival storage with retrieval within 12 hours",
+      "C": "S3 Glacier Flexible Retrieval — standard retrieval within 3-5 hours meets the 12-hour SLA at the lowest cost",
+      "D": "S3 Standard-IA — avoids retrieval delays entirely and the access is too rare for Standard to matter"
+    },
+    "answer": "B",
+    "reasoning": "Deep Archive standard retrieval is within 12 hours — which EXACTLY meets the stated SLA. At ~$0.00099/GB/month vs Glacier Flexible's ~$0.0036/GB/month, Deep Archive is 3.6x cheaper for petabyte-scale. The trap is thinking '12 hours is tight, better use Flexible for safety' — but Deep Archive standard retrieval reliably delivers within 12 hours. For a multi-petabyte archive held 7 years, this cost difference is massive. Glacier Instant is overkill (milliseconds not needed, much more expensive). IA is way too expensive for archive.",
+    "eliminated": {
+      "C": "Glacier Flexible Retrieval (3-5 hours) works but costs 3.6x more per GB than Deep Archive — when the SLA is 12 hours and Deep Archive delivers within that window, Flexible is paying for unneeded speed",
+      "A": "Glacier Instant Retrieval costs much more than Flexible or Deep Archive — paying for millisecond access when you have a 12-hour SLA is extreme waste on petabyte-scale data",
+      "D": "Standard-IA costs ~20x more than Deep Archive per GB — for multi-petabyte data accessed once per year, this is financially unjustifiable"
+    }
+  },
+  {
+    "id": "L2-006",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "S3 Object Lock Compliance mode — NOBODY can delete, not even root",
+    "constraint_terms": [
+      "regulatory requirement",
+      "immutable records",
+      "no exceptions"
+    ],
+    "scenario": "A financial services company is subject to SEC Rule 17a-4 which requires that trading records be stored in immutable, non-erasable, non-rewritable format for a minimum of 6 years. Even the company's AWS account root user must NOT be able to delete or modify these records during the retention period.",
+    "question": "Which S3 configuration ensures records cannot be altered or deleted by anyone?",
+    "options": {
+      "A": "S3 bucket policy denying s3:DeleteObject for all principals including root",
+      "B": "S3 Object Lock in Governance mode with a 6-year retention period",
+      "C": "S3 versioning with MFA Delete enabled — requires MFA to delete any version",
+      "D": "S3 Object Lock in Compliance mode with a 6-year retention period"
+    },
+    "answer": "D",
+    "reasoning": "Compliance mode is ABSOLUTE — once set, the retention period cannot be shortened and NO ONE can delete the object version during that period. Not root, not AWS Support, nobody. Even the bucket cannot be deleted while locked objects exist. This maps directly to WORM (Write Once Read Many) requirements like SEC 17a-4. Governance mode allows users with s3:BypassGovernanceRetention permission to override — which means root COULD delete, violating the requirement. MFA Delete protects against accidental deletion but root can still delete with MFA. Bucket policies can be changed by root.",
+    "eliminated": {
+      "B": "Governance mode allows users with special permission (s3:BypassGovernanceRetention) to delete objects before retention expires — root inherently has all permissions and could override",
+      "C": "MFA Delete requires MFA for version deletion but doesn't make objects immutable — root with MFA can still delete. It's anti-accident, not anti-tampering",
+      "A": "Bucket policies can be modified by anyone with s3:PutBucketPolicy permission (including root) — the policy itself is not immutable, so it provides no hard guarantee"
+    }
+  },
+  {
+    "id": "L2-007",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "S3 Object Lock Governance mode can be overridden with special permissions",
+    "constraint_terms": [
+      "prevent accidental deletion",
+      "administrators can override if needed"
+    ],
+    "scenario": "A media company stores large video master files in S3. Editors sometimes accidentally delete assets during cleanup operations. The company wants to prevent accidental deletion but retain the ability for privileged administrators to remove content that must be taken down for legal reasons before the retention period expires.",
+    "question": "Which S3 feature provides this protection?",
+    "options": {
+      "A": "S3 Lifecycle rule with a transition delay — objects can only be deleted after the delay expires",
+      "B": "S3 Object Lock in Governance mode — prevents deletion unless the user has s3:BypassGovernanceRetention permission",
+      "C": "S3 versioning alone — deleted objects can be recovered from previous versions",
+      "D": "S3 Object Lock in Compliance mode — provides absolute protection with legal hold for takedown"
+    },
+    "answer": "B",
+    "reasoning": "Governance mode is the 'soft lock' — it prevents most users from deleting/modifying objects, but users with the specific s3:BypassGovernanceRetention permission AND x-amz-bypass-governance-retention:true header CAN override. This is exactly 'prevent accidents, allow privileged override.' Compliance mode (B) would work for prevention but NO ONE can override — even for legal takedown. Versioning (C) allows recovery but doesn't PREVENT deletion. Lifecycle (D) controls transitions, not delete protection.",
+    "eliminated": {
+      "D": "Compliance mode cannot be overridden by anyone, ever — if legal requires content removal before retention expires, you literally cannot comply. The 'administrators can override' requirement forces Governance mode",
+      "C": "Versioning preserves deleted objects as delete markers (recoverable) but doesn't PREVENT the deletion action — users still experience the deletion and think it worked, causing confusion",
+      "A": "Lifecycle rules manage storage class transitions and expiration scheduling — they don't prevent explicit delete API calls from succeeding"
+    }
+  },
+  {
+    "id": "L2-008",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "DataSync = online transfer needing bandwidth. Snow = offline physical device for limited bandwidth + large data",
+    "constraint_terms": [
+      "petabytes of data",
+      "limited bandwidth",
+      "migrate to AWS"
+    ],
+    "scenario": "A company has 80TB of video production files in an on-premises NAS. Their internet connection is 100 Mbps. They need to migrate ALL the data to S3 within 2 weeks to meet a datacenter lease expiration deadline. A back-of-napkin calculation shows 100 Mbps would take approximately 74 days to transfer 80TB.",
+    "question": "Which migration approach meets the 2-week deadline?",
+    "options": {
+      "A": "Use AWS DataSync over the 100 Mbps connection with parallel transfer tasks to maximize throughput",
+      "B": "Order an AWS Snowball Edge device, copy data locally, and ship it to AWS for import into S3",
+      "C": "Use S3 Transfer Acceleration with multipart upload to speed up the internet transfer",
+      "D": "Set up AWS Direct Connect to increase bandwidth to 10 Gbps, then use DataSync over the connection"
+    },
+    "answer": "B",
+    "reasoning": "The math kills all network options: 80TB over 100 Mbps = ~74 days. Even perfectly saturating the link doesn't meet 2 weeks. Snowball Edge holds up to 80TB usable, ships in days, and AWS imports to S3 within a day of receiving. Total: ~1 week order + ~1 day copy + ship + import = comfortably within 2 weeks. Direct Connect takes WEEKS TO MONTHS to provision — violates the timeline. Transfer Acceleration speeds uploads but cannot exceed the pipe's 100 Mbps. DataSync optimizes transfer but is still limited by available bandwidth.",
+    "eliminated": {
+      "A": "DataSync is an online tool — no matter how many parallel tasks you run, you cannot exceed the 100 Mbps physical link capacity. 74 days is 74 days",
+      "D": "Direct Connect provisioning takes weeks to months (physical cross-connect installation) — by the time it's active, the deadline has passed",
+      "C": "Transfer Acceleration optimizes the path between your network and S3 (edge locations), but your bottleneck is the 100 Mbps link leaving your premises — TA can't make your ISP pipe wider"
+    }
+  },
+  {
+    "id": "L2-009",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "Storage Gateway = ongoing hybrid access, DataSync = one-time or scheduled migration/sync",
+    "constraint_terms": [
+      "ongoing access",
+      "hybrid cloud",
+      "local cache",
+      "NFS"
+    ],
+    "scenario": "A company keeps its on-premises application writing data to a local NFS file share. The company wants to store the canonical data in S3 for analytics, while the on-premises application continues to use the same NFS interface with low-latency reads of recently accessed files. This is an ongoing operational pattern, not a one-time migration.",
+    "question": "Which AWS service provides this hybrid access pattern?",
+    "options": {
+      "A": "S3 bucket mounted directly on-premises using s3fs-fuse with local caching enabled",
+      "B": "AWS Storage Gateway (File Gateway) — presents S3 as an NFS mount with a local cache for low-latency reads",
+      "C": "AWS Transfer Family SFTP server pointing to S3 for the application to write to",
+      "D": "AWS DataSync with a scheduled task running continuously to sync the NFS share to S3"
+    },
+    "answer": "B",
+    "reasoning": "Storage Gateway File Gateway is designed for EXACTLY this: ongoing hybrid access where on-premises apps keep using NFS/SMB protocol and data transparently lives in S3. It maintains a local cache of recently accessed data for low-latency reads and asynchronously uploads new/modified data to S3. DataSync is for TRANSFER — moving data on schedule or one-time, not for providing an ongoing file system interface. The key differentiator: 'continues to use the same NFS interface with low-latency reads' = Gateway. 'Migrate data / scheduled sync' = DataSync.",
+    "eliminated": {
+      "D": "DataSync is a transfer/migration tool — it copies data between locations but doesn't provide a live NFS file system interface. Applications can't mount a DataSync task",
+      "A": "s3fs-fuse is an unsupported community tool with poor performance and consistency — not appropriate for production workloads, and doesn't provide a local cache for low-latency access",
+      "C": "Transfer Family provides SFTP/FTP/FTPS endpoints backed by S3 — it's for file transfer workflows, not for mounting a filesystem that applications read/write directly via NFS"
+    }
+  },
+  {
+    "id": "L2-010",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "EBS io2 Multi-Attach only works within same AZ, needs cluster-aware filesystem",
+    "constraint_terms": [
+      "shared block storage",
+      "high IOPS",
+      "same Availability Zone"
+    ],
+    "scenario": "A company runs a clustered Oracle RAC database on EC2 that requires multiple instances to have concurrent read/write access to the SAME block-level storage volume. All instances run in the same AZ. The cluster uses Oracle's own filesystem (OCFS2) for coordination. The database requires 50,000 IOPS.",
+    "question": "Which EBS configuration supports this requirement?",
+    "options": {
+      "A": "Multiple separate EBS io2 volumes, one per instance, with application-level replication",
+      "B": "EBS gp3 volume with Multi-Attach enabled for cost-effective shared access",
+      "C": "Amazon EFS mounted by all cluster nodes to provide shared file-level access",
+      "D": "EBS io2 volume with Multi-Attach enabled, shared across cluster instances in the same AZ"
+    },
+    "answer": "D",
+    "reasoning": "EBS io2 Multi-Attach allows a SINGLE volume to be attached to up to 16 Nitro-based instances within the SAME AZ simultaneously. It requires a cluster-aware filesystem (like OCFS2, GFS2) to coordinate concurrent writes — Oracle RAC with OCFS2 is exactly this use case. gp3 does NOT support Multi-Attach. EFS is file-level (NFS), not block-level — Oracle RAC requires block storage. Separate volumes with replication changes the architecture entirely.",
+    "eliminated": {
+      "B": "gp3 volumes do NOT support the Multi-Attach feature — only io1 and io2 volume types support multi-attach. This option simply cannot work technically",
+      "C": "EFS is NFS-based file storage — Oracle RAC requires RAW BLOCK DEVICE access for its shared disk architecture. File-level storage doesn't support Oracle ASM or database block operations",
+      "A": "Separate volumes per instance means each instance sees different data — Oracle RAC specifically requires shared storage where all nodes read/write the same blocks"
+    }
+  },
+  {
+    "id": "L2-011",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "S3 lifecycle rules for automated tier transitions",
+    "constraint_terms": [
+      "reduce cost over time",
+      "automated",
+      "access pattern changes predictably"
+    ],
+    "scenario": "A company stores application logs in S3. Logs are analyzed frequently in the first 7 days, occasionally queried for the first 90 days, and must be retained for 5 years for compliance but are never accessed after 90 days. The company wants to automate cost optimization without managing transitions manually.",
+    "question": "Which lifecycle configuration minimizes storage cost?",
+    "options": {
+      "A": "Standard (days 0-90) → Glacier Deep Archive (day 91) for the remaining retention",
+      "B": "Intelligent-Tiering for the entire 5-year retention — let it auto-manage tiers",
+      "C": "Standard (days 0-7) → Standard-IA (day 8) → Glacier Flexible Retrieval (day 91) → Deep Archive (day 180)",
+      "D": "Standard-IA from day one → Glacier Deep Archive (day 91) — skip the expensive Standard period"
+    },
+    "answer": "C",
+    "reasoning": "Multi-step lifecycle matches each access phase precisely: Standard for heavy first-week access (no retrieval fees), IA for occasional 8-90 day queries (cheaper storage, acceptable retrieval fee for occasional use), Glacier Flexible for 91-180 days (keep minutes-to-hours retrieval in case of late queries), Deep Archive beyond 180 (lowest cost for truly cold data held years). Option B skips IA savings for 83 days. C works but Intelligent-Tiering charges monitoring fee per-object for millions of log objects over 5 years. D puts frequently-accessed day 1-7 logs in IA, incurring retrieval fees on every analysis.",
+    "eliminated": {
+      "A": "Keeping in Standard for 90 days is 10x more expensive per GB than transitioning to IA on day 8 — you pay Standard rate for 83 extra days when access is only 'occasional'",
+      "B": "Intelligent-Tiering charges ~$0.0025 per 1000 objects/month for monitoring — with millions of daily log files over 5 years, this monitoring fee accumulates significantly. Predictable patterns are better served by lifecycle rules",
+      "D": "Standard-IA from day one means every analysis query in the first 7 days incurs a per-GB retrieval fee — for frequently-accessed data, IA is actually MORE expensive than Standard"
+    }
+  },
+  {
+    "id": "L2-012",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "S3 replication does NOT replicate existing objects — only new objects after rule creation",
+    "constraint_terms": [
+      "cross-Region copy",
+      "existing and new objects",
+      "disaster recovery"
+    ],
+    "scenario": "A company has an S3 bucket with 5TB of existing data and receives ~100 new objects daily. For disaster recovery, they need ALL data (existing + future) replicated to a bucket in another Region. A solutions architect enables S3 Cross-Region Replication on the bucket.",
+    "question": "What additional step is needed to replicate the existing 5TB of data?",
+    "options": {
+      "A": "Enable versioning on both buckets first, then CRR will process all existing versions",
+      "B": "Run an S3 Batch Replication job to copy the existing 5TB — CRR only replicates objects created AFTER the rule is enabled",
+      "C": "No additional step — enabling CRR will retroactively replicate all existing objects within 24 hours",
+      "D": "Delete and re-upload the existing objects so they appear as 'new' to the replication rule"
+    },
+    "answer": "B",
+    "reasoning": "S3 replication (CRR/SRR) only applies to objects PUT AFTER the replication rule is created. Existing objects are invisible to the rule — this is a critical trap because people assume 'turn on replication = everything replicates.' AWS provides S3 Batch Replication specifically for this gap: you create a Batch Replication job that processes existing objects. After that, new objects are handled by the live rule. Versioning IS required for replication, but enabling it doesn't trigger retroactive replication.",
+    "eliminated": {
+      "C": "CRR absolutely does NOT replicate existing objects retroactively — this is one of the most commonly tested S3 misconceptions. Only new PUTs/POSTs/DELETEs after rule creation are replicated",
+      "D": "Deleting and re-uploading 5TB is impractical, costly (data transfer), and risky — S3 Batch Replication is the purpose-built solution for this exact problem",
+      "A": "Versioning is a prerequisite for replication, but it doesn't cause existing objects to be replicated. Versioning tracks changes; replication rules apply to future changes"
+    }
+  },
+  {
+    "id": "L2-013",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "EBS volumes are AZ-locked — cannot attach cross-AZ",
+    "constraint_terms": [
+      "high availability",
+      "persistent storage",
+      "multi-AZ"
+    ],
+    "scenario": "A company runs a stateful application on a single EC2 instance with an EBS volume storing application state. The architect must redesign for high availability across two AZs so that if one AZ fails, the application recovers quickly with its latest data.",
+    "question": "Which approach provides multi-AZ resilience for the application's persistent data?",
+    "options": {
+      "A": "Configure EBS Multi-Attach to share the volume between instances in two AZs",
+      "B": "Create EBS snapshots on a schedule and restore in the other AZ during failover",
+      "C": "Use S3 as the primary data store since it automatically replicates across AZs within a Region",
+      "D": "Use EFS for the stateful data — it spans multiple AZs automatically and both instances can mount it"
+    },
+    "answer": "D",
+    "reasoning": "EFS is inherently multi-AZ — data is replicated across AZs within the Region and can be mounted by instances in any AZ simultaneously. If one AZ fails, the other instance already has access to the same data with no failover mechanism needed. EBS Multi-Attach (B) ONLY works within the SAME AZ — it cannot span AZs. Snapshots (C) work for DR but have data loss (time since last snapshot) and recovery delay. S3 (D) is multi-AZ but it's object storage — if the app needs a POSIX filesystem, S3 doesn't work directly.",
+    "eliminated": {
+      "A": "EBS Multi-Attach shares a volume between instances in the SAME AZ only — it provides no cross-AZ capability whatsoever. This is a hard architectural limit of EBS",
+      "B": "Scheduled snapshots mean data loss equal to the time since last snapshot (RPO > 0) and recovery requires creating a new volume from snapshot (minutes of RTO). Not 'recovers quickly with latest data'",
+      "C": "S3 is multi-AZ but requires application redesign to use object API instead of file I/O — this might work for some apps but doesn't satisfy 'persistent storage' if the app needs POSIX filesystem semantics"
+    }
+  },
+  {
+    "id": "L2-014",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "S3 Transfer Acceleration uses CloudFront edge locations for faster upload — doesn't help with bandwidth limits",
+    "constraint_terms": [
+      "global users",
+      "upload performance",
+      "large files"
+    ],
+    "scenario": "A global media company has photographers in 40 countries uploading RAW image files (50-200MB each) to a centralized S3 bucket in us-east-1. Users in Asia and Africa experience very slow uploads due to geographic distance. The company's local ISP bandwidth is not the bottleneck — latency and packet loss over long distances are.",
+    "question": "Which solution improves upload speed for geographically distant users?",
+    "options": {
+      "A": "Use AWS Global Accelerator with a custom upload endpoint to route traffic over the AWS network",
+      "B": "Deploy additional S3 buckets in each user's Region and use S3 Cross-Region Replication to consolidate",
+      "C": "Configure multipart upload with larger part sizes to reduce the number of round trips",
+      "D": "Enable S3 Transfer Acceleration on the bucket — uploads route through the nearest CloudFront edge location over AWS's optimized backbone"
+    },
+    "answer": "D",
+    "reasoning": "Transfer Acceleration leverages CloudFront's 400+ edge locations. The upload from Asia hits a NEARBY edge (low latency), then traverses AWS's internal backbone (optimized, low packet loss) to us-east-1. This directly addresses the 'long distance = latency + packet loss' problem by minimizing the public internet portion. Multi-Region buckets (B) add complexity. Multipart (C) helps for parallel throughput but doesn't fix latency. Global Accelerator (D) is for TCP/UDP applications, not specifically S3 uploads — Transfer Acceleration is the purpose-built S3 feature.",
+    "eliminated": {
+      "B": "Multiple buckets with replication works but adds significant operational complexity — managing buckets in many Regions, replication rules, consistency across Regions. Transfer Acceleration solves it with one setting",
+      "C": "Multipart upload parallelizes parts but each part still travels the full public internet path to us-east-1 — latency and packet loss on the long-haul connection affect each part",
+      "A": "Global Accelerator provides static IPs and AWS backbone routing for TCP apps but is not designed for S3 uploads specifically — Transfer Acceleration is the purpose-built, simpler solution for this exact problem"
+    }
+  },
+  {
+    "id": "L2-015",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "moderate",
+    "trap_fact": "Glacier Deep Archive: 180-day minimum storage, standard retrieval 12+ hours",
+    "constraint_terms": [
+      "lowest storage cost",
+      "rarely accessed",
+      "tolerate long retrieval"
+    ],
+    "scenario": "A government agency must retain 10 years of financial audit records. Records are accessed only if a formal investigation is opened — approximately once every 3-5 years. When needed, the agency can tolerate up to 48 hours to retrieve the data. The archive contains 500TB and is growing by 50TB per year.",
+    "question": "Which storage class provides the lowest cost for this archive?",
+    "options": {
+      "A": "S3 Glacier Flexible Retrieval — provides retrieval within 3-5 hours for faster access when needed",
+      "B": "S3 Intelligent-Tiering with Deep Archive Access tier enabled — automatically manages the archive tier",
+      "C": "S3 Glacier Instant Retrieval — millisecond access ensures immediate availability during investigations",
+      "D": "S3 Glacier Deep Archive — lowest per-GB storage cost with retrieval within 12-48 hours"
+    },
+    "answer": "D",
+    "reasoning": "Deep Archive is ~$0.00099/GB/month — the absolute lowest S3 storage cost. The 48-hour retrieval tolerance maps perfectly to Deep Archive's standard 12-hour or bulk 48-hour retrieval options. At 500TB growing 50TB/year, the cost difference between Deep Archive and Glacier Flexible is ~$1,300/month from day one. Flexible Retrieval (B) costs 3-4x more per GB for speed you don't need. Instant Retrieval (C) costs even more. Intelligent-Tiering with Deep Archive tier works but charges monitoring fees on objects that you KNOW won't be accessed — lifecycle rule to Deep Archive is simpler.",
+    "eliminated": {
+      "A": "Glacier Flexible costs ~$0.0036/GB vs Deep Archive ~$0.00099/GB — 3.6x more expensive per GB. At 500TB, that's ~$1,300/month extra for retrieval speed you don't need (48h tolerance covers Deep Archive)",
+      "C": "Glacier Instant Retrieval costs significantly more per GB — paying for millisecond access when you can tolerate 48 hours is extreme waste at this scale",
+      "B": "Intelligent-Tiering's Deep Archive Access tier charges a monitoring fee per object — for data you KNOW won't be accessed for years, a simple lifecycle rule to Deep Archive avoids this recurring per-object fee"
+    }
+  },
+  {
+    "id": "L2-016",
+    "layer": 2,
+    "category": "storage",
+    "difficulty": "hard",
+    "trap_fact": "Storage Gateway Volume Gateway can create EBS snapshots from on-premises volumes",
+    "constraint_terms": [
+      "hybrid",
+      "block storage",
+      "disaster recovery to AWS"
+    ],
+    "scenario": "A company runs a critical application on-premises using iSCSI block storage. For disaster recovery, they need point-in-time snapshots of their on-premises volumes stored in AWS, with the ability to quickly restore as EBS volumes if the on-premises site is destroyed.",
+    "question": "Which AWS service provides block-level DR snapshots from on-premises to AWS?",
+    "options": {
+      "A": "AWS Storage Gateway (Volume Gateway in cached mode) — presents iSCSI volumes on-premises and backs up to EBS snapshots in AWS",
+      "B": "S3 Cross-Region Replication from an on-premises S3-compatible storage system",
+      "C": "AWS Backup with an on-premises backup agent that sends block-level data to S3",
+      "D": "AWS DataSync with an NFS source agent running on-premises, syncing to an EBS volume in the cloud"
+    },
+    "answer": "A",
+    "reasoning": "Volume Gateway (cached or stored mode) presents iSCSI block volumes to on-premises applications. Behind the scenes, it creates EBS snapshots in AWS that can be instantly converted to EBS volumes for DR recovery. Cached mode stores primary data in S3 with frequently accessed data cached locally. The key differentiator: iSCSI interface → EBS snapshots → EBS volumes for DR. DataSync (B) is file-level, not block-level. AWS Backup (C) doesn't have an on-premises block agent. S3 replication (D) requires the source to already be S3-compatible.",
+    "eliminated": {
+      "D": "DataSync transfers FILE-level data (NFS/SMB) — it does not provide block-level iSCSI access or create EBS snapshots. Different abstraction layer entirely",
+      "C": "AWS Backup manages backup policies for AWS resources — it does not have an agent you install on-premises to capture block-level data from local storage arrays",
+      "B": "CRR works between S3 buckets — on-premises iSCSI storage is not S3-compatible. You'd need to first get the data into S3 format, which is the problem we're solving"
+    }
+  }
+]

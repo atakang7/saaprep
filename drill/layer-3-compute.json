@@ -1,0 +1,410 @@
+[
+  {
+    "id": "L3-001",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Lambda has 15-minute maximum timeout",
+    "constraint_terms": [
+      "serverless",
+      "processing time exceeds 15 minutes",
+      "least operational overhead"
+    ],
+    "scenario": "A company processes uploaded video files by transcoding them into multiple formats. The transcoding process takes between 20 and 45 minutes per file depending on size. The company wants a serverless, event-driven architecture triggered by S3 uploads.",
+    "question": "Which compute solution handles this workload without managing servers?",
+    "options": {
+      "A": "AWS Step Functions orchestrating AWS Batch with Fargate — Step Functions triggers on S3 upload, Batch runs the transcoding container",
+      "B": "Amazon ECS on EC2 with Auto Scaling triggered by S3 event via EventBridge",
+      "C": "Lambda function that splits the video into 15-minute chunks, processes each chunk separately, then reassembles",
+      "D": "AWS Lambda function triggered by S3 event notification with the timeout set to maximum"
+    },
+    "answer": "A",
+    "reasoning": "Lambda's HARD LIMIT is 15 minutes — a 20-45 minute process cannot run in Lambda, period. No splitting trick solves video transcoding (you can't arbitrarily chunk a transcode). AWS Batch on Fargate is serverless container execution designed for long-running jobs — you don't manage servers, AWS manages the compute. Step Functions provides the orchestration (trigger on upload, monitor job, handle failure). ECS on EC2 (C) requires managing EC2 instances — not serverless. The exam loves this pattern: 'serverless' + '>15 min' = Batch/Fargate, never Lambda.",
+    "eliminated": {
+      "D": "Lambda maximum timeout is 15 minutes — cannot be extended. A 20-45 minute process will ALWAYS be killed at the 15-minute mark. This is a hard platform limit",
+      "B": "ECS on EC2 requires managing EC2 instances (capacity, patching, scaling) — violates 'serverless' and 'least operational overhead.' ECS on FARGATE would work, but the option says EC2",
+      "C": "Video transcoding cannot be naively split into time chunks — transcoding requires processing the full file sequentially (codec state, GOP structure, frame dependencies). This isn't how transcoding works"
+    }
+  },
+  {
+    "id": "L3-002",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "hard",
+    "trap_fact": "Lambda has no persistent local state between invocations",
+    "constraint_terms": [
+      "maintain database connection pool",
+      "thousands of concurrent requests",
+      "serverless"
+    ],
+    "scenario": "A company has a Lambda function that queries an RDS MySQL database on every invocation. Under high load (3,000 concurrent Lambda executions), the RDS instance is overwhelmed by connection attempts — each Lambda creates a new database connection. The team needs to reduce connection pressure on the database while keeping the serverless architecture.",
+    "question": "Which solution reduces database connection overhead?",
+    "options": {
+      "A": "Configure Lambda provisioned concurrency to limit the number of execution environments creating connections",
+      "B": "Enable Amazon RDS Proxy between Lambda and the database — it pools and shares database connections across all Lambda invocations",
+      "C": "Increase the RDS instance size to handle more concurrent connections",
+      "D": "Initialize the database connection outside the handler function so it persists across warm invocations within the same execution environment"
+    },
+    "answer": "B",
+    "reasoning": "RDS Proxy is purpose-built for this exact problem. It maintains a pool of persistent database connections and multiplexes thousands of Lambda connection requests through a smaller set of actual database connections. Lambda can't maintain a traditional connection pool because each execution environment is independent and ephemeral. Option B helps slightly (warm containers reuse connections) but doesn't solve the core problem: 3,000 concurrent executions still means up to 3,000 connections. RDS Proxy collapses that to a manageable pool regardless of Lambda concurrency.",
+    "eliminated": {
+      "D": "Connection reuse in warm containers helps but each concurrent execution environment still holds its own connection — 3,000 concurrent Lambdas = up to 3,000 connections even with this optimization",
+      "C": "Scaling the database up treats the symptom not the cause — connection limits exist at all sizes, and you're paying more for a problem that RDS Proxy solves architecturally at lower cost",
+      "A": "Provisioned concurrency pre-warms environments (reduces cold starts) but doesn't limit total concurrent executions. Reserved concurrency limits concurrency but throttles your application"
+    }
+  },
+  {
+    "id": "L3-003",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Fargate — no access to underlying host OS",
+    "constraint_terms": [
+      "container workload",
+      "install monitoring agent on host",
+      "compliance requirement"
+    ],
+    "scenario": "A company runs containerized microservices on Amazon ECS. Their compliance framework requires a security monitoring agent to be installed and running on the underlying host operating system to detect kernel-level threats. The agent cannot run as a sidecar container — it requires host-level access to the kernel.",
+    "question": "Which ECS launch type supports this compliance requirement?",
+    "options": {
+      "A": "ECS on EC2 — you manage the host OS and can install any agent directly on the instance",
+      "B": "ECS on EC2 Spot with a daemonset-style service that deploys the agent to every instance",
+      "C": "ECS on Fargate with a privileged container running the monitoring agent alongside application containers",
+      "D": "ECS on Fargate with a custom AMI that includes the monitoring agent pre-installed"
+    },
+    "answer": "A",
+    "reasoning": "Fargate is SERVERLESS containers — you have ZERO access to the host. No SSH, no agent installation, no kernel access, no custom AMI. The host doesn't exist from your perspective. When the requirement is 'install something on the host OS' or 'kernel-level access,' Fargate is immediately disqualified. EC2 launch type gives you the instances — you control the AMI, can SSM into them, install agents, access the OS. The trade-off: you manage the instances (patching, scaling) but gain full host control.",
+    "eliminated": {
+      "C": "Fargate doesn't support privileged containers (as of the standard configuration) and even if it did, a privileged container still runs in a container namespace — it doesn't have the same host kernel access as a native agent",
+      "D": "Fargate does NOT use YOUR AMI — there is no concept of a custom AMI for Fargate. AWS manages the host entirely and you cannot modify it. The AMI concept only applies to EC2 launch type",
+      "B": "This actually works (ECS daemon service on EC2 instances) but Spot instances can be interrupted — a compliance monitoring agent that disappears when Spot reclaims the instance would leave gaps in coverage. Standard EC2 is safer for compliance"
+    }
+  },
+  {
+    "id": "L3-004",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "hard",
+    "trap_fact": "Spot instances can be interrupted with 2-minute warning",
+    "constraint_terms": [
+      "fault-tolerant",
+      "80% cost savings",
+      "stateless",
+      "can retry"
+    ],
+    "scenario": "A genomics company runs a data analysis pipeline where each step processes an independent data chunk, writes results to S3, and has built-in retry logic. Processing a single chunk takes 10-20 minutes. The company wants to minimize compute costs. The pipeline is fully containerized and runs on ECS.",
+    "question": "Which compute strategy maximizes cost savings for this workload?",
+    "options": {
+      "A": "ECS on EC2 Spot instances with a diversified Spot Fleet across multiple instance types and AZs",
+      "B": "ECS on Fargate Spot with retry logic at the ECS service level",
+      "C": "ECS on EC2 with Reserved Instances for 1-year term to get predictable pricing",
+      "D": "ECS on Graviton EC2 instances with On-Demand pricing for the architecture cost savings"
+    },
+    "answer": "A",
+    "reasoning": "This workload has ALL the Spot markers: stateless, fault-tolerant, can retry, independent chunks, results saved to S3 (no state loss on termination). Diversified Spot fleets across multiple instance types and AZs reduce interruption probability — if one pool is reclaimed, others likely aren't. Fargate Spot (B) works but has lower discount (~70% vs 90%) and less capacity diversity. RIs waste money on a bursty pipeline. The key pattern: 'can be interrupted + can retry + stateless' = Spot with diversification.",
+    "eliminated": {
+      "B": "Fargate Spot works but typically offers ~70% discount vs EC2 Spot's ~90%. Also less control over capacity diversification — fewer knobs to reduce interruption risk",
+      "C": "Reserved Instances lock you into a fixed capacity for 1 year — genomics pipelines are often bursty (heavy for days, idle for weeks). RIs pay for capacity you're not using during idle periods",
+      "D": "Graviton provides ~20% price/performance improvement over x86 — good, but nowhere near the 80%+ savings from Spot vs On-Demand. These are complementary (use Graviton Spot) but alone Graviton doesn't meet '80% savings'"
+    }
+  },
+  {
+    "id": "L3-005",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Reserved Instances tied to instance type + Region + platform",
+    "constraint_terms": [
+      "changing instance families",
+      "flexibility",
+      "commit to compute spend"
+    ],
+    "scenario": "A company commits to spending $50,000/month on compute for the next 3 years. However, their workloads evolve — they started on m5.xlarge instances but are migrating to m6i and c6i families, may shift some workloads to different Regions, and plan to move some services to Fargate. They want to commit for maximum discount without being locked to specific instance configurations.",
+    "question": "Which pricing model provides the best discount with this flexibility requirement?",
+    "options": {
+      "A": "EC2 Instance Savings Plans — flexible on size within a family but locked to Region and instance family",
+      "B": "Standard 3-year Reserved Instances for m5.xlarge with the ability to exchange for other instance types",
+      "C": "Convertible Reserved Instances that can be exchanged for different instance families and sizes",
+      "D": "Compute Savings Plans — apply to any EC2 instance family, size, Region, OS, and Fargate/Lambda usage"
+    },
+    "answer": "D",
+    "reasoning": "Compute Savings Plans offer the broadest flexibility: any instance family (m5, m6i, c6i), any Region, any OS, any tenancy, AND they cover Fargate and Lambda. The discount (~66% for 3-year all upfront) is slightly less than EC2 Savings Plans (~72%) but the flexibility across families, Regions, and even compute types (Fargate) matches every stated requirement. EC2 Savings Plans lock to a family+Region. Convertible RIs can exchange but are complex, have limited discount, and don't cover Fargate. The exam tests: 'maximum flexibility across families/Regions' = Compute SP.",
+    "eliminated": {
+      "A": "EC2 Instance Savings Plans lock you to a specific instance family AND Region — the company is changing families (m5→m6i→c6i) AND may shift Regions. Both constraints are violated",
+      "B": "Standard RIs cannot be exchanged — they're locked to the exact instance type, Region, and platform. Exchangeability is a feature of CONVERTIBLE RIs. Standard gives highest discount but zero flexibility",
+      "C": "Convertible RIs can be exchanged but: (1) exchanges are constrained (new value must be >= old value), (2) discount is lower (~54% vs 66% for Compute SP), (3) they don't cover Fargate or Lambda, (4) management overhead of exchanging is high"
+    }
+  },
+  {
+    "id": "L3-006",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Cluster placement group — same AZ, same rack, lowest latency but no multi-AZ",
+    "constraint_terms": [
+      "low latency between instances",
+      "high throughput",
+      "same AZ"
+    ],
+    "scenario": "A high-performance computing application requires the lowest possible network latency between 20 EC2 instances. The instances exchange large amounts of data in a tightly-coupled parallel computation. The application is designed to handle instance failures by checkpointing to S3 every 5 minutes.",
+    "question": "Which placement strategy minimizes inter-instance network latency?",
+    "options": {
+      "A": "Partition placement group — divides instances into partitions on separate racks for batch workloads",
+      "B": "Default placement (no group) with enhanced networking enabled on all instances",
+      "C": "Spread placement group — distributes instances across hardware to minimize correlated failures",
+      "D": "Cluster placement group — places all instances on nearby hardware within a single AZ for lowest latency and highest throughput"
+    },
+    "answer": "D",
+    "reasoning": "Cluster placement group packs instances onto the SAME underlying hardware rack within a single AZ. This gives: lowest latency (microseconds), highest bandwidth (up to 100 Gbps between instances), and no cross-rack hops. The trade-off: if that rack fails, ALL instances may fail simultaneously. The scenario explicitly handles this (checkpointing to S3), so the trade-off is acceptable. Spread groups MAXIMIZE distance between instances (opposite of what we want). Partitions spread across racks. Default placement gives no locality guarantees.",
+    "eliminated": {
+      "C": "Spread placement MAXIMIZES distance between instances — each instance goes to a different physical rack. This is for HA (reducing correlated failure), the exact opposite of low-latency clustering",
+      "A": "Partition placement separates instances into groups on different racks — useful for distributed databases (HDFS, Cassandra) where you want failure isolation between replicas, not for tightly-coupled HPC",
+      "B": "Enhanced networking enables SR-IOV for better NIC performance but without a placement group, instances may be spread across different racks/switches — no guarantee of proximity"
+    }
+  },
+  {
+    "id": "L3-007",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "hard",
+    "trap_fact": "Auto Scaling cooldown prevents flapping — rapid scaling without it causes thrashing",
+    "constraint_terms": [
+      "rapidly fluctuating load",
+      "scaling too aggressively",
+      "stabilize"
+    ],
+    "scenario": "A company's Auto Scaling group scales between 2 and 20 instances based on CPU utilization. During traffic spikes, the group scales out rapidly but then immediately scales back in when new instances reduce average CPU, only to scale out again seconds later. This oscillation repeats continuously, causing instance churn and poor user experience.",
+    "question": "Which Auto Scaling configuration change stops this oscillation?",
+    "options": {
+      "A": "Add a scheduled action that pre-scales during known peak hours instead of reactive scaling",
+      "B": "Increase the cooldown period to give newly launched instances time to absorb traffic before the next scaling decision",
+      "C": "Set the minimum capacity to 20 instances so scaling decisions never trigger",
+      "D": "Switch from simple scaling to target tracking scaling — it handles fluctuations automatically without cooldown"
+    },
+    "answer": "B",
+    "reasoning": "The cooldown period prevents the Auto Scaling group from launching or terminating additional instances before PREVIOUS instances have time to impact the metric. Without adequate cooldown, the group sees high CPU → scales out → new instances reduce CPU → scales in → CPU spikes again → repeat. Cooldown says 'after scaling, wait X seconds before checking again.' Target tracking (B) is good but ALSO uses cooldown internally — switching to it doesn't eliminate the fundamental timing problem if instances need time to warm up. Min=max=20 wastes money. Scheduled actions don't help with unpredictable spikes.",
+    "eliminated": {
+      "D": "Target tracking is a better policy type but still evaluates metrics periodically — if instances take time to absorb load (application startup, JVM warmup), oscillation can still occur. The root cause is insufficient stabilization time, which cooldown addresses",
+      "C": "Setting minimum to 20 means you always pay for 20 instances regardless of load — this isn't scaling, it's over-provisioning. Defeats the purpose of Auto Scaling entirely",
+      "A": "Scheduled actions only help for PREDICTABLE load patterns — the scenario describes traffic 'spikes' which are unpredictable. You can't schedule what you can't predict"
+    }
+  },
+  {
+    "id": "L3-008",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Lambda cold starts add latency — consistent ultra-low latency may need always-on compute",
+    "constraint_terms": [
+      "consistent sub-10ms response",
+      "API endpoint",
+      "millions of requests"
+    ],
+    "scenario": "A financial trading platform requires that its pricing API respond in under 10 milliseconds on EVERY request — including the first request after idle periods. The API receives 50 million requests per day with unpredictable traffic patterns. The compute solution must handle these bursts without ANY request exceeding the 10ms latency threshold.",
+    "question": "Which compute approach meets the strict latency requirement?",
+    "options": {
+      "A": "Lambda with provisioned concurrency set to handle peak traffic — eliminates cold starts entirely",
+      "B": "Lambda with SnapStart enabled for fast initialization",
+      "C": "Fargate containers with minimum task count to ensure always-ready capacity",
+      "D": "EC2 instances in an Auto Scaling group behind an NLB — application stays warm with in-memory caching and no cold start penalty"
+    },
+    "answer": "D",
+    "reasoning": "Sub-10ms on EVERY request rules out Lambda even with provisioned concurrency. Provisioned concurrency eliminates cold starts but Lambda still has: invocation overhead (~1-5ms), VPC setup if applicable, and the function execution time itself. For sub-10ms total latency, you need code running in-memory on an always-warm instance with optimized network (NLB = Layer 4, minimal processing). EC2 with pre-warmed instances, in-memory caches, and NLB (not ALB — NLB adds less latency) gives the tightest control. Fargate has task startup latency for new tasks.",
+    "eliminated": {
+      "A": "Provisioned concurrency eliminates cold starts but Lambda still incurs per-invocation overhead (service routing, environment marshaling). For sub-10ms TOTAL including all overhead, Lambda's architecture adds too many milliseconds",
+      "B": "SnapStart reduces cold start for Java Lambdas but doesn't eliminate all invocation overhead — still has the same fundamental Lambda latency floor above 10ms for the full request path",
+      "C": "Fargate minimum tasks stay running but Fargate's networking adds latency compared to EC2 — the API traverses the Fargate network namespace which adds overhead vs a bare EC2 instance directly behind NLB"
+    }
+  },
+  {
+    "id": "L3-009",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Lambda 6MB synchronous response payload limit",
+    "constraint_terms": [
+      "generate large report",
+      "return to user",
+      "serverless"
+    ],
+    "scenario": "A serverless application uses API Gateway + Lambda to generate PDF reports. Some reports exceed 10MB. Users receive a 502 error when requesting these large reports because Lambda cannot return the full response through API Gateway.",
+    "question": "How should the architect redesign the report delivery?",
+    "options": {
+      "A": "Split the PDF into multiple chunks and return them across multiple synchronous Lambda calls",
+      "B": "Enable response compression on API Gateway to bring the payload under the limit",
+      "C": "Lambda writes the PDF to S3 and returns a pre-signed URL to the client — client downloads directly from S3",
+      "D": "Increase the Lambda response payload limit by requesting a service quota increase"
+    },
+    "answer": "C",
+    "reasoning": "Lambda's synchronous response limit (6MB) and API Gateway's payload limit (10MB) are HARD LIMITS — they cannot be increased. The pattern for large outputs is: Lambda generates the file → writes to S3 → returns a lightweight response containing a pre-signed URL → client downloads directly from S3 (no payload limits, handles any size). This is the canonical 'large response from serverless' pattern. Compression might help for some files but PDFs are already compressed. Chunking requires client-side reassembly and multiple round trips.",
+    "eliminated": {
+      "D": "The Lambda synchronous payload limit (6MB) and API Gateway limit (10MB) are hard limits that CANNOT be increased via service quotas — they are architectural constraints of the service",
+      "B": "PDF files contain compressed binary content — further compression yields minimal size reduction. A 10MB PDF might compress to 9MB, still exceeding Lambda's 6MB limit",
+      "A": "Splitting a PDF across multiple calls requires the client to make multiple requests and reassemble — poor UX, complex error handling, and still bounded by per-call limits"
+    }
+  },
+  {
+    "id": "L3-010",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "hard",
+    "trap_fact": "Spot + On-Demand mixed fleet for cost optimization with baseline guarantee",
+    "constraint_terms": [
+      "80% cost reduction",
+      "some capacity must always be available",
+      "web application"
+    ],
+    "scenario": "A web application runs on an Auto Scaling group with a minimum of 4 instances needed for availability. Traffic peaks require up to 20 instances. The company wants to minimize costs but cannot tolerate dropping below 4 healthy instances at any time — the base capacity is critical.",
+    "question": "Which Auto Scaling configuration optimizes cost while guaranteeing minimum capacity?",
+    "options": {
+      "A": "All 20 instances as Spot with a minimum capacity of 4 — Auto Scaling maintains minimum even with Spot interruptions",
+      "B": "All Spot instances with capacity rebalancing enabled to replace interrupted instances automatically",
+      "C": "Mixed instances policy: 4 instances On-Demand as base capacity, remaining spot instances across multiple instance types for peak scaling",
+      "D": "Reserved Instances for 4 base instances and On-Demand for bursting to 20"
+    },
+    "answer": "C",
+    "reasoning": "Mixed instances policy lets you define a BASE of On-Demand capacity (guaranteeing 4 instances that can NEVER be interrupted) while the scaling portion above base uses Spot (up to 90% cheaper). Multiple instance types in the Spot pool reduce interruption probability. This gives: guaranteed base (On-Demand) + cheap burst (Spot diversified). Pure Spot (B/D) can drop below 4 during mass reclamation events — the 2-minute warning isn't enough to guarantee replacement before impact. RIs for base + On-Demand burst (C) works but costs significantly more than the Spot burst portion.",
+    "eliminated": {
+      "A": "Auto Scaling will TRY to maintain minimum capacity but if Spot capacity is reclaimed across all pools simultaneously, there's a gap. ASG has 2 minutes to replace — during multi-AZ reclamation events, it may temporarily drop below 4",
+      "D": "RIs for base + On-Demand for burst works but costs much more — On-Demand pricing for 16 burst instances vs Spot pricing is ~70-90% more expensive for the burst portion",
+      "B": "Capacity rebalancing proactively replaces at-risk instances but still uses ALL Spot — if Spot is generally unavailable in your pools, you have NO fallback. The guaranteed base must be non-Spot"
+    }
+  },
+  {
+    "id": "L3-011",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "Lambda@Edge vs CloudFront Functions — edge compute selection",
+    "constraint_terms": [
+      "simple header manipulation",
+      "every request",
+      "lowest latency",
+      "cheapest"
+    ],
+    "scenario": "A company uses CloudFront to serve a web application. They need to add a security header (Strict-Transport-Security) to every HTTP response before it reaches the user. The logic is a simple string insertion — no external calls, no complex computation.",
+    "question": "Which edge compute option is most cost-effective for this simple manipulation?",
+    "options": {
+      "A": "CloudFront Functions — lightweight JavaScript execution at every edge location with sub-millisecond latency and lower cost than Lambda@Edge",
+      "B": "Lambda@Edge function triggered on viewer response events",
+      "C": "Configure CloudFront response headers policy without any custom code",
+      "D": "Origin response Lambda@Edge function that adds the header before CloudFront caches it"
+    },
+    "answer": "C",
+    "reasoning": "Trick question — CloudFront has BUILT-IN response headers policies that add security headers (HSTS, CSP, X-Frame-Options, etc.) without ANY custom code. This is cheaper, simpler, and faster than both Lambda@Edge and CloudFront Functions. When the exam describes simple header manipulation for standard security headers, the managed feature wins. If the headers policy didn't exist or required custom logic, CloudFront Functions would be next best (cheaper and faster than Lambda@Edge for simple transformations). Lambda@Edge is for complex logic needing network calls or larger resources.",
+    "eliminated": {
+      "A": "CloudFront Functions work but are unnecessary here — CloudFront's managed response headers policy handles HSTS natively without any code. Using CF Functions adds code maintenance for something the service does out-of-the-box",
+      "B": "Lambda@Edge is the most expensive and complex option for edge compute — invoked at Regional edge caches (not all PoPs), higher latency, higher cost per invocation. Overkill for header insertion",
+      "D": "Origin response Lambda@Edge runs only on cache misses (when CF fetches from origin) — this means the header is added once and cached. Works, but still requires deploying and maintaining a Lambda function for a built-in feature"
+    }
+  },
+  {
+    "id": "L3-012",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "hard",
+    "trap_fact": "EC2 Auto Scaling launch template vs launch configuration — templates support versioning and mixed instances",
+    "constraint_terms": [
+      "multiple instance types",
+      "Spot and On-Demand mix",
+      "Auto Scaling"
+    ],
+    "scenario": "A company needs to configure an Auto Scaling group that uses multiple instance types (m5.large, m5.xlarge, m6i.large), supports both Spot and On-Demand instances in the same group, and allows the team to update configurations without recreating the ASG.",
+    "question": "Which configuration resource must be used?",
+    "options": {
+      "A": "Multiple Auto Scaling groups (one per instance type) behind the same load balancer",
+      "B": "Launch template — supports versioning, multiple instance types, mixed instances policies, and Spot integration",
+      "C": "EC2 Fleet with a separate Auto Scaling policy attached for capacity management",
+      "D": "Launch configuration — the original ASG configuration that supports all instance type and purchasing options"
+    },
+    "answer": "B",
+    "reasoning": "Launch templates are the modern replacement for launch configurations and are REQUIRED for mixed instances policies (Spot + On-Demand in same ASG) and multiple instance type selection. Launch configurations don't support: versioning, multiple instance types in one ASG, Spot + On-Demand mixed policies, or T2/T3 unlimited mode. AWS recommends launch templates for all new ASGs. EC2 Fleet (C) is a separate concept for one-time fleet provisioning, not ongoing Auto Scaling. Multiple ASGs (D) add operational burden needlessly.",
+    "eliminated": {
+      "D": "Launch configurations are LEGACY — they don't support mixed instances policies, can't specify multiple instance types, don't version, and can't be updated (you must create new ones). AWS no longer recommends them",
+      "C": "EC2 Fleet is for provisioning a set of instances at once (like a Spot Fleet request) — it's not designed for ongoing Auto Scaling with target tracking and health check replacement",
+      "A": "Running multiple ASGs adds operational complexity — separate scaling policies, health checks, and capacity management per group. Launch template with mixed instances policy handles this in one ASG natively"
+    }
+  },
+  {
+    "id": "L3-013",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "ECS vs EKS — ECS is AWS-native, EKS for Kubernetes portability",
+    "constraint_terms": [
+      "existing Kubernetes manifests",
+      "multi-cloud strategy",
+      "container orchestration"
+    ],
+    "scenario": "A company is migrating containerized microservices from an on-premises Kubernetes cluster to AWS. They have existing Helm charts, kubectl scripts, and Kubernetes-native service mesh (Istio). The company also runs some workloads in GCP and wants to maintain operational consistency across clouds.",
+    "question": "Which container orchestration service should they use on AWS?",
+    "options": {
+      "A": "Amazon ECS Anywhere — allows running ECS tasks on on-premises and multi-cloud infrastructure",
+      "B": "Amazon ECS — AWS-native container orchestration that's simpler and fully integrated with AWS services",
+      "C": "Amazon EKS — managed Kubernetes that runs their existing manifests, Helm charts, and Istio without modification",
+      "D": "Self-managed Kubernetes on EC2 for maximum control and consistency with on-premises"
+    },
+    "answer": "C",
+    "reasoning": "The trigger words are: 'existing Kubernetes manifests,' 'Helm charts,' 'kubectl,' 'Kubernetes-native service mesh,' and 'multi-cloud consistency.' EKS runs upstream Kubernetes — all existing K8s tooling works unchanged. The multi-cloud angle is critical: K8s is the common API across AWS (EKS), GCP (GKE), and Azure (AKS). Using ECS means rewriting all orchestration for AWS-specific API. ECS Anywhere runs ECS agent on other platforms but doesn't help with K8s tooling. Self-managed K8s works but 'managed' wins for operational overhead.",
+    "eliminated": {
+      "B": "ECS uses AWS-specific task definitions and APIs — all existing Kubernetes manifests, Helm charts, and kubectl scripts would need to be completely rewritten. Also not consistent with GCP (which uses GKE/Kubernetes)",
+      "A": "ECS Anywhere extends ECS to external infrastructure but uses ECS APIs, not Kubernetes APIs — doesn't satisfy the 'existing Kubernetes tooling' or 'multi-cloud K8s consistency' requirements",
+      "D": "Self-managed Kubernetes on EC2 provides consistency but requires managing the entire control plane (etcd, API server, scheduler) — significant operational overhead vs managed EKS"
+    }
+  },
+  {
+    "id": "L3-014",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "hard",
+    "trap_fact": "Spot interruption happens at instance level — application must handle graceful shutdown",
+    "constraint_terms": [
+      "Spot interruption handling",
+      "graceful shutdown",
+      "no data loss"
+    ],
+    "scenario": "A batch processing application runs on Spot instances. Each instance processes a job for 8-12 minutes. If an instance is terminated mid-job, the partial work is lost and the entire job must restart from scratch. The team wants to minimize wasted compute from Spot interruptions.",
+    "question": "Which combination of techniques minimizes wasted work from Spot interruptions?",
+    "options": {
+      "A": "Set the Spot interruption behavior to 'hibernate' so the instance resumes exactly where it left off when capacity returns",
+      "B": "Use Spot blocks (defined-duration instances) to guarantee instances for the full job duration",
+      "C": "Use Spot interruption notices (2-minute warning via instance metadata) to checkpoint progress to S3, AND configure the ASG with capacity rebalancing to proactively replace at-risk instances",
+      "D": "Configure the Auto Scaling group to use only On-Demand instances for any job currently in progress"
+    },
+    "answer": "C",
+    "reasoning": "Two-pronged approach: (1) Spot interruption notice gives 2 minutes warning via instance metadata — the application polls for it and checkpoints in-progress work to S3 when detected. On restart, it resumes from checkpoint instead of starting over. (2) Capacity rebalancing detects instances at ELEVATED risk of interruption (before the 2-min notice) and proactively launches replacements. Together: early warning replaces at-risk instances, and if interruption does happen, checkpoint minimizes lost work. Hibernate (B) doesn't work for all instance types and requires EBS root. Spot blocks (C) are discontinued.",
+    "eliminated": {
+      "A": "Spot hibernation requires EBS-backed instances, has size limits, and most importantly — the instance may not resume for hours/days if capacity isn't available. Not a reliable strategy for time-sensitive batch work",
+      "B": "Spot blocks (defined-duration Spot instances) were DISCONTINUED by AWS — they are no longer available. This is a common outdated reference in study materials",
+      "D": "Dynamically switching running instances from Spot to On-Demand mid-job is not possible — you can't change an instance's purchasing option after launch. You'd need to migrate the workload to a new On-Demand instance"
+    }
+  },
+  {
+    "id": "L3-015",
+    "layer": 3,
+    "category": "compute",
+    "difficulty": "moderate",
+    "trap_fact": "AWS Batch manages job queues and compute environments — ideal for batch workloads without managing infrastructure",
+    "constraint_terms": [
+      "thousands of independent jobs",
+      "variable completion times",
+      "cost optimize",
+      "no cluster management"
+    ],
+    "scenario": "A pharmaceutical company needs to run 10,000 molecular simulation jobs. Each job takes 30 minutes to 4 hours depending on the molecule. Jobs are independent (no inter-job communication). The company has no DevOps team and wants to submit jobs without managing any compute infrastructure.",
+    "question": "Which service runs this batch workload with the least operational overhead?",
+    "options": {
+      "A": "Amazon EMR cluster with a custom job scheduler for distributed simulation processing",
+      "B": "Amazon ECS with an Auto Scaling group that scales based on the SQS queue depth of pending jobs",
+      "C": "AWS Step Functions with a map state launching one Lambda function per simulation",
+      "D": "AWS Batch with a Fargate compute environment — submit jobs, Batch handles queuing, scheduling, and serverless compute provisioning"
+    },
+    "answer": "D",
+    "reasoning": "AWS Batch is purpose-built for exactly this: submit many independent jobs, it handles queue management, job scheduling, retry logic, and provisioning compute (Fargate = zero infrastructure management). You define a job definition (container), submit 10,000 jobs, and Batch handles everything. ECS+ASG (B) requires you to build the job scheduling logic, manage scaling policies, handle job distribution — significant operational work. Lambda (C) has a 15-minute limit (jobs take up to 4 hours). EMR (D) is for distributed data processing (Spark/Hadoop), not independent simulations.",
+    "eliminated": {
+      "B": "ECS with SQS + ASG requires building: job submission logic, queue management, worker scaling policies, error handling, retry mechanisms — all of which Batch provides out of the box",
+      "C": "Lambda's 15-minute maximum timeout makes it impossible for jobs lasting 30 minutes to 4 hours — each simulation would be killed before completion",
+      "A": "EMR is for distributed data frameworks (MapReduce, Spark) — it's not a general batch job scheduler. Running 10,000 independent simulations doesn't benefit from EMR's distributed processing model"
+    }
+  }
+]

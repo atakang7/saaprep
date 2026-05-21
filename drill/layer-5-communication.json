@@ -1,0 +1,326 @@
+[
+  {
+    "id": "L5-001",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "SQS Standard has at-least-once delivery — messages may be duplicated",
+    "constraint_terms": [
+      "exactly-once processing",
+      "payment transactions",
+      "no duplicates"
+    ],
+    "scenario": "An e-commerce platform processes payment confirmations. Each payment must be processed EXACTLY once — a duplicate would charge the customer twice. The current architecture uses SQS Standard queue and occasionally a payment is processed twice during high-traffic periods.",
+    "question": "Which change prevents duplicate processing?",
+    "options": {
+      "A": "Switch to SQS FIFO queue with deduplication enabled — FIFO guarantees exactly-once delivery within the deduplication window",
+      "B": "Add a Dead Letter Queue to catch and discard duplicate messages",
+      "C": "Decrease the visibility timeout to reduce the chance of another consumer picking up the same message",
+      "D": "Enable SQS long polling to ensure only one consumer receives each message"
+    },
+    "answer": "A",
+    "reasoning": "SQS Standard provides AT-LEAST-ONCE delivery — the same message CAN be delivered to multiple consumers. This is by design for maximum throughput. SQS FIFO (First-In-First-Out) provides EXACTLY-ONCE processing: it uses content-based deduplication (or explicit deduplication IDs) to reject duplicate sends within a 5-minute window. Each message is delivered exactly once and remains available until a consumer processes and deletes it. Visibility timeout (B) manages concurrent consumers but doesn't prevent duplicates from the queue itself. Long polling (C) is about efficiency, not deduplication.",
+    "eliminated": {
+      "C": "Visibility timeout prevents OTHER consumers from seeing a message while one consumer processes it — but Standard queue can deliver the same message multiple times even to the same consumer due to its distributed architecture",
+      "D": "Long polling reduces empty-response API calls (cost/latency optimization) — it has no effect on message deduplication or delivery guarantees",
+      "B": "Dead Letter Queues capture messages that FAIL processing after max attempts — they don't detect or filter duplicate messages. DLQ is for handling poison messages, not deduplication"
+    }
+  },
+  {
+    "id": "L5-002",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "hard",
+    "trap_fact": "SQS FIFO has 3,000 msg/s with batching, 300 without — throughput ceiling",
+    "constraint_terms": [
+      "high throughput",
+      "ordered processing",
+      "100,000 events per second"
+    ],
+    "scenario": "A clickstream analytics system ingests 100,000 click events per second. Events must be processed in order per user session (but order between different users doesn't matter). The architect initially proposes SQS FIFO with message group IDs per user session.",
+    "question": "Why is SQS FIFO insufficient for this workload, and what is the alternative?",
+    "options": {
+      "A": "FIFO can handle 100,000 msg/s but requires 34 parallel FIFO queues — use SQS Standard with application-level sequencing instead",
+      "B": "FIFO ordering is global (entire queue), not per-group — use multiple Standard queues, one per user session",
+      "C": "FIFO's maximum throughput is 3,000 messages/second per queue (with batching) — use Amazon Kinesis Data Streams with per-user partition keys for ordered, high-throughput ingestion",
+      "D": "FIFO doesn't support message group IDs for per-entity ordering — use SNS FIFO with per-user topics"
+    },
+    "answer": "C",
+    "reasoning": "SQS FIFO hard limits: 300 messages/second without batching, 3,000 with batching, per API action. Even with aggressive batching, 100,000 msg/s is 33x beyond capacity. Kinesis Data Streams handles hundreds of thousands of records/second by distributing across shards. The PARTITION KEY provides per-key ordering (all events for user X go to the same shard, preserving order). Different users' events can be on different shards (parallelism). This is THE pattern: 'high-throughput ordered stream per entity' = Kinesis with partition key.",
+    "eliminated": {
+      "D": "FIFO absolutely DOES support message group IDs — that's their main feature for per-entity ordering. The issue is THROUGHPUT, not feature capability",
+      "A": "You cannot simply use 34 parallel FIFO queues to achieve this — routing logic becomes complex, and it doesn't solve the per-queue throughput ceiling properly. Kinesis handles this natively with shards",
+      "B": "FIFO ordering IS per-message-group (when group IDs are used), not global. The statement is factually wrong about FIFO's ordering model — and Standard queues have NO ordering guarantee regardless"
+    }
+  },
+  {
+    "id": "L5-003",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "SQS is pull-based (consumers poll), SNS is push-based (subscribers get pushed to)",
+    "constraint_terms": [
+      "fan-out",
+      "multiple subscribers",
+      "real-time notification"
+    ],
+    "scenario": "When a new order is placed, the system must simultaneously: (1) send a confirmation email, (2) update the inventory service, (3) trigger the fulfillment workflow, and (4) update the analytics dashboard. All four actions must fire on a single order event.",
+    "question": "Which messaging pattern delivers the order event to all four subscribers simultaneously?",
+    "options": {
+      "A": "Kinesis Data Stream with four consumer applications",
+      "B": "EventBridge with a single rule targeting all four destinations",
+      "C": "SNS topic with four subscriptions (Lambda for email, SQS for inventory, Step Functions for fulfillment, Firehose for analytics) — SNS pushes to all subscribers on each publish",
+      "D": "SQS queue with four consumers polling for new order messages"
+    },
+    "answer": "C",
+    "reasoning": "SNS fan-out is the canonical pattern for one-to-many delivery. One message published → instantly pushed to ALL subscribers. Each subscriber gets its own copy independently. SQS (B) is one-to-one: a message is received by ONE consumer, then deleted — the other three never see it. EventBridge (C) can target multiple destinations per rule but SNS is the exam's standard fan-out answer when the pattern is simple pub/sub. Kinesis (D) works but is over-engineered for simple event distribution to 4 targets. SNS + SQS combo for each subscriber adds buffering if needed.",
+    "eliminated": {
+      "D": "SQS delivers each message to ONE consumer — once a consumer receives and processes it, it's deleted. The other three consumers never receive that message. SQS is point-to-point, not fan-out",
+      "B": "EventBridge can have up to 5 targets per rule, so this technically works. However, SNS is the standard fan-out primitive — EventBridge is better for content-based routing with complex filtering rules. For simple 'deliver to all,' SNS is the expected exam answer",
+      "A": "Kinesis supports multiple consumers via enhanced fan-out but adds complexity: shard management, checkpoint tracking, and consumer application logic. It's designed for streaming data, not simple event distribution"
+    }
+  },
+  {
+    "id": "L5-004",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "hard",
+    "trap_fact": "SNS has no message retention — if subscriber is down, message is lost",
+    "constraint_terms": [
+      "guaranteed delivery",
+      "subscriber may be temporarily offline",
+      "no message loss"
+    ],
+    "scenario": "A company publishes order events to SNS. One of the subscribers (an inventory microservice) occasionally goes offline for maintenance windows of 5-10 minutes. During these windows, any SNS messages are lost because the subscriber's endpoint returns errors. The company cannot afford to lose any order events.",
+    "question": "How should the architect ensure the offline subscriber processes all messages without loss?",
+    "options": {
+      "A": "Configure SNS message retry with maximum retry count and extended backoff — SNS will hold messages until the subscriber recovers",
+      "B": "Set up a Dead Letter Queue on the SNS subscription to capture failed messages for later processing",
+      "C": "Subscribe an SQS queue to the SNS topic, then have the inventory service consume from SQS — SQS retains messages during subscriber downtime",
+      "D": "Enable SNS message archiving to store failed deliveries for later replay"
+    },
+    "answer": "C",
+    "reasoning": "SNS is a push mechanism with LIMITED retry — it retries failed deliveries for about 23 days for SQS/Lambda, but for HTTP(S) endpoints the retry policy is configurable and limited. The fundamental issue: SNS doesn't STORE messages. The architectural solution is SNS → SQS → Consumer. SQS stores messages for up to 14 days. The subscriber reads from SQS at its own pace — if it's offline for 5-10 minutes, messages accumulate safely in SQS. When it comes back, it processes the backlog. This 'SNS → SQS buffer' pattern is the standard durable fan-out architecture.",
+    "eliminated": {
+      "A": "SNS retry policies for HTTP(S) endpoints have a limited number of retries with backoff — after exhausting retries (minutes to hours), the message is lost. SNS does NOT hold messages indefinitely waiting for subscriber recovery",
+      "D": "SNS does not have a built-in 'message archiving' feature for failed deliveries — this option describes functionality that doesn't exist in SNS",
+      "B": "SNS subscriptions can have DLQs (for Lambda/SQS subscription types) which capture messages that fail all delivery attempts — but this is for forensics/debugging, not for reliable re-processing in operational flow. The SQS buffer model is the primary solution"
+    }
+  },
+  {
+    "id": "L5-005",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "Kinesis Data Streams: you manage shards. Firehose: fully managed delivery, no shard management",
+    "constraint_terms": [
+      "deliver streaming data to S3",
+      "no infrastructure management",
+      "near real-time"
+    ],
+    "scenario": "A company generates IoT sensor data from 10,000 devices. The data must be collected and delivered to S3 in near real-time (within 60-300 seconds) for analytics. The company has no DevOps team and wants a fully managed solution that requires no capacity planning or shard management.",
+    "question": "Which service delivers streaming data to S3 with the least operational overhead?",
+    "options": {
+      "A": "Amazon Kinesis Data Streams with a Lambda consumer that writes batches to S3",
+      "B": "Amazon Data Firehose (formerly Kinesis Data Firehose) — fully managed delivery stream that auto-scales and writes to S3 with configurable buffer intervals",
+      "C": "Amazon Kinesis Data Streams with the Kinesis Client Library writing to S3",
+      "D": "Amazon MSK (Managed Streaming for Apache Kafka) with Kafka Connect S3 sink connector"
+    },
+    "answer": "B",
+    "reasoning": "Firehose is FULLY managed delivery — no shards to provision, no consumers to code, no scaling to manage. You point it at S3 (or Redshift, OpenSearch, HTTP endpoint) and it buffers data for 60-900 seconds (or by size) then writes to the destination automatically. It auto-scales with data volume. Kinesis Data Streams (B/C) requires YOU to manage shard count, build consumers, handle checkpointing. MSK (D) requires Kafka expertise, connector configuration, cluster management. The exam keyword: 'least operational overhead for streaming TO a destination' = Firehose.",
+    "eliminated": {
+      "A": "Kinesis Data Streams requires provisioning/managing shards (capacity planning), plus building and maintaining a Lambda consumer with batching logic, error handling, and checkpoint management",
+      "C": "KCL applications require running EC2/container compute to host the consumer code, managing shard iterators, handling resharding events — significant operational overhead",
+      "D": "MSK requires managing Kafka clusters (broker sizing, ZooKeeper/KRaft, topic configuration) plus Kafka Connect workers — the most operationally complex option for a simple S3 delivery use case"
+    }
+  },
+  {
+    "id": "L5-006",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "hard",
+    "trap_fact": "Firehose: near real-time (60-900s buffer). Kinesis Data Streams: real-time (~200ms with enhanced fan-out)",
+    "constraint_terms": [
+      "real-time per-record processing",
+      "custom analytics application",
+      "sub-second latency"
+    ],
+    "scenario": "A fraud detection system must analyze each financial transaction INDIVIDUALLY within 200 milliseconds of occurrence. The system runs a custom ML model that scores each record. Results must be available to the API layer immediately after scoring. The system processes 50,000 transactions per second.",
+    "question": "Which streaming service supports this real-time per-record processing pattern?",
+    "options": {
+      "A": "Amazon Data Firehose with a Lambda transformation function for per-record scoring",
+      "B": "Amazon EventBridge with a rule triggering a Lambda function for each transaction event",
+      "C": "Amazon SQS with a Lambda trigger processing each message individually",
+      "D": "Kinesis Data Streams with enhanced fan-out — delivers records to consumers with ~200ms latency per shard, supporting custom real-time processing applications"
+    },
+    "answer": "D",
+    "reasoning": "Kinesis Data Streams with enhanced fan-out provides DEDICATED throughput per consumer at ~200ms propagation delay. You build a custom consumer (KCL or Lambda) that processes EACH record as it arrives. This is TRUE real-time: record-in → process → available within 200ms. Firehose BUFFERS for minimum 60 seconds before delivering — it's NEAR real-time, not real-time. SQS (C) can achieve near-real-time with Lambda triggers but at 50K TPS, you'd need thousands of concurrent Lambda invocations and SQS doesn't guarantee ordering. EventBridge (D) has concurrency and throughput limits for this volume.",
+    "eliminated": {
+      "A": "Firehose buffers data for 60-900 seconds before invoking the transformation Lambda — a 60-second minimum delay violates the 200ms requirement. Firehose is for delivery, not real-time processing",
+      "C": "SQS + Lambda can process per-message but at 50,000 TPS: the Lambda concurrency required is extreme, ordering isn't guaranteed (Standard queue), and SQS adds latency from polling intervals. Not architecturally suited for sub-second streaming analytics",
+      "B": "EventBridge has a throughput soft limit and per-event matching overhead. At 50,000 events/second, you'd hit throttling limits and the event processing chain (match → invoke) adds latency beyond 200ms"
+    }
+  },
+  {
+    "id": "L5-007",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "EventBridge has archive and replay capability — SNS does not",
+    "constraint_terms": [
+      "replay events from last week",
+      "debug production issues",
+      "event-driven"
+    ],
+    "scenario": "A company's event-driven architecture uses events to trigger multiple downstream services. A bug is discovered that caused a service to misprocess events for the last 3 days. The team needs to fix the bug and then REPLAY those 3 days of events through the corrected service without affecting other subscribers.",
+    "question": "Which event service supports event replay for debugging and reprocessing?",
+    "options": {
+      "A": "Amazon Kinesis Data Streams with extended retention (7 days) to re-read old records",
+      "B": "Amazon SQS with a very long message retention period (14 days) to keep old messages available",
+      "C": "Amazon EventBridge with archive enabled — stores all events and allows replaying archived events to a specific target for any time range",
+      "D": "Amazon SNS with message retention enabled for replay capability"
+    },
+    "answer": "C",
+    "reasoning": "EventBridge Archive & Replay is purpose-built for this exact scenario. You enable archiving on an event bus → all events are stored (indefinitely or with a retention policy). When you need to reprocess, you create a REPLAY targeting specific time ranges and route replayed events to specific targets (not all subscribers). This is the key: 'replay events from a time period to a specific target' = EventBridge. SNS has NO retention or replay. SQS messages are deleted after processing. Kinesis (D) could work with extended retention but replaying requires repositioning iterators and affects all consumers of that stream.",
+    "eliminated": {
+      "D": "SNS does NOT have message retention or replay capability — once a message is delivered to subscribers, it's gone. SNS is a stateless push mechanism",
+      "B": "SQS retains unprocessed messages but once a message is successfully consumed and deleted, it's gone forever. You can't 'replay' already-processed messages from SQS",
+      "A": "Kinesis extended retention (up to 365 days) keeps records available for re-reading, but repositioning reshards ALL consumers of that stream — you can't replay to just one specific target without affecting others"
+    }
+  },
+  {
+    "id": "L5-008",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "Step Functions Standard: up to 1 year. Express: 5 minutes max but high volume",
+    "constraint_terms": [
+      "long-running workflow",
+      "human approval step",
+      "orchestrate multiple services"
+    ],
+    "scenario": "A loan application process involves: (1) validate application (Lambda, 2 seconds), (2) run credit check (external API, 30 seconds), (3) wait for human underwriter approval (could take hours or days), (4) if approved, initiate disbursement (Lambda, 5 seconds). The entire workflow must be tracked and auditable.",
+    "question": "Which workflow service orchestrates this multi-step process?",
+    "options": {
+      "A": "Amazon SQS with visibility timeout representing each workflow step's wait period",
+      "B": "AWS Step Functions Standard Workflow — supports executions up to 1 year, has built-in wait states for human approval, and provides full execution audit history",
+      "C": "AWS Lambda with recursive invocations managing state in DynamoDB",
+      "D": "AWS Step Functions Express Workflow — lower cost for high-volume, short-duration orchestration"
+    },
+    "answer": "B",
+    "reasoning": "Step Functions Standard Workflow supports executions up to 1 YEAR with built-in states for waiting (Wait state, Task with callback pattern for human approval). It tracks every state transition, provides audit history, handles retries, and visualizes the workflow. Express workflows are limited to 5 MINUTES — human approval alone can take days, immediately disqualifying Express. The trigger: 'long-running' + 'human approval/waiting' + 'orchestration' + 'auditable' = Standard workflow. Express is for high-volume sub-5-minute event processing.",
+    "eliminated": {
+      "D": "Express workflows have a 5-MINUTE maximum execution duration — waiting hours for human approval is impossible. Express is designed for high-volume, short-duration workflows (IoT event processing, streaming transforms)",
+      "A": "SQS visibility timeout maxes at 12 hours and isn't designed for workflow orchestration — there's no state machine logic, no conditional branching, no audit trail, and managing multi-step state through message passing is extremely fragile",
+      "C": "Recursive Lambda invocations with DynamoDB state management is error-prone, hard to debug, has no visual auditing, and risks infinite loops. Step Functions solves exactly this anti-pattern"
+    }
+  },
+  {
+    "id": "L5-009",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "hard",
+    "trap_fact": "Amazon MQ is for EXISTING applications using standard broker protocols (AMQP, MQTT, STOMP) — not for greenfield",
+    "constraint_terms": [
+      "migrate existing application",
+      "uses RabbitMQ",
+      "minimal code changes"
+    ],
+    "scenario": "A company migrates an on-premises microservices application that uses RabbitMQ with AMQP protocol for inter-service messaging. The application code uses RabbitMQ-specific features like routing keys, exchanges, and message acknowledgments. The team wants to minimize code changes during migration.",
+    "question": "Which AWS messaging service requires the fewest code changes?",
+    "options": {
+      "A": "Amazon EventBridge with content-based routing rules to replicate exchange behavior",
+      "B": "Amazon MQ with a RabbitMQ broker — managed RabbitMQ that supports AMQP protocol and RabbitMQ-native features without code changes",
+      "C": "Amazon MSK (Managed Kafka) as a direct protocol-compatible replacement for RabbitMQ",
+      "D": "Amazon SQS with SNS for topic-based routing to replace exchanges and routing keys"
+    },
+    "answer": "B",
+    "reasoning": "Amazon MQ supports RabbitMQ (and ActiveMQ) as MANAGED brokers running the EXACT same protocols. Application code connects to the Amazon MQ endpoint using the same AMQP protocol, same client libraries, same routing keys, same exchange patterns — zero code changes. This is THE answer when the scenario says 'existing application uses [RabbitMQ/ActiveMQ/MQTT/STOMP]' + 'minimal code changes.' SQS/SNS are AWS-native (different API, different patterns). MSK runs Kafka (different protocol). EventBridge is event routing (different paradigm). Greenfield = SQS/SNS. Migration from standard broker = Amazon MQ.",
+    "eliminated": {
+      "D": "SQS/SNS use AWS-proprietary APIs — all RabbitMQ client code, exchange configurations, routing key logic, and acknowledgment patterns must be rewritten. Significant code changes required",
+      "C": "MSK runs Apache Kafka which uses its own protocol (Kafka protocol, not AMQP) — RabbitMQ clients cannot connect to Kafka without complete code rewrite. Different messaging paradigm entirely",
+      "A": "EventBridge uses AWS event format and its own routing model — no compatibility with AMQP, RabbitMQ exchanges, or routing keys. Complete application rewrite needed"
+    }
+  },
+  {
+    "id": "L5-010",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "API Gateway has 29-second timeout — backends longer than this need async pattern",
+    "constraint_terms": [
+      "API response time exceeds 30 seconds",
+      "synchronous API",
+      "long-running backend"
+    ],
+    "scenario": "A REST API uses API Gateway + Lambda to generate complex financial reports. The report generation takes 45-90 seconds. Clients receive 504 Gateway Timeout errors because API Gateway disconnects after 29 seconds.",
+    "question": "How should the architect redesign this API to handle long-running report generation?",
+    "options": {
+      "A": "Replace API Gateway with an Application Load Balancer that has a 300-second idle timeout",
+      "B": "Use API Gateway WebSocket API to maintain a persistent connection until the report is ready",
+      "C": "Increase the API Gateway timeout to 120 seconds via service quota request",
+      "D": "Switch to an asynchronous pattern: API Gateway invokes Lambda to start the job (returns immediately with a job ID), Lambda triggers Step Functions or writes to SQS, client polls a status endpoint for completion"
+    },
+    "answer": "D",
+    "reasoning": "API Gateway's 29-second timeout is a HARD LIMIT — cannot be increased. When backends exceed this, the only pattern is ASYNCHRONOUS: accept the request (return 202 + job ID immediately), process in background (Step Functions, SQS + Worker, Batch), expose a status/result endpoint that the client polls. This is the canonical 'long-running task via API' pattern. WebSocket (C) maintains a connection but Lambda behind WebSocket still has timeouts. ALB (D) technically has longer timeout but loses API Gateway features (throttling, auth, caching, API keys).",
+    "eliminated": {
+      "C": "API Gateway's 29-second integration timeout is a HARD platform limit — it cannot be increased via service quota or support request. This is an architectural constraint, not a configurable quota",
+      "B": "WebSocket APIs maintain persistent connections (good), but the backend Lambda still has a 15-minute limit, and the WebSocket connection management adds complexity. For a simple request-response pattern, async polling is simpler and more standard",
+      "A": "ALB can handle longer connections (up to 4000s idle timeout) but you lose: WAF integration via API Gateway, usage plans, API keys, request validation, automatic SDK generation, caching — trading features for a timeout workaround"
+    }
+  },
+  {
+    "id": "L5-011",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "hard",
+    "trap_fact": "SNS + SQS fan-out pattern for durable one-to-many delivery with independent consumer rates",
+    "constraint_terms": [
+      "one event multiple consumers",
+      "different processing speeds",
+      "no message loss"
+    ],
+    "scenario": "An image upload event must trigger three independent processes: (1) thumbnail generation (fast, 2 seconds via Lambda), (2) ML-based content moderation (slow, 30 seconds via ECS), and (3) metadata extraction (medium, 10 seconds via Lambda). Each process runs at different speeds and must process every image independently without interfering with others.",
+    "question": "Which architecture ensures all three processes receive every event and process at their own pace?",
+    "options": {
+      "A": "EventBridge rule with three targets — all three invoked simultaneously per event",
+      "B": "Single SQS queue with three consumer groups, each competing for messages",
+      "C": "SNS topic with an SQS queue subscribed for EACH process — each consumer reads from its own dedicated queue at its own rate independently",
+      "D": "SNS topic with three direct Lambda subscriptions for parallel invocation"
+    },
+    "answer": "C",
+    "reasoning": "SNS → individual SQS queues per consumer is the DURABLE FAN-OUT pattern. Why not just SNS → Lambda directly (C)? Because the slow ECS process takes 30 seconds — if it fails or falls behind, messages are LOST (SNS doesn't retain). Each SQS queue holds messages for up to 14 days, each consumer processes at its own rate, each has its own DLQ for failures. The 30-second ECS task can take its time without message loss. The fast Lambda processes immediately. No interference between consumers. This is the exam's #1 messaging architecture pattern.",
+    "eliminated": {
+      "B": "Single SQS queue with multiple consumers means messages are COMPETED for — one consumer gets a message, others don't. This is one-to-one delivery, not fan-out. Each message would only reach ONE of the three processes",
+      "D": "SNS direct to Lambda works for the fast processes, but if the ECS-based moderation fails or is slow, SNS retries with limited patience — eventually the message is lost. No buffering means no durability for slow consumers",
+      "A": "EventBridge can target multiple destinations but if the ECS task fails, EventBridge has limited retry. Adding SQS queues as targets would improve this, but at that point it's the same pattern as answer A with extra Event→Bus routing"
+    }
+  },
+  {
+    "id": "L5-012",
+    "layer": 5,
+    "category": "communication",
+    "difficulty": "moderate",
+    "trap_fact": "SQS Dead Letter Queue captures messages that fail processing repeatedly — prevents poison messages",
+    "constraint_terms": [
+      "failed messages",
+      "prevent queue blocking",
+      "investigate errors"
+    ],
+    "scenario": "A Lambda function processes messages from an SQS queue. Occasionally, a malformed message causes the Lambda to throw an exception. The message returns to the queue, Lambda retries, fails again — this cycle repeats indefinitely, consuming Lambda concurrency and blocking other messages.",
+    "question": "How should the architect handle messages that repeatedly fail processing?",
+    "options": {
+      "A": "Configure a Dead Letter Queue (DLQ) with maxReceiveCount of 3 — after 3 failed processing attempts, the message moves to the DLQ for investigation",
+      "B": "Add error handling in the Lambda to delete any message that throws an exception on first attempt",
+      "C": "Configure Lambda's reserved concurrency to 1 so only one message processes at a time, preventing pile-up",
+      "D": "Set the queue's message retention to 1 hour so failing messages automatically expire quickly"
+    },
+    "answer": "A",
+    "reasoning": "Dead Letter Queue is the standard pattern for POISON MESSAGE handling. After N failed attempts (maxReceiveCount), the message automatically moves to a separate DLQ where it can be inspected, debugged, and reprocessed after fixing the consumer. The main queue unblocks and processes healthy messages. This separates 'messages that need human attention' from 'messages that should flow normally.' Short retention (B) LOSES messages with no way to investigate. Deleting on first error (C) loses important data. Reserved concurrency 1 (D) makes the problem worse by serializing ALL processing.",
+    "eliminated": {
+      "D": "Reducing retention means ALL messages (including valid ones) have less time to be processed — and failed messages disappear without any way to investigate what went wrong. You lose the evidence",
+      "B": "Deleting messages on first exception means a temporary error (network timeout, throttling) permanently loses the message. Some errors are transient and succeed on retry — immediate deletion is too aggressive",
+      "C": "Reserved concurrency of 1 means the queue processes only one message at a time — one poison message now blocks ALL subsequent messages entirely. Makes the blocking problem worse, not better"
+    }
+  }
+]

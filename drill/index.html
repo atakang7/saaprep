@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 Drill</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 2rem; }
+.container { max-width: 800px; width: 100%; }
+.header { text-align: center; margin-bottom: 2rem; opacity: 0.6; font-size: 0.85rem; }
+.progress { text-align: center; margin-bottom: 1rem; font-size: 0.9rem; color: #888; }
+.scenario { background: #16213e; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; line-height: 1.7; font-size: 1.05rem; }
+.question { font-weight: 600; margin-bottom: 1.5rem; font-size: 1.05rem; }
+.options { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+.option { background: #16213e; border: 2px solid #2a2a4a; border-radius: 8px; padding: 1rem 1.25rem; cursor: pointer; transition: all 0.15s; font-size: 1rem; line-height: 1.5; }
+.option:hover { border-color: #4a90d9; background: #1a2744; }
+.option.selected { border-color: #4a90d9; background: #1a2744; }
+.option.correct { border-color: #4caf50; background: #1b3d1b; }
+.option.wrong { border-color: #f44336; background: #3d1b1b; }
+.option.was-correct { border-color: #4caf50; opacity: 0.7; }
+.reasoning { background: #0f3460; border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem; display: none; line-height: 1.7; }
+.reasoning h3 { color: #4a90d9; margin-bottom: 0.75rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.reasoning p { margin-bottom: 0.75rem; }
+.eliminated { margin-top: 1rem; font-size: 0.9rem; opacity: 0.8; }
+.eliminated div { margin: 0.3rem 0; }
+.btn { display: block; margin: 1.5rem auto 0; padding: 0.75rem 2rem; background: #4a90d9; color: white; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+.btn:hover { background: #3a7bc8; }
+.meta { text-align: center; margin-top: 1rem; font-size: 0.8rem; color: #666; }
+.score { text-align: center; font-size: 1.5rem; margin: 2rem 0; }
+.layer-select { text-align: center; margin-bottom: 2rem; }
+.layer-select button { margin: 0.25rem; padding: 0.5rem 1rem; background: #16213e; border: 1px solid #2a2a4a; color: #e0e0e0; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+.layer-select button:hover, .layer-select button.active { background: #4a90d9; border-color: #4a90d9; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">SAA-C03 Decision Drill</div>
+  <div id="layer-picker" class="layer-select">
+    <p style="margin-bottom:1rem;opacity:0.7">Pick layers to drill (or All):</p>
+    <button onclick="toggleLayer('all')">All</button>
+    <button onclick="toggleLayer(0)">0 Network</button>
+    <button onclick="toggleLayer(1)">1 Access</button>
+    <button onclick="toggleLayer(2)">2 Storage</button>
+    <button onclick="toggleLayer(3)">3 Compute</button>
+    <button onclick="toggleLayer(4)">4 Database</button>
+    <button onclick="toggleLayer(5)">5 Communication</button>
+    <button onclick="toggleLayer(6)">6 Resilience</button>
+    <button onclick="toggleLayer(7)">7 Edge</button>
+    <button onclick="toggleLayer(8)">8 Cost</button>
+    <button onclick="toggleLayer(9)">9 Governance</button>
+    <br><br>
+    <button class="btn" onclick="startDrill()">Start</button>
+  </div>
+  <div id="quiz" class="hidden">
+    <div class="progress" id="progress"></div>
+    <div class="scenario" id="scenario"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="reasoning" id="reasoning"></div>
+    <button class="btn hidden" id="next-btn" onclick="nextQuestion()">Next →</button>
+    <div class="meta" id="meta"></div>
+  </div>
+  <div id="results" class="hidden">
+    <div class="score" id="score"></div>
+    <button class="btn" onclick="location.reload()">Again</button>
+  </div>
+</div>
+
+<script>
+const FILES = [
+  'layer-0-network.json','layer-1-access.json','layer-2-storage.json',
+  'layer-3-compute.json','layer-4-database.json','layer-5-communication.json',
+  'layer-6-resilience.json','layer-7-edge.json','layer-8-cost.json','layer-9-governance.json'
+];
+
+let allQuestions = [];
+let questions = [];
+let current = 0;
+let correctCount = 0;
+let answered = false;
+let selectedLayers = new Set();
+
+async function loadAll() {
+  for (const file of FILES) {
+    try {
+      const res = await fetch(file);
+      if (res.ok) { const data = await res.json(); allQuestions.push(...data); }
+    } catch(e) {}
+  }
+}
+
+function toggleLayer(l) {
+  if (l === 'all') { selectedLayers.clear(); selectedLayers.add('all'); }
+  else { selectedLayers.delete('all'); if (selectedLayers.has(l)) selectedLayers.delete(l); else selectedLayers.add(l); }
+  document.querySelectorAll('.layer-select button').forEach(b => b.classList.remove('active'));
+  if (selectedLayers.has('all')) document.querySelector('.layer-select button').classList.add('active');
+  selectedLayers.forEach(l => { if (l !== 'all') document.querySelectorAll('.layer-select button')[l+1]?.classList.add('active'); });
+}
+
+function startDrill() {
+  if (selectedLayers.size === 0 || selectedLayers.has('all')) questions = [...allQuestions];
+  else questions = allQuestions.filter(q => selectedLayers.has(q.layer));
+  if (!questions.length) { alert('No questions loaded. Generate layer JSON files first.'); return; }
+  questions.sort(() => Math.random() - 0.5);
+  current = 0; correctCount = 0;
+  document.getElementById('layer-picker').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  showQuestion();
+}
+
+function showQuestion() {
+  answered = false;
+  const q = questions[current];
+  document.getElementById('progress').textContent = `${current+1} / ${questions.length}`;
+  document.getElementById('scenario').textContent = q.scenario;
+  document.getElementById('question').textContent = q.question;
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  for (const [letter, text] of Object.entries(q.options)) {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = `${letter}. ${text}`;
+    div.onclick = () => selectAnswer(letter);
+    div.dataset.letter = letter;
+    opts.appendChild(div);
+  }
+  document.getElementById('reasoning').style.display = 'none';
+  document.getElementById('next-btn').classList.add('hidden');
+  document.getElementById('meta').textContent = `Layer ${q.layer} | ${q.difficulty} | ${q.trap_fact}`;
+  document.getElementById('meta').style.visibility = 'hidden';
+}
+
+function selectAnswer(letter) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const correct = q.answer;
+  const isCorrect = letter === correct;
+  if (isCorrect) correctCount++;
+
+  document.querySelectorAll('.option').forEach(el => {
+    const l = el.dataset.letter;
+    if (l === correct) el.classList.add('correct');
+    else if (l === letter && !isCorrect) el.classList.add('wrong');
+    if (l === correct && l !== letter) el.classList.add('was-correct');
+  });
+
+  const r = document.getElementById('reasoning');
+  r.style.display = 'block';
+  r.innerHTML = `<h3>Reasoning</h3><p>${q.reasoning}</p>
+    <div class="eliminated"><strong>Eliminations:</strong>${Object.entries(q.eliminated||{}).map(([k,v])=>`<div><strong>${k}:</strong> ${v}</div>`).join('')}</div>`;
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('meta').style.visibility = 'visible';
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('results').classList.remove('hidden');
+    document.getElementById('score').textContent = `${correctCount} / ${questions.length} (${Math.round(100*correctCount/questions.length)}%)`;
+  } else { showQuestion(); }
+}
+
+loadAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+[
+  {
+    "id": "L9-001",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "moderate",
+    "trap_fact": "CloudTrail records API calls (who did what). Config evaluates current resource STATE (is it compliant now).",
+    "constraint_terms": [
+      "who changed the resource",
+      "audit trail",
+      "API activity"
+    ],
+    "scenario": "A security group was modified to allow 0.0.0.0/0 on port 22 at 3:47 AM. The security team needs to determine: WHO made this change, WHEN exactly, and from WHAT IP address they called the API.",
+    "question": "Which service provides this information?",
+    "options": {
+      "A": "AWS Config — tracks the security group's configuration history showing when it changed to allow 0.0.0.0/0:22",
+      "B": "AWS CloudTrail — records every API call including the principal, timestamp, source IP, and parameters of the AuthorizeSecurityGroupIngress call",
+      "C": "Amazon CloudWatch Logs — contains the detailed API call records for security group modifications",
+      "D": "Amazon GuardDuty — detects and alerts on unauthorized security group changes"
+    },
+    "answer": "B",
+    "reasoning": "CloudTrail is the API AUDIT LOG. Every API call to AWS services is recorded with: WHO (IAM principal ARN), WHEN (timestamp), FROM WHERE (source IP), WHAT (API action + parameters), and the RESULT (success/failure). For 'who changed this?' questions, CloudTrail is ALWAYS the answer. Config (B) shows WHAT changed (before/after configuration state) but not necessarily the complete API call details. GuardDuty (D) might flag this as a finding but doesn't provide the raw API audit trail. CloudWatch Logs (C) stores application/service logs, not API call records (unless you pipe CloudTrail to it).",
+    "eliminated": {
+      "A": "Config shows the configuration timeline (this SG had rule X at time T1, then rule Y at time T2) but its primary purpose is compliance evaluation, not 'who did it.' For the HUMAN identity and IP, CloudTrail is authoritative",
+      "C": "CloudWatch Logs stores logs you send to it — it doesn't automatically capture API calls. You CAN send CloudTrail to CloudWatch Logs, but the source of truth is CloudTrail, not CloudWatch itself",
+      "D": "GuardDuty might generate a finding like 'unusual API call pattern' but it's a THREAT DETECTION service, not an audit log. It doesn't provide the raw who/when/where for arbitrary API calls — only for detected threats"
+    }
+  },
+  {
+    "id": "L9-002",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "moderate",
+    "trap_fact": "Config evaluates compliance of resource STATE — can auto-remediate",
+    "constraint_terms": [
+      "detect non-compliant resources",
+      "automatically fix",
+      "continuous compliance"
+    ],
+    "scenario": "A company policy requires all EBS volumes to be encrypted. New developers occasionally create unencrypted volumes. The security team wants to: (1) continuously detect unencrypted EBS volumes as soon as they're created, and (2) automatically encrypt them without manual intervention.",
+    "question": "Which service combination provides continuous detection AND automatic remediation?",
+    "options": {
+      "A": "AWS CloudTrail monitoring CreateVolume API calls + Lambda function triggered on unencrypted creation events",
+      "B": "AWS Security Hub control for EBS encryption + automatic remediation through Security Hub workflows",
+      "C": "AWS Config rule checking EBS encryption compliance + auto-remediation action using SSM Automation to create an encrypted copy and replace the unencrypted volume",
+      "D": "Amazon Inspector scanning for unencrypted volumes + automatic remediation through Inspector findings"
+    },
+    "answer": "C",
+    "reasoning": "AWS Config is built for CONTINUOUS COMPLIANCE. Config rules evaluate resource configuration against desired state (encrypted=true). When a non-compliant resource is detected, auto-remediation triggers an SSM Automation document that fixes it (in this case: snapshot the unencrypted volume → create encrypted copy → swap). Config is the DETECT + FIX pair for resource compliance. CloudTrail records events but isn't designed for compliance evaluation. Inspector scans for CVEs, not encryption compliance. Security Hub aggregates findings but relies on Config rules underneath.",
+    "eliminated": {
+      "A": "CloudTrail + Lambda works (detective + custom fix) but you're building custom detection/remediation when Config provides it MANAGED. Also CloudTrail event-based triggers have slight delay vs Config's continuous resource evaluation",
+      "D": "Inspector scans for software vulnerabilities (CVEs) and network exposure — it does NOT check whether EBS volumes are encrypted. Wrong scope entirely",
+      "B": "Security Hub CAN surface encryption findings (from Config underneath) but its auto-remediation is limited. Config rules with SSM remediation is the direct, purpose-built solution"
+    }
+  },
+  {
+    "id": "L9-003",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "hard",
+    "trap_fact": "GuardDuty detects threats but does NOT prevent/block — it's detective, not preventive",
+    "constraint_terms": [
+      "block malicious traffic",
+      "automated response",
+      "threat detection"
+    ],
+    "scenario": "Amazon GuardDuty generates a finding that an EC2 instance is communicating with a known command-and-control server. The security team wants to AUTOMATICALLY isolate the compromised instance within seconds of detection — not just alert on it.",
+    "question": "Which automated response architecture isolates the instance upon GuardDuty detection?",
+    "options": {
+      "A": "GuardDuty finding → SNS notification → security team manually isolates the instance during business hours",
+      "B": "GuardDuty automatically blocks the C2 communication by modifying the NACL when it detects the threat",
+      "C": "GuardDuty finding → EventBridge rule → Lambda function that modifies the instance's security group to deny all traffic (quarantine SG) and disables the instance's IAM role",
+      "D": "GuardDuty with Shield Advanced integration that automatically blocks network-layer threats"
+    },
+    "answer": "C",
+    "reasoning": "GuardDuty is DETECTIVE ONLY — it identifies threats but takes NO blocking action. Automated response requires: GuardDuty emits finding → EventBridge captures the event → Lambda executes remediation (replace SG with quarantine SG that allows no inbound/outbound, revoke IAM credentials). This is seconds-fast automated isolation. GuardDuty NEVER modifies infrastructure itself (no SG changes, no NACL changes, no traffic blocking). It only raises findings. The automation chain (EventBridge + Lambda) is what converts detection into response.",
+    "eliminated": {
+      "B": "GuardDuty does NOT modify any infrastructure — no SG changes, no NACL modifications, no traffic blocking. It is purely a detection/findings service. All response actions must be built as separate automation triggered BY the findings",
+      "A": "Manual response during business hours means overnight or weekend attacks go uncontained for hours — the requirement says 'automatically within seconds.' Human response is too slow for active C2 communication",
+      "D": "Shield Advanced protects against DDoS attacks — it doesn't integrate with GuardDuty findings for C2 detection/response. Shield and GuardDuty solve different threat categories"
+    }
+  },
+  {
+    "id": "L9-004",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "moderate",
+    "trap_fact": "CloudTrail default 90-day event history — longer retention requires S3 trail",
+    "constraint_terms": [
+      "7-year audit retention",
+      "compliance",
+      "CloudTrail logs"
+    ],
+    "scenario": "A company's compliance framework requires that all API activity logs be retained for 7 years. When an auditor requests logs from 6 months ago, the team discovers CloudTrail's Event History only shows the last 90 days. Older records are gone.",
+    "question": "How should the architect ensure 7-year CloudTrail log retention?",
+    "options": {
+      "A": "Enable CloudTrail Insights which extends the retention period for all management events",
+      "B": "Send CloudTrail to CloudWatch Logs with a 7-year retention setting on the log group",
+      "C": "Create a CloudTrail trail that delivers log files to an S3 bucket with a lifecycle policy retaining objects for 7 years (in Glacier/Deep Archive for cost efficiency)",
+      "D": "Increase the CloudTrail Event History retention period to 7 years through the console settings"
+    },
+    "answer": "C",
+    "reasoning": "CloudTrail Event History is a FIXED 90-day window — it cannot be extended. For longer retention, you create a TRAIL that delivers JSON log files to S3. Once in S3, you control retention with lifecycle policies: keep recent months in Standard/IA for fast access, transition to Glacier after 1 year, Deep Archive after 2 years for minimum cost over the 7-year span. S3 Object Lock can make them immutable for compliance. This is the standard long-term audit log architecture. CloudWatch Logs (D) works too but is more expensive than S3+Glacier for 7-year cold storage.",
+    "eliminated": {
+      "D": "CloudTrail Event History's 90-day retention is a HARD LIMIT — there is no setting to extend it. It's a convenience lookup feature, not a long-term storage mechanism",
+      "A": "CloudTrail Insights detects unusual API call patterns (anomaly detection) — it has nothing to do with retention periods. It's an analytics feature, not a storage feature",
+      "B": "CloudWatch Logs CAN store CloudTrail events with custom retention, but storing 7 years of API logs in CloudWatch Logs is significantly more expensive than S3 + Glacier lifecycle. For compliance cold storage, S3 is the cost-effective choice"
+    }
+  },
+  {
+    "id": "L9-005",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "hard",
+    "trap_fact": "Macie is S3 only — sensitive data in other services requires different tools",
+    "constraint_terms": [
+      "detect sensitive data",
+      "PII in S3 buckets",
+      "automated scanning"
+    ],
+    "scenario": "A healthcare company stores patient records across S3 buckets. They need to automatically discover which buckets contain Protected Health Information (PHI), Social Security Numbers, and credit card numbers — then generate findings for remediation.",
+    "question": "Which service automatically discovers and classifies sensitive data in S3?",
+    "options": {
+      "A": "Amazon Inspector scanning S3 buckets for data classification and compliance",
+      "B": "Amazon Macie — uses ML and pattern matching to discover, classify, and protect sensitive data (PII, PHI, financial) stored in S3 buckets",
+      "C": "Amazon GuardDuty — scans S3 bucket contents for sensitive data patterns as part of threat detection",
+      "D": "AWS Config rules that scan object contents for sensitive data patterns"
+    },
+    "answer": "B",
+    "reasoning": "Macie is PURPOSE-BUILT for S3 sensitive data discovery. It uses: managed data identifiers (Medicare IDs, passport numbers, credit cards, etc.) and ML classifiers to scan S3 objects and identify sensitive content. It reports: which buckets, which objects, what type of PII, severity. Macie ONLY works with S3 — not RDS, not DynamoDB, not EFS. GuardDuty (B) detects THREATS (API anomalies, network threats) not data content. Config (C) evaluates resource CONFIGURATION, not file contents. Inspector (D) scans for software vulnerabilities and network exposure.",
+    "eliminated": {
+      "C": "GuardDuty detects security threats (unusual API calls, cryptocurrency mining, C2 communication) — it does NOT scan file contents for PII/PHI. GuardDuty's S3 protection detects suspicious ACCESS patterns, not sensitive data types",
+      "D": "Config rules evaluate resource CONFIGURATION state (is encryption enabled? is versioning on?) — they do NOT read/scan object CONTENTS for sensitive data patterns. Config works at the metadata/config level, not data level",
+      "A": "Inspector scans EC2 instances and container images for known software vulnerabilities (CVEs) and network exposure — it does not perform data classification or content scanning of S3 objects"
+    }
+  },
+  {
+    "id": "L9-006",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "moderate",
+    "trap_fact": "Security Hub aggregates findings — doesn't generate its own detections",
+    "constraint_terms": [
+      "central security dashboard",
+      "aggregate findings",
+      "multiple sources"
+    ],
+    "scenario": "A company uses GuardDuty, Inspector, Macie, and Config across 30 accounts. Each generates findings independently. The security team needs a single centralized view of all security findings across all accounts with prioritization and compliance scoring.",
+    "question": "Which service provides centralized security findings aggregation?",
+    "options": {
+      "A": "AWS Organizations with delegated administrator for each security service",
+      "B": "AWS CloudWatch with custom dashboards importing findings from all security services",
+      "C": "AWS Security Hub — aggregates findings from GuardDuty, Inspector, Macie, Config, Firewall Manager, and third-party tools into a single prioritized dashboard with compliance standards scoring",
+      "D": "Amazon GuardDuty with multi-account management as the central security aggregator"
+    },
+    "answer": "C",
+    "reasoning": "Security Hub is the SINGLE PANE OF GLASS for security findings. It consumes findings from ALL security services (GuardDuty, Inspector, Macie, Config, Firewall Manager, third-party) in AWS Security Finding Format (ASFF). It provides: compliance posture scoring against standards (CIS, PCI-DSS, AWS Best Practices), finding prioritization by severity, cross-account aggregation, and automated workflow responses. GuardDuty (B) is ONE source of findings — it doesn't aggregate Macie or Inspector findings. CloudWatch (C) is operational, not security-oriented. Organizations (D) manages accounts, not security findings.",
+    "eliminated": {
+      "D": "GuardDuty has its own multi-account view but ONLY for GuardDuty findings — it doesn't aggregate Inspector vulnerability findings, Macie sensitive data findings, or Config compliance findings. It's one piece of the puzzle, not the aggregator",
+      "B": "CloudWatch is for operational metrics and logs — while you could theoretically build custom dashboards, it doesn't natively consume security findings in ASFF format, provide compliance scoring, or offer security-specific aggregation",
+      "A": "Organizations manages account hierarchy and enables service integration (delegated admin) but doesn't provide a security findings dashboard — it's the organizational structure, not a findings aggregation tool"
+    }
+  },
+  {
+    "id": "L9-007",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "hard",
+    "trap_fact": "Inspector scans for CVEs on workloads — not the same as GuardDuty threat detection",
+    "constraint_terms": [
+      "vulnerability scanning",
+      "CVE detection",
+      "container images"
+    ],
+    "scenario": "A company deploys containerized applications on ECS Fargate. They need to automatically scan container images for known software vulnerabilities (CVEs) both when images are pushed to ECR and continuously while running in production. Findings must include CVE severity and remediation guidance.",
+    "question": "Which service provides automated vulnerability scanning for container images?",
+    "options": {
+      "A": "Amazon Inspector — automatically scans ECR images on push AND running containers for CVEs with severity scoring and remediation recommendations",
+      "B": "AWS Config rules checking container image compliance against a CVE database",
+      "C": "Amazon GuardDuty with container protection — scans images for malware and vulnerabilities at runtime",
+      "D": "Amazon ECR image scanning with vulnerability findings integrated into the deployment pipeline"
+    },
+    "answer": "A",
+    "reasoning": "Amazon Inspector provides two scanning modes: (1) ECR scanning — automatic scan when images are pushed to ECR, before deployment; (2) continual scanning — re-evaluates running workloads when new CVEs are published. It covers EC2 instances, Lambda functions, AND container images. Results include: CVE ID, severity (CVSS score), affected package, and fix version. GuardDuty (B) detects RUNTIME THREATS (malicious behavior) not software vulnerabilities. Config (C) checks configuration, not OS/library CVEs. ECR basic scanning (D) exists but Inspector enhanced scanning is the comprehensive answer.",
+    "eliminated": {
+      "C": "GuardDuty Container Protection (Runtime Monitoring) detects RUNTIME THREATS like suspicious process execution or network connections — it doesn't scan for known CVEs in software packages. Threat detection ≠ vulnerability scanning",
+      "B": "Config evaluates resource CONFIGURATION (task definitions, network settings) — it doesn't scan container filesystem contents or OS packages for CVE vulnerabilities. Different scope entirely",
+      "D": "ECR basic scanning uses Clair for scanning but Inspector's enhanced scanning provides better coverage, continuous re-scanning for new CVEs, and broader integration. The exam expects 'Inspector' as the vulnerability scanning answer"
+    }
+  },
+  {
+    "id": "L9-008",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "moderate",
+    "trap_fact": "Organizations — consolidated billing shares RI/SP discounts, SCPs control member accounts",
+    "constraint_terms": [
+      "multi-account management",
+      "consolidated billing",
+      "share discounts"
+    ],
+    "scenario": "A company has 50 AWS accounts. Some teams buy Reserved Instances that go partially unused while other teams pay full On-Demand price. The CFO wants all RI discounts automatically shared across the organization so unused RIs in one account benefit other accounts.",
+    "question": "Which Organizations feature enables this automatic RI sharing?",
+    "options": {
+      "A": "Reserved Instance Marketplace to sell unused RIs to other accounts in the organization",
+      "B": "AWS Resource Access Manager (RAM) to share Reserved Instances between accounts",
+      "C": "Service Control Policies (SCPs) that allow RI usage across accounts",
+      "D": "Organizations Consolidated Billing — automatically shares RI and Savings Plans discounts across all accounts in the organization by default (RI sharing is enabled by default)"
+    },
+    "answer": "D",
+    "reasoning": "When accounts join an AWS Organization, Consolidated Billing is ON by default. A key feature: RI and Savings Plans discounts are automatically shared across ALL linked accounts. If Account A has an unused m5.xlarge RI and Account B runs an m5.xlarge On-Demand instance, Account B automatically gets the RI discount — no configuration needed. This is a billing POOLING feature, not a resource sharing feature. The RI doesn't 'move' — the discount is applied at the billing layer. This can be disabled per account if needed.",
+    "eliminated": {
+      "C": "SCPs control what ACTIONS accounts can perform (deny/allow API calls) — they have nothing to do with billing discount sharing. SCPs are permission boundaries, not financial instruments",
+      "B": "RAM shares RESOURCES (subnets, Transit Gateways, databases) between accounts — not billing discounts. Reserved Instances aren't resources shared via RAM; their discounts are shared via consolidated billing automatically",
+      "A": "RI Marketplace sells unused RIs to ANY AWS customer (not just organization members) — it's for permanently selling commitments you don't need, not for temporary sharing within an organization"
+    }
+  },
+  {
+    "id": "L9-009",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "hard",
+    "trap_fact": "CloudWatch vs CloudTrail vs Config — operational monitoring vs API audit vs compliance state",
+    "constraint_terms": [
+      "monitor application health",
+      "trigger alarm",
+      "automatic scaling"
+    ],
+    "scenario": "A solutions architect needs to: (1) receive an alert when API response latency exceeds 2 seconds, (2) automatically scale the fleet when request count exceeds 10,000/minute, and (3) visualize CPU utilization trends over the past month.",
+    "question": "Which service provides metrics collection, alarms, and visualization for these operational requirements?",
+    "options": {
+      "A": "Amazon CloudWatch — collects metrics (latency, request count, CPU), triggers alarms at thresholds, drives Auto Scaling actions, and provides dashboards for visualization",
+      "B": "AWS CloudTrail — monitors all API activity and can trigger alarms when latency thresholds are breached",
+      "C": "AWS Config — continuously evaluates whether application performance metrics meet compliance thresholds",
+      "D": "AWS X-Ray — traces requests through the application and provides latency metrics for alarming"
+    },
+    "answer": "A",
+    "reasoning": "CloudWatch is the OPERATIONAL MONITORING service: (1) Metrics — collects numerical time-series data (CPU, latency, request count, custom metrics). (2) Alarms — triggers actions when metrics cross thresholds (alert via SNS, Auto Scaling action, Lambda). (3) Dashboards — visualize metrics over time. It's the central nervous system for operational health. CloudTrail (B) records WHO did what (API audit), not how fast the application responds. Config (C) evaluates resource CONFIGURATION state, not runtime performance. X-Ray (D) provides distributed tracing but CloudWatch is the alarm/scaling driver.",
+    "eliminated": {
+      "B": "CloudTrail records API calls (CreateInstance, PutObject, etc.) — it does NOT measure application latency, request rates, or CPU utilization. It answers 'who called what API?' not 'how is the application performing?'",
+      "C": "Config evaluates whether resources ARE CONFIGURED correctly (encryption enabled, public access blocked) — it doesn't measure runtime performance metrics or trigger scaling based on load",
+      "D": "X-Ray provides detailed request tracing (where time is spent in distributed calls) which is useful for debugging latency — but CloudWatch is what COLLECTS the metric, SETS the alarm, and TRIGGERS the scaling action"
+    }
+  },
+  {
+    "id": "L9-010",
+    "layer": 9,
+    "category": "governance",
+    "difficulty": "moderate",
+    "trap_fact": "AWS Config conformance packs — bundled compliance rules for standards like PCI-DSS, HIPAA",
+    "constraint_terms": [
+      "compliance standard",
+      "PCI-DSS",
+      "audit-ready",
+      "continuous evaluation"
+    ],
+    "scenario": "A company processing credit card payments must demonstrate PCI-DSS compliance to auditors. They need continuous automated evaluation of their AWS infrastructure against PCI-DSS requirements, with a compliance score and specific remediation steps for non-compliant resources.",
+    "question": "Which service provides automated PCI-DSS compliance evaluation?",
+    "options": {
+      "A": "AWS Security Hub with the PCI-DSS compliance standard enabled — scores infrastructure against PCI controls",
+      "B": "AWS Audit Manager with the PCI-DSS framework — collects evidence and generates audit-ready reports",
+      "C": "All three work but serve different purposes: Config (resource compliance), Security Hub (security posture), Audit Manager (audit evidence collection)",
+      "D": "AWS Config conformance packs with the PCI-DSS operational best practices template — evaluates all relevant Config rules continuously and provides compliance scoring"
+    },
+    "answer": "C",
+    "reasoning": "This is a nuanced exam pattern where the 'most complete' answer acknowledges that multiple services participate: Config conformance packs EVALUATE individual resource compliance against PCI rules (Is this SG compliant? Is encryption enabled?). Security Hub scores your OVERALL posture against PCI controls (you're 85% compliant). Audit Manager COLLECTS evidence and generates reports auditors accept. For the exam, if it asks about 'continuous evaluation' lean Config. If 'security posture score' lean Security Hub. If 'audit-ready reports/evidence' lean Audit Manager. Real answer: use all three.",
+    "eliminated": {
+      "D": "Config conformance packs DO evaluate PCI compliance at the resource level — this is correct but incomplete. For the full audit picture, you also need Security Hub's posture scoring and Audit Manager's evidence collection",
+      "B": "Audit Manager is specifically for audit EVIDENCE collection and report generation — it doesn't evaluate resource configurations itself (it leverages Config and Security Hub findings). Important but one piece of the puzzle",
+      "A": "Security Hub's PCI-DSS standard provides compliance scoring but relies on Config rules underneath for the actual evaluations — it's the dashboard, not the evaluation engine"
+    }
+  }
+]

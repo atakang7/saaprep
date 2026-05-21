@@ -1,0 +1,476 @@
+[
+  {
+    "id": "L1-001",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "SCP never GRANTS permissions, only restricts",
+    "constraint_terms": [
+      "grant access",
+      "across organization"
+    ],
+    "scenario": "A company uses AWS Organizations with multiple member accounts. The security team wants developers in Account B to be able to launch EC2 instances in a specific Region. The security administrator creates an SCP that lists ec2:RunInstances as an allowed action and attaches it to Account B's OU.",
+    "question": "Why can developers still NOT launch instances despite the SCP being in place?",
+    "options": {
+      "A": "SCPs only restrict permissions — they never grant them. The developers still need an IAM policy that explicitly allows ec2:RunInstances",
+      "B": "The SCP must be attached directly to the account, not to the OU",
+      "C": "SCPs do not support EC2 actions — only S3 and IAM actions are supported",
+      "D": "The SCP needs to specify the Region constraint using a condition key before it takes effect"
+    },
+    "answer": "A",
+    "reasoning": "SCPs are permission BOUNDARIES — they define the maximum available permissions, like a ceiling. They never GIVE permissions. Think of SCP as a filter that says 'at most, these actions are possible.' The IAM policy on the user/role actually GRANTS the permission. Without the IAM grant, the SCP allow does nothing — it just means 'if someone grants this, I won't block it.' Two layers must both say yes: SCP (allows) + IAM (grants).",
+    "eliminated": {
+      "B": "SCPs attached to OUs apply to all accounts within that OU — attaching to OU is correct and inherited",
+      "C": "SCPs support all AWS service actions — there is no service restriction on SCP capabilities",
+      "D": "Region restriction in SCPs uses condition keys but is a separate concern — the fundamental issue is that SCPs cannot grant, not a Region problem"
+    }
+  },
+  {
+    "id": "L1-002",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "SCP does NOT apply to the management account",
+    "constraint_terms": [
+      "prevent actions",
+      "all accounts including management"
+    ],
+    "scenario": "A company's compliance team uses AWS Organizations and attaches an SCP to the root that denies all users from disabling CloudTrail. During an audit, they discover that an IAM user in the management account successfully disabled CloudTrail logging yesterday.",
+    "question": "Why was the management account user able to disable CloudTrail despite the SCP?",
+    "options": {
+      "A": "SCPs do not affect the management account — they only apply to member accounts in the organization",
+      "B": "The IAM user had an explicit allow that overrides the SCP deny",
+      "C": "SCPs attached to the root only apply to OUs, not directly to accounts at the root level",
+      "D": "The SCP deny statement had a syntax error in the action name that prevented it from matching"
+    },
+    "answer": "A",
+    "reasoning": "This is a hard-coded AWS Organizations design decision: the management account is IMMUNE to SCPs. The rationale is that the management account must always be able to manage the organization — if an SCP locked it out, nobody could fix it. This means you should never put workloads in the management account because you cannot restrict it via SCPs. Compliance controls for the management account must use IAM policies + CloudWatch alarms + Config rules instead.",
+    "eliminated": {
+      "D": "The scenario states the SCP denies disabling CloudTrail — if it worked on member accounts, syntax is fine. The issue is scope, not syntax",
+      "B": "In member accounts, SCP deny wins over IAM allow — SCP is an outer boundary. But this is irrelevant because the management account isn't subject to SCPs at all",
+      "C": "SCPs attached to root apply to ALL member accounts in the organization, regardless of OU structure — but still not the management account"
+    }
+  },
+  {
+    "id": "L1-003",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "Cross-account IAM role needs BOTH trust policy AND permission to assume",
+    "constraint_terms": [
+      "cross-account access",
+      "least privilege"
+    ],
+    "scenario": "Account A (111111111111) needs to read objects from an S3 bucket in Account B (222222222222). A solutions architect creates a role in Account B with an S3 read policy and sets the trust policy to allow Account A's root. When an EC2 instance in Account A tries to assume the role, the request is denied.",
+    "question": "What is the MOST LIKELY cause of this failure?",
+    "options": {
+      "A": "The EC2 instance's IAM role in Account A does not have sts:AssumeRole permission for the role ARN in Account B",
+      "B": "The S3 bucket policy in Account B must also explicitly allow Account A in addition to the role",
+      "C": "Cross-account role assumption requires a VPC peering connection between the two accounts",
+      "D": "The trust policy in Account B must specify the exact IAM role ARN from Account A, not the account root"
+    },
+    "answer": "A",
+    "reasoning": "Cross-account role assumption is a TWO-SIDED handshake. Side 1 (Account B): trust policy says 'I trust Account A to assume me' — this is done. Side 2 (Account A): the identity doing the assuming needs sts:AssumeRole permission pointing at the target role's ARN — this is missing. Most people set up the trust policy and forget the caller still needs explicit permission to call AssumeRole. When trust policy specifies the account root, it means 'any principal in Account A that has sts:AssumeRole permission for this role' — which is nobody if their IAM policy doesn't grant it.",
+    "eliminated": {
+      "D": "Trust policy allowing account root is valid — it delegates to Account A's IAM to decide WHO within the account can assume. Specifying exact ARN is tighter but root works",
+      "C": "VPC peering is a network-layer concept — IAM role assumption is an API call (STS) that uses the AWS control plane, not VPC data plane",
+      "B": "When using role assumption, the role's permissions determine S3 access — the bucket policy doesn't need to separately allow Account A if the role already has S3 read policy"
+    }
+  },
+  {
+    "id": "L1-004",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "S3 bucket policy can enforce VPC endpoint condition to restrict access",
+    "constraint_terms": [
+      "restrict access to VPC only",
+      "prevent internet access to bucket"
+    ],
+    "scenario": "A company stores sensitive data in S3. The security policy requires that the bucket is accessible ONLY from the company's VPC via a gateway endpoint — not from the public internet, not from the AWS console, and not from any other network path. A solutions architect configures a VPC gateway endpoint for S3.",
+    "question": "What additional step ensures the bucket is inaccessible from any path other than the VPC endpoint?",
+    "options": {
+      "A": "Remove the bucket's public access block and rely solely on the VPC endpoint policy to restrict access",
+      "B": "Enable S3 Block Public Access at the account level — this prevents all non-VPC access to any bucket",
+      "C": "Configure the VPC endpoint route table to block non-VPC traffic from reaching S3",
+      "D": "Add a bucket policy with a Deny statement using aws:sourceVpce condition that denies all requests NOT from the specific VPC endpoint ID"
+    },
+    "answer": "D",
+    "reasoning": "The VPC endpoint creates a PRIVATE PATH to S3 but does NOT remove the public path. S3 is still accessible via the public endpoint. To enforce VPC-only access, you must tell S3 to REJECT requests not arriving through that endpoint. A bucket policy with Deny + Condition: aws:sourceVpce != vpce-xxx achieves this — any request from console, CLI over internet, or another VPC is denied. The endpoint policy controls what the VPC can do with S3; the bucket policy controls what paths can reach the bucket. Both are needed for full lockdown.",
+    "eliminated": {
+      "A": "Removing public access block makes things LESS secure. VPC endpoint policies restrict what GOES OUT of the VPC to S3, not what reaches the bucket from other paths",
+      "C": "Route tables don't 'block' traffic to S3's public endpoint from other sources — route tables only affect traffic within the VPC. External paths still exist",
+      "B": "S3 Block Public Access prevents anonymous/public ACL access, but does NOT prevent authenticated IAM users from accessing S3 via the internet — it's about public ACLs and policies, not network path enforcement"
+    }
+  },
+  {
+    "id": "L1-005",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "KMS key policy is the PRIMARY authority — IAM alone is not sufficient",
+    "constraint_terms": [
+      "decrypt data",
+      "cross-account",
+      "KMS"
+    ],
+    "scenario": "Account A has a Lambda function that needs to read and decrypt objects from an S3 bucket in Account B. The objects are encrypted with a customer-managed KMS key in Account B. The Lambda's execution role has s3:GetObject and kms:Decrypt permissions. The S3 bucket policy allows Account A. However, decryption fails with AccessDenied.",
+    "question": "What is the most likely cause of the decryption failure?",
+    "options": {
+      "A": "Customer-managed KMS keys cannot be used for cross-account decryption — only AWS-managed keys support this",
+      "B": "The S3 bucket policy must explicitly include kms:Decrypt in addition to s3:GetObject for encrypted objects",
+      "C": "The KMS key policy in Account B does not grant kms:Decrypt to Account A or the Lambda role's ARN",
+      "D": "The Lambda function must be in the same Region as the KMS key for decryption to work"
+    },
+    "answer": "C",
+    "reasoning": "KMS key policies are DIFFERENT from other AWS resource policies. For KMS, the key policy is the PRIMARY gatekeeper. Unlike S3 or SQS where IAM alone can grant access if the resource policy doesn't explicitly deny, KMS requires the key policy to EXPLICITLY allow the caller (or delegate to IAM). Even if IAM allows kms:Decrypt, if the key policy doesn't include the cross-account principal, access is denied. This is the 'KMS key policy is primary authority' rule — it must participate in every access decision.",
+    "eliminated": {
+      "D": "KMS keys can be used cross-Region — the Lambda just needs the full key ARN with Region. Cross-Region is supported for decryption",
+      "A": "Customer-managed KMS keys absolutely support cross-account usage — that's their primary use case for controlled sharing. AWS-managed keys actually CANNOT be shared cross-account",
+      "B": "S3 bucket policies don't need KMS actions — S3 handles GetObject, then KMS handles decryption separately through its own policy evaluation"
+    }
+  },
+  {
+    "id": "L1-006",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "Resource policy can grant cross-account access WITHOUT role assumption",
+    "constraint_terms": [
+      "simplest cross-account access",
+      "S3"
+    ],
+    "scenario": "Account A needs to write processed reports to an S3 bucket owned by Account B. The architect is choosing between two approaches: (1) Create a cross-account role in Account B and have Account A assume it, or (2) Add a bucket policy in Account B that allows Account A's role to perform PutObject. Both approaches can work.",
+    "question": "Which approach requires FEWER configuration steps and is simpler to maintain?",
+    "options": {
+      "A": "Create a VPC peering connection between the accounts and use the private path",
+      "B": "Bucket policy approach — add Account A's role ARN to the bucket policy with PutObject permission",
+      "C": "Cross-account role approach — create a role in Account B with trust policy and have Account A assume it",
+      "D": "Use S3 Access Points with delegated access from the bucket owner"
+    },
+    "answer": "B",
+    "reasoning": "Resource-based policies (like S3 bucket policies) allow DIRECT cross-account access without the assuming account needing to take on a different identity. Account A's role stays itself and just writes directly. Only ONE configuration: the bucket policy. The role approach requires: (1) create role in B, (2) set trust policy, (3) grant permissions on role, (4) grant sts:AssumeRole to caller in A, (5) modify code to assume role first. When the question says 'simplest' or 'fewest steps' and the target is a resource that supports resource policies, direct resource policy wins.",
+    "eliminated": {
+      "C": "Works but requires more steps: create role, trust policy, permission policy, and the calling identity needs AssumeRole permission — more configuration to maintain",
+      "A": "VPC peering is network layer — S3 is accessed via public or VPC endpoint, not through peering. Peering doesn't grant S3 access permissions",
+      "D": "S3 Access Points add abstraction but still need a policy — they're for managing complex access patterns at scale, not for simplifying a single cross-account write"
+    }
+  },
+  {
+    "id": "L1-007",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "Cognito User Pool is for APP authentication, IAM Identity Center is for workforce",
+    "constraint_terms": [
+      "corporate employees",
+      "AWS Management Console access",
+      "centralized identity"
+    ],
+    "scenario": "A company with 500 employees wants to give its engineering team access to the AWS Management Console across 12 AWS accounts using their existing corporate Active Directory credentials. The security team requires centralized management of permissions and single sign-on.",
+    "question": "Which service should the solutions architect use?",
+    "options": {
+      "A": "Amazon Cognito User Pool federated with the corporate Active Directory",
+      "B": "Amazon Cognito Identity Pool with SAML federation to Active Directory",
+      "C": "AWS IAM Identity Center (successor to AWS SSO) with Active Directory integration",
+      "D": "Create IAM users in each account synced from Active Directory using a Lambda function"
+    },
+    "answer": "C",
+    "reasoning": "IAM Identity Center is built specifically for WORKFORCE access to AWS accounts and applications. It integrates with AD, provides SSO across multiple accounts, and centrally manages permission sets. Cognito is for APPLICATION END USERS (your customers) authenticating to your web/mobile apps — not for employees accessing the AWS console. The trigger words: 'employees,' 'AWS Console,' 'multiple accounts,' 'corporate AD,' 'centralized' → always IAM Identity Center. 'App users,' 'sign up,' 'mobile' → always Cognito.",
+    "eliminated": {
+      "A": "Cognito User Pools authenticate end users of applications (customers), not employees accessing AWS Console — wrong use case entirely",
+      "D": "Creating IAM users per account means managing users in 12 places, no SSO, no centralization — violates every requirement",
+      "B": "Cognito Identity Pools vend temporary AWS credentials for app users to call AWS services — not for Console access or workforce management"
+    }
+  },
+  {
+    "id": "L1-008",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "Cognito Identity Pool hands out temporary AWS credentials after authentication",
+    "constraint_terms": [
+      "mobile application",
+      "access AWS resources",
+      "unauthenticated and authenticated"
+    ],
+    "scenario": "A company builds a mobile app where users can browse a public product catalog (stored in DynamoDB) without logging in. After logging in with a social provider (Google/Facebook), users should also access their personal S3 data. The app needs direct AWS SDK calls from the device.",
+    "question": "Which combination of Cognito components enables this architecture?",
+    "options": {
+      "A": "API Gateway with Cognito authorizer in front of all DynamoDB and S3 operations — no direct AWS SDK calls needed",
+      "B": "Cognito Identity Pool alone without a User Pool — use the social providers directly with the Identity Pool and handle auth/unauth with separate API keys",
+      "C": "Cognito User Pool alone with IAM roles attached to User Pool groups — the SDK uses User Pool tokens directly",
+      "D": "Cognito User Pool for login PLUS Cognito Identity Pool to vend temporary AWS credentials — Identity Pool provides both authenticated and unauthenticated IAM roles"
+    },
+    "answer": "D",
+    "reasoning": "Two distinct Cognito components serve different purposes. User Pool = authentication (who is this user? verify identity). Identity Pool = authorization for AWS (give this verified user temporary STS credentials mapped to an IAM role). The Identity Pool uniquely supports UNAUTHENTICATED access with a limited-permission IAM role — perfect for browsing without login. After User Pool authenticates via social provider, the Identity Pool swaps the token for credentials with a fuller IAM role. User Pool tokens are NOT AWS credentials — you cannot call DynamoDB/S3 directly with them.",
+    "eliminated": {
+      "C": "User Pool tokens (JWT) cannot be used directly with the AWS SDK to call DynamoDB/S3 — you need actual AWS credentials (access key/secret/session token) which only Identity Pool provides",
+      "B": "Identity Pool CAN work with social providers directly, but you lose the unified user directory and custom attributes that User Pool provides. Also, option says 'API keys' which isn't how Identity Pool unauthenticated access works",
+      "A": "This changes the architecture — question specified 'direct AWS SDK calls from device.' API Gateway adds a proxy layer and doesn't give the device AWS credentials for direct SDK usage"
+    }
+  },
+  {
+    "id": "L1-009",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "IAM role trust policy + resource policy evaluation — explicit deny wins everywhere",
+    "constraint_terms": [
+      "prevent specific action",
+      "organization-wide"
+    ],
+    "scenario": "A company uses AWS Organizations. The security team must ensure that NO member account can ever create IAM users with console access — all human access must go through IAM Identity Center. Some account administrators have AdministratorAccess managed policy attached.",
+    "question": "Which approach prevents IAM user creation across all member accounts even for administrators?",
+    "options": {
+      "A": "Remove AdministratorAccess from all account administrators and grant only specific permissions",
+      "B": "Add a boundary policy to every IAM administrator role that excludes iam:CreateUser",
+      "C": "Attach an SCP to the root that denies iam:CreateUser and iam:CreateLoginProfile",
+      "D": "Create an AWS Config rule that detects IAM user creation and sends an alert to the security team"
+    },
+    "answer": "C",
+    "reasoning": "SCPs are the CEILING for ALL identities in member accounts (except the management account). Even if someone has AdministratorAccess (which allows *), the SCP deny blocks it. SCP deny cannot be overridden by any IAM policy in the member account — it's an outer boundary. This is the correct preventive control. Removing Admin access works but doesn't prevent re-granting. Config detects but doesn't PREVENT. Permission boundaries must be attached to each role individually — not scalable and can be removed by the account admin.",
+    "eliminated": {
+      "A": "Account administrators could grant themselves or others the permission again — this is not a hard boundary, just a current state fix",
+      "D": "Config rules are DETECTIVE, not PREVENTIVE — the user is already created by the time the alert fires. The question says 'prevent', not 'detect'",
+      "B": "Permission boundaries must be attached per-role and can be removed by someone with sufficient IAM permissions in the account — not an organization-level hard block"
+    }
+  },
+  {
+    "id": "L1-010",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "KMS key policy is PRIMARY authority — different from all other AWS resource policies",
+    "constraint_terms": [
+      "encrypt",
+      "specific applications only",
+      "key management"
+    ],
+    "scenario": "A company has a customer-managed KMS key used to encrypt sensitive data. The key was created by an administrator who has since left. New applications need to use this key for encryption. The application team adds kms:Encrypt to their IAM role, but calls to KMS return AccessDenied.",
+    "question": "What should the solutions architect check FIRST?",
+    "options": {
+      "A": "Whether the IAM role has a permissions boundary that excludes KMS actions",
+      "B": "Whether the key is in a disabled or pending-deletion state",
+      "C": "The KMS key policy — verify it allows the application role or delegates permission management to IAM",
+      "D": "Whether the application's VPC has a KMS VPC endpoint configured"
+    },
+    "answer": "C",
+    "reasoning": "KMS operates differently from other AWS services. For most services, if the IAM policy allows an action and no resource policy explicitly denies it, access is granted. KMS flips this: the KEY POLICY must explicitly allow the principal OR include the statement that enables IAM policies to work ('Enable IAM policies' statement that allows the account root). If the departed admin created the key with a restrictive key policy that only listed themselves, no amount of IAM policy will grant access. Check key policy FIRST — it's the primary authority.",
+    "eliminated": {
+      "B": "Disabled/deleted keys return specific errors (DisabledException, NotFoundException) — not AccessDenied. The AccessDenied specifically signals a permission issue",
+      "D": "KMS calls work without VPC endpoints via the public AWS endpoint — VPC endpoint is for private network path preference, not a requirement for functionality",
+      "A": "Permissions boundaries could cause this, but the KMS key policy being the primary authority makes it the FIRST check. Boundary is secondary concern"
+    }
+  },
+  {
+    "id": "L1-011",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "Resource policy can grant cross-account WITHOUT role assumption — but object ownership matters in S3",
+    "constraint_terms": [
+      "cross-account S3 writes",
+      "bucket owner must have full control"
+    ],
+    "scenario": "Account A writes objects to Account B's S3 bucket using a bucket policy that allows Account A's role to PutObject. Account B's analytics team discovers they cannot read or manage the objects written by Account A, receiving AccessDenied errors.",
+    "question": "What is causing this issue and what is the recommended fix?",
+    "options": {
+      "A": "Account A owns the objects it writes. Set the bucket's Object Ownership to 'Bucket owner enforced' which disables ACLs and makes Account B the automatic owner",
+      "B": "Account A must include the x-amz-acl: bucket-owner-full-control header which transfers ownership to Account B",
+      "C": "Account B must create a cross-account IAM role and have Account A write objects while assuming Account B's identity",
+      "D": "S3 does not support cross-account writes — the bucket policy grant is ignored for PutObject actions"
+    },
+    "answer": "A",
+    "reasoning": "When Account A writes to Account B's bucket, traditionally Account A OWNS that object — and Account B (the bucket owner) cannot even read it. The modern fix is 'Bucket owner enforced' Object Ownership setting, which disables ACLs entirely and makes the bucket owner always own all objects regardless of who wrote them. Option B (bucket-owner-full-control ACL) is the LEGACY approach that still works but requires the writer to remember the header — fragile. The exam prefers 'Bucket owner enforced' because it's a one-time bucket setting that eliminates the problem structurally.",
+    "eliminated": {
+      "B": "This is the old approach — it works but requires every write to include the header. If any write forgets it, ownership problem returns. 'Bucket owner enforced' is the structural fix",
+      "C": "Role assumption changes who writes the object (Account B's identity) which fixes ownership, but adds complexity. The question asks for the recommended fix — Object Ownership setting is simpler",
+      "D": "S3 absolutely supports cross-account writes via bucket policy — this is a fundamental S3 capability used in countless architectures"
+    }
+  },
+  {
+    "id": "L1-012",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "SCP + IAM together determine effective permissions — SCP is the ceiling",
+    "constraint_terms": [
+      "least privilege",
+      "prevent Region usage"
+    ],
+    "scenario": "A company's compliance framework requires that all workloads run ONLY in eu-west-1 and eu-central-1. The company uses AWS Organizations with multiple accounts. Some teams have broad IAM permissions. The security team needs to ensure no resources are created in any other Region, regardless of individual IAM permissions.",
+    "question": "Which approach enforces this Region restriction across all member accounts?",
+    "options": {
+      "A": "Use AWS Config rules to detect resources in non-approved Regions and automatically delete them",
+      "B": "Attach an SCP that denies all actions when aws:RequestedRegion is NOT eu-west-1 or eu-central-1 (with exceptions for global services)",
+      "C": "Create VPC configurations only in the approved Regions — services cannot be created without a VPC",
+      "D": "Configure IAM permission boundaries on all roles to restrict the aws:RequestedRegion condition"
+    },
+    "answer": "B",
+    "reasoning": "SCPs provide an UNBYPASSABLE ceiling for ALL identities in member accounts. A deny SCP on Region cannot be overridden by any IAM policy, regardless of how broad it is. The aws:RequestedRegion condition key covers all regional service API calls. You must exempt global services (IAM, CloudFront, Route 53, Organizations, STS) since they operate from us-east-1. Permission boundaries (B) must be applied role-by-role and can be changed by anyone with iam:PutRolePermissionsBoundary. SCP is the only org-wide hard enforcement.",
+    "eliminated": {
+      "D": "Permission boundaries must be manually attached to every role and can be detached by account administrators — not an unbypassable organization-level control",
+      "A": "Config rules are detective and reactive — resources are created first, then detected and deleted. There's a window of non-compliance and potential data exposure",
+      "C": "Many AWS services (S3, Lambda, DynamoDB, IAM) work without a VPC — VPC absence doesn't prevent service usage in a Region"
+    }
+  },
+  {
+    "id": "L1-013",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "VPC endpoint policy + bucket policy together create defense in depth for S3",
+    "constraint_terms": [
+      "data exfiltration prevention",
+      "restrict to company buckets only"
+    ],
+    "scenario": "A financial company has strict data loss prevention requirements. EC2 instances in private subnets use a VPC gateway endpoint to access S3. The security team discovers that a compromised instance could exfiltrate data by writing to an attacker-controlled bucket in a different AWS account, since the gateway endpoint allows access to ALL S3 buckets by default.",
+    "question": "Which combination of controls prevents data exfiltration to unauthorized S3 buckets? (Select the MOST complete answer)",
+    "options": {
+      "A": "Apply a VPC endpoint policy that allows access ONLY to the company's specific bucket ARNs, AND add a bucket policy on company buckets restricting access to the VPC endpoint",
+      "B": "Use S3 Block Public Access on the company's buckets to prevent external access",
+      "C": "Add a NACL rule on the private subnet denying outbound traffic to S3 IP ranges not belonging to the company's buckets",
+      "D": "Configure the VPC gateway endpoint route table to only route traffic destined for the company's bucket IP ranges"
+    },
+    "answer": "A",
+    "reasoning": "Defense in depth requires BOTH sides locked: (1) VPC endpoint policy restricts which buckets the VPC can reach — stops the instance from WRITING to attacker buckets. (2) Bucket policy restricts which networks can access company data — stops requests from non-company VPCs from READING company data. Together they create a bidirectional lock: your VPC can only talk to your buckets, and your buckets only accept traffic from your VPC endpoints. One without the other leaves a gap.",
+    "eliminated": {
+      "D": "S3 gateway endpoint routing works at the service prefix list level (all of S3), not per-bucket IP ranges — you cannot route to specific bucket IPs because S3 is a shared service on shared IPs",
+      "C": "NACLs work on IP/port, not on S3 bucket identity — all S3 traffic goes to the same IP prefixes. You cannot NACL-filter by bucket name",
+      "B": "Block Public Access prevents anonymous access to YOUR buckets but doesn't prevent your instances from writing to OTHER people's buckets — wrong direction of protection"
+    }
+  },
+  {
+    "id": "L1-014",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "IAM roles for EC2 are delivered via instance metadata — instance profile is the delivery mechanism",
+    "constraint_terms": [
+      "EC2 access to AWS services",
+      "no long-term credentials"
+    ],
+    "scenario": "A developer deploys an application on EC2 that needs to read from a DynamoDB table. The developer initially hard-codes AWS access keys in the application configuration file. A security review flags this as a critical finding and requires removal of long-term credentials.",
+    "question": "What is the recommended approach to give the EC2 instance access to DynamoDB without long-term credentials?",
+    "options": {
+      "A": "Create an IAM role with DynamoDB read permissions and attach it to the EC2 instance via an instance profile",
+      "B": "Store the access keys in AWS Secrets Manager and have the application retrieve them at startup",
+      "C": "Create an IAM user with DynamoDB permissions, generate temporary credentials with STS, and store the session token in the environment",
+      "D": "Configure a VPC interface endpoint for DynamoDB to allow access without credentials"
+    },
+    "answer": "A",
+    "reasoning": "IAM roles attached to EC2 (via instance profiles) provide TEMPORARY credentials that are automatically rotated by the AWS metadata service. The application SDK automatically retrieves them from the instance metadata — no code changes, no stored secrets. This is THE pattern for EC2 → AWS service access. Secrets Manager still stores credentials (the wrong model). STS from an IAM user still starts with a long-term key. VPC endpoints provide a private path but don't remove the NEED for credentials — you still need IAM permissions.",
+    "eliminated": {
+      "B": "Secrets Manager stores and rotates secrets, but the access keys are still long-term credentials being stored — this doesn't eliminate the fundamental problem. Also, the application needs credentials to READ from Secrets Manager (circular)",
+      "C": "Starting with an IAM user's access key to call STS means you still have long-term credentials — you've just added a step. The requirement is to eliminate long-term creds entirely",
+      "D": "VPC endpoints provide private network connectivity but do NOT eliminate the need for IAM authentication — every API call still requires valid credentials to identify the caller"
+    }
+  },
+  {
+    "id": "L1-015",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "Permission evaluation: explicit deny > explicit allow, and SCP + IAM + resource policy all evaluated",
+    "constraint_terms": [
+      "troubleshoot access denied",
+      "multiple policies"
+    ],
+    "scenario": "An application on EC2 in Account A calls s3:PutObject to a bucket in the same account. The following policies exist: (1) IAM role policy allows s3:PutObject on the bucket, (2) S3 bucket policy allows the role, (3) An SCP on the account allows all S3 actions, (4) A permission boundary on the role allows s3:* on all resources. The call STILL returns AccessDenied.",
+    "question": "Which additional factor could cause this denial?",
+    "options": {
+      "A": "The S3 bucket has versioning enabled which requires additional s3:PutObjectVersion permission",
+      "B": "The KMS key policy on the bucket's encryption key does not allow the role to perform kms:GenerateDataKey",
+      "C": "A VPC endpoint policy on the S3 gateway endpoint restricts which buckets can be accessed from that VPC",
+      "D": "The IAM role's session policy from an AssumeRole call restricts the allowed actions"
+    },
+    "answer": "B",
+    "reasoning": "When a bucket uses KMS encryption (SSE-KMS), every PutObject call also requires kms:GenerateDataKey (to create the data key that encrypts the object). All S3 permissions can be perfect, but if the KMS key policy doesn't allow the caller, the ENTIRE operation fails with AccessDenied. This is the 'hidden dependency' trap — you think you have all S3 permissions but forget that encryption adds a KMS permission requirement. Options A and C are also valid denial causes, but D is the most commonly tested because it's the least obvious.",
+    "eliminated": {
+      "C": "VPC endpoint policies CAN restrict access, but the scenario says the SCP allows all S3 actions — and a VPC endpoint policy could cause denial. However, D is more specific to the 'everything looks right but still denied' pattern",
+      "A": "Versioning doesn't require additional permissions — s3:PutObject works whether versioning is enabled or not. There is no s3:PutObjectVersion action",
+      "D": "Session policies from AssumeRole CAN restrict, but the scenario doesn't mention the role being assumed with a session policy — the EC2 instance uses the role directly via instance profile"
+    }
+  },
+  {
+    "id": "L1-016",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "Secrets Manager vs Parameter Store — Secrets Manager has built-in rotation, Parameter Store does not",
+    "constraint_terms": [
+      "automatic rotation",
+      "database credentials",
+      "least operational overhead"
+    ],
+    "scenario": "A company runs an RDS MySQL database. The security team requires that database credentials are rotated every 30 days automatically without any application downtime or manual intervention. The application reads credentials at connection time.",
+    "question": "Which service should store and rotate the database credentials?",
+    "options": {
+      "A": "AWS Systems Manager Parameter Store SecureString with a scheduled Lambda function to rotate the value",
+      "B": "Store credentials in an encrypted S3 object and use a lifecycle policy to trigger rotation",
+      "C": "AWS Secrets Manager with automatic rotation enabled using the built-in RDS rotation Lambda",
+      "D": "Use IAM database authentication to eliminate the need for password credentials entirely"
+    },
+    "answer": "C",
+    "reasoning": "Secrets Manager has BUILT-IN automatic rotation with pre-built Lambda functions for RDS/Aurora/Redshift/DocumentDB. You enable it, set a schedule (30 days), and AWS handles: generating new password → updating the database → updating the secret value → zero manual intervention. Parameter Store CAN store secrets but has NO built-in rotation — you'd build and maintain your own Lambda. IAM DB auth works for some scenarios but has limitations (max connections, Aurora/MySQL/PostgreSQL only) and the scenario says 'database credentials' implying password-based auth exists.",
+    "eliminated": {
+      "A": "Parameter Store has no built-in rotation mechanism — you must write, deploy, and maintain a custom Lambda function yourself. Violates 'least operational overhead'",
+      "B": "S3 lifecycle policies control storage tier transitions (Standard → IA → Glacier), not credential rotation. This doesn't solve the rotation problem at all",
+      "D": "IAM DB auth eliminates passwords, which is good, but has a 200 connections/second limit per instance. The scenario specifically mentions existing credentials needing rotation, suggesting password-based auth is required"
+    }
+  },
+  {
+    "id": "L1-017",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "moderate",
+    "trap_fact": "Resource policies allow direct cross-account access — IAM role assumption is not always needed",
+    "constraint_terms": [
+      "cross-account",
+      "Lambda invoke",
+      "least complexity"
+    ],
+    "scenario": "Account A has a Lambda function that needs to be invoked by an EventBridge rule in Account B. The solutions architect is designing the cross-account invocation mechanism.",
+    "question": "What is the simplest way to allow Account B's EventBridge rule to invoke Account A's Lambda function?",
+    "options": {
+      "A": "Create a cross-account IAM role in Account A that Account B's EventBridge service assumes before invoking the Lambda",
+      "B": "Set up an SQS queue as an intermediary — Account B sends to SQS, Account A's Lambda polls",
+      "C": "Deploy a copy of the Lambda function in Account B so EventBridge doesn't need cross-account access",
+      "D": "Add a resource-based policy on the Lambda function granting events.amazonaws.com from Account B permission to invoke it"
+    },
+    "answer": "D",
+    "reasoning": "Lambda resource-based policies (also called function policies) allow external services and accounts to invoke the function DIRECTLY without role assumption. A single AddPermission call grants Account B's EventBridge the invoke right. This is the simplest approach — one API call, no role creation, no trust policies. Role assumption (B) adds unnecessary complexity for this use case. SQS (C) changes the architecture. Duplicating code (D) creates maintenance problems. When the target service supports resource policies, direct grant is simplest.",
+    "eliminated": {
+      "A": "Cross-account roles add complexity: create role, set trust policy, configure EventBridge to assume it, grant invoke permissions. Resource policy is one step",
+      "B": "Adding SQS changes the invocation pattern from synchronous direct invoke to async polling — different architecture with new components to manage",
+      "C": "Duplicating Lambda functions across accounts means maintaining code in two places — doubles maintenance effort and risks version drift"
+    }
+  },
+  {
+    "id": "L1-018",
+    "layer": 1,
+    "category": "access",
+    "difficulty": "hard",
+    "trap_fact": "IAM policy evaluation — within same account: union of all policies. Cross-account: intersection",
+    "constraint_terms": [
+      "cross-account",
+      "access denied troubleshooting"
+    ],
+    "scenario": "Within Account A, a Lambda function has an IAM role with s3:GetObject on arn:aws:s3:::bucket-a/*. There is NO bucket policy on bucket-a. The Lambda successfully reads from bucket-a. Now, the same Lambda tries to read from bucket-b in Account B. Account B's bucket policy allows the Lambda role ARN for s3:GetObject. The call returns AccessDenied.",
+    "question": "Why does the intra-account call succeed but the cross-account call fail?",
+    "options": {
+      "A": "Cross-account S3 reads require a VPC endpoint — the Lambda function is not configured to access Account B's S3 through a private path",
+      "B": "Within the same account, IAM policy alone is sufficient (union model). Cross-account requires BOTH the caller's IAM policy AND the resource policy to allow the action (intersection model). The Lambda role does not have s3:GetObject for bucket-b's ARN.",
+      "C": "The Lambda role's trust policy only allows Account A's services to assume it — Account B's bucket cannot validate the role identity",
+      "D": "S3 bucket policies cannot reference IAM role ARNs from external accounts — only account IDs are supported as principals"
+    },
+    "answer": "B",
+    "reasoning": "This is the critical evaluation model difference. SAME ACCOUNT: if EITHER the IAM policy OR the resource policy allows, access is granted (union). The account owns both the identity and the resource, so one-sided permission suffices. CROSS ACCOUNT: BOTH the identity's IAM policy AND the resource policy must independently allow the action (intersection). Neither alone is enough. The Lambda role allows bucket-a/* but NOT bucket-b/* — so the identity side fails for cross-account even though the resource side (bucket policy) allows it.",
+    "eliminated": {
+      "A": "VPC endpoints are for PRIVATE network path — they don't affect IAM permission evaluation. Cross-account S3 access works over the public endpoint with correct permissions",
+      "C": "Trust policies control WHO can assume the role — once assumed, the role's permissions are evaluated. The bucket doesn't 'validate' the role; it checks the bucket policy against the caller's identity",
+      "D": "S3 bucket policies absolutely support IAM role ARNs from external accounts as principals — this is standard cross-account S3 configuration"
+    }
+  }
+]

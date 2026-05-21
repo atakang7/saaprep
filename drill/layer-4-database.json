@@ -1,0 +1,382 @@
+[
+  {
+    "id": "L4-001",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "RDS Multi-AZ standby CANNOT serve read traffic",
+    "constraint_terms": [
+      "high availability",
+      "read scaling",
+      "relational database"
+    ],
+    "scenario": "A company runs a MySQL database on Amazon RDS. The application experiences high read traffic from reporting dashboards during business hours, causing the primary to approach CPU limits. The system must also survive an AZ failure without manual intervention.",
+    "question": "Which configuration provides BOTH read scaling and high availability?",
+    "options": {
+      "A": "Enable Multi-AZ for failover AND create one or more read replicas to offload reporting queries",
+      "B": "Deploy two separate RDS instances in different AZs with application-level read routing",
+      "C": "Enable Multi-AZ deployment — the standby instance will automatically serve read traffic during peak periods",
+      "D": "Create a read replica and promote it if the primary fails — this provides both HA and read scaling"
+    },
+    "answer": "A",
+    "reasoning": "Multi-AZ and read replicas solve DIFFERENT problems. Multi-AZ standby is a synchronous replica that takes over on failure — it CANNOT serve any traffic until promoted during failover. Read replicas are asynchronous copies that actively serve READ queries. You need BOTH: Multi-AZ for automated HA failover + read replicas for read scaling. The exam constantly tests whether you know the standby is invisible to read traffic. The trap is thinking 'Multi-AZ = two copies = can read from both' — wrong.",
+    "eliminated": {
+      "C": "Multi-AZ standby is completely inaccessible for reads — it exists ONLY to become primary during failure. No connection endpoint, no read traffic, no queries. This is the #1 RDS trap on the exam",
+      "D": "Promoting a read replica breaks replication PERMANENTLY and creates an independent database — it's a one-way door. It's not automated HA: you'd need to detect failure, promote manually, update DNS. Not equivalent to Multi-AZ failover",
+      "B": "Managing two independent RDS instances with application-level routing means no automatic failover, no synchronized replication guarantees, and significant operational complexity"
+    }
+  },
+  {
+    "id": "L4-002",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "hard",
+    "trap_fact": "RDS read replica has asynchronous replication — slight lag means not perfectly consistent",
+    "constraint_terms": [
+      "strong consistency",
+      "read-after-write",
+      "cannot tolerate stale data"
+    ],
+    "scenario": "An e-commerce platform displays order status to customers immediately after they place an order. The current RDS PostgreSQL primary handles all reads and writes. Under load, the solutions architect considers adding read replicas. However, customers complain if they place an order and the status page shows 'no order found' even momentarily.",
+    "question": "How should the architect handle reads that require immediate consistency?",
+    "options": {
+      "A": "Configure synchronous replication on the read replica to eliminate all replication lag",
+      "B": "Route write-then-read patterns (like order status after purchase) to the PRIMARY instance, use read replicas only for queries tolerant of slight staleness (like product catalog browsing)",
+      "C": "Add an ElastiCache layer in front of the read replica — cache invalidation ensures consistency",
+      "D": "Increase the read replica instance size to reduce replication lag to near-zero"
+    },
+    "answer": "B",
+    "reasoning": "Read replicas use ASYNCHRONOUS replication — there is ALWAYS a window (milliseconds to seconds) where the replica is behind the primary. For read-after-write consistency, the ONLY guarantee is reading from the writer (primary). The architectural pattern: classify your reads into 'must be consistent' (route to primary) vs 'tolerable staleness' (route to replicas). You can't make replicas synchronous in RDS (that's what Multi-AZ standby is, and it can't serve reads). Bigger instances don't eliminate lag. Cache doesn't solve replication lag timing.",
+    "eliminated": {
+      "A": "RDS read replicas CANNOT be configured for synchronous replication — that's architecturally what the Multi-AZ standby is (synchronous but unreadable). You cannot have both synchronous AND readable in standard RDS",
+      "C": "Cache in front of replica still serves STALE data during the replication lag window — cache doesn't know when the write happened on primary. Cache invalidation happens after replica catches up, which is the timing problem we're trying to solve",
+      "D": "Replication lag in RDS is primarily about network propagation and write-apply time, not instance CPU. A larger instance may apply logs faster but cannot eliminate the inherent async propagation delay"
+    }
+  },
+  {
+    "id": "L4-003",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "Aurora up to 15 replicas that CAN serve reads — different from RDS replica model",
+    "constraint_terms": [
+      "relational database",
+      "very high read throughput",
+      "automatic failover"
+    ],
+    "scenario": "A SaaS platform serves 10,000 concurrent users with a read-heavy workload (95% reads). The current RDS MySQL instance with 2 read replicas is hitting its scaling ceiling. The team needs more read capacity, faster failover, and simplified replica management while staying with MySQL compatibility.",
+    "question": "Which migration provides significantly more read scaling with improved availability?",
+    "options": {
+      "A": "Deploy RDS MySQL Multi-AZ with read replicas in each AZ for combined HA and read scaling",
+      "B": "Add more RDS MySQL read replicas (up to the maximum of 15) to distribute the read load further",
+      "C": "Migrate to DynamoDB for its unlimited read scaling with on-demand capacity",
+      "D": "Migrate to Amazon Aurora MySQL — supports up to 15 read replicas sharing the same storage layer with automatic failover in under 30 seconds"
+    },
+    "answer": "D",
+    "reasoning": "Aurora fundamentally reimagines the replica model. Aurora replicas share the SAME storage layer (no replication lag from log shipping), support up to 15 replicas, have automatic failover (promotion in <30 seconds), and you can use a READER endpoint that load-balances across all replicas automatically. RDS replicas are independent copies with their own storage (higher lag, no shared storage). RDS max is actually 5 read replicas for MySQL (not 15). DynamoDB is NoSQL — doesn't support SQL joins/transactions cleanly.",
+    "eliminated": {
+      "B": "RDS MySQL supports a maximum of 5 read replicas (not 15) — and each has its own storage copy with asynchronous lag. Aurora's 15 replicas with shared storage is architecturally superior",
+      "A": "RDS Multi-AZ provides failover but the standby STILL cannot serve reads. Adding replicas in each AZ helps distribution but doesn't solve the replica count limit or lag issues",
+      "C": "DynamoDB is a NoSQL key-value/document store — migrating a complex relational application with SQL queries, joins, and transactions to DynamoDB requires a complete application rewrite"
+    }
+  },
+  {
+    "id": "L4-004",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "hard",
+    "trap_fact": "Aurora Global Database — secondary Regions are READ-ONLY, write forwarding adds latency",
+    "constraint_terms": [
+      "multi-Region",
+      "low-latency writes in all Regions",
+      "active-active"
+    ],
+    "scenario": "A global application needs active-active database write capability in US, Europe, and Asia simultaneously. Users in each Region must write to a local database instance with single-digit millisecond latency. Cross-Region data synchronization must happen automatically.",
+    "question": "Which database service supports active-active multi-Region writes?",
+    "options": {
+      "A": "Aurora Global Database — secondary Regions handle writes via write forwarding with minimal latency",
+      "B": "Aurora Global Database with Multi-Master mode enabled in all three Regions",
+      "C": "DynamoDB Global Tables — active-active replication where every Region accepts writes with single-digit millisecond latency locally",
+      "D": "RDS MySQL with cross-Region read replicas promoted to writable primaries in each Region"
+    },
+    "answer": "C",
+    "reasoning": "DynamoDB Global Tables is the ONLY AWS managed database offering TRUE multi-Region active-active writes. Every Region has a full read/write replica, writes are local (single-digit ms), and replication between Regions happens automatically (typically under 1 second). Aurora Global Database secondary Regions are READ-ONLY. Write forwarding exists but routes writes BACK to the primary Region (adding cross-Region latency — not local single-digit ms). Aurora Multi-Master existed but was deprecated and only worked within a SINGLE Region, not cross-Region.",
+    "eliminated": {
+      "A": "Aurora write forwarding sends writes from secondary Region BACK to the primary Region's writer — this adds cross-Region network latency (50-200ms), NOT single-digit millisecond local writes",
+      "D": "Promoting read replicas creates independent databases — no automatic synchronization. You'd have split-brain problems with no conflict resolution. This isn't active-active, it's split databases",
+      "B": "Aurora Multi-Master was limited to a SINGLE Region (same cluster) and has been deprecated in favor of Aurora Global Database. Cross-Region multi-master for Aurora does not exist"
+    }
+  },
+  {
+    "id": "L4-005",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "DynamoDB 400KB max item size",
+    "constraint_terms": [
+      "store large objects",
+      "key-value access pattern",
+      "metadata + content"
+    ],
+    "scenario": "A document management system stores documents with metadata (title, author, tags — totaling ~2KB) and the document content itself (PDF files ranging from 500KB to 50MB). The application needs millisecond-latency key-value lookups for document retrieval.",
+    "question": "Which storage pattern supports this workload?",
+    "options": {
+      "A": "Store everything in S3 with a metadata index in S3 Object Tags for query capability",
+      "B": "Use DynamoDB with DAX caching to handle the large document items with lower latency",
+      "C": "Store metadata in DynamoDB and document content in S3 — the DynamoDB item holds an S3 object key that the application uses to retrieve the file",
+      "D": "Store both metadata and document content as a single DynamoDB item using the Binary attribute type"
+    },
+    "answer": "C",
+    "reasoning": "DynamoDB has a HARD 400KB item size limit. Documents at 500KB-50MB cannot be stored IN DynamoDB, period. The canonical pattern: DynamoDB stores the metadata + a pointer (S3 key), S3 stores the actual large document. Application flow: query DynamoDB by key (millisecond latency) → get S3 URL from result → fetch document from S3. This separates the fast-lookup metadata from bulk content storage. This pattern appears constantly on the exam whenever 'DynamoDB' + 'large objects' are in the same question.",
+    "eliminated": {
+      "D": "DynamoDB items cannot exceed 400KB total — PDFs up to 50MB physically cannot be stored in a DynamoDB item regardless of attribute type. This violates a hard platform limit",
+      "A": "S3 Object Tags support only 10 tags per object with limited query capability (no complex queries). S3 Select can query content but doesn't provide structured metadata indexing with millisecond key-value lookups",
+      "B": "DAX caches DynamoDB items but doesn't change the 400KB item limit — you still can't store 50MB documents in DynamoDB. DAX accelerates access to what's already in DDB, doesn't expand its limits"
+    }
+  },
+  {
+    "id": "L4-006",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "DynamoDB on-demand is more expensive per-request than provisioned at steady traffic",
+    "constraint_terms": [
+      "predictable traffic",
+      "cost optimization",
+      "DynamoDB"
+    ],
+    "scenario": "A company's DynamoDB table handles a steady-state workload of 5,000 reads and 2,000 writes per second, 24/7, with minimal variation. The workload has been this way for 6 months and is expected to remain the same. Currently running in on-demand mode, the monthly bill is $8,000. The team asks if they can reduce costs.",
+    "question": "Which capacity mode change reduces costs?",
+    "options": {
+      "A": "Switch to provisioned capacity WITHOUT Auto Scaling — fixed provisioning for exactly 5,000 RCU and 2,000 WCU",
+      "B": "Switch to provisioned capacity with Auto Scaling — provision for the known steady-state rate with slight headroom. Per-RCU/WCU cost is significantly lower than on-demand per-request pricing",
+      "C": "Enable DynamoDB Accelerator (DAX) to cache reads and reduce the number of read requests hitting the table",
+      "D": "Stay in on-demand mode but enable DynamoDB Reserved Capacity to get a discount on the existing on-demand pricing"
+    },
+    "answer": "B",
+    "reasoning": "On-demand mode charges ~$1.25 per million write request units vs provisioned at ~$0.00065 per WCU-hour. For sustained 2,000 WCU: on-demand ≈ $5,184/month vs provisioned ≈ $936/month for writes alone. The math is clear: PREDICTABLE, STEADY traffic should use provisioned mode — on-demand is for unpredictable/spiky patterns where you'd otherwise over-provision. Auto Scaling provides small buffer for minor variations. Reserved Capacity (B) applies to PROVISIONED mode (not on-demand). DAX adds cost; reducing reads from an already-predictable workload doesn't fix the fundamental pricing model mismatch.",
+    "eliminated": {
+      "D": "DynamoDB Reserved Capacity is a commitment applied to PROVISIONED capacity — it discounts provisioned WCU/RCU further. It does NOT apply to on-demand mode pricing",
+      "A": "Fixed provisioning without Auto Scaling means any traffic above 5,000/2,000 gets throttled — even a tiny spike causes errors. Auto Scaling provides safety margin with minimal additional cost",
+      "C": "DAX adds its own hourly cost (node pricing) and is designed for latency improvement, not cost reduction. For a steady predictable workload, the billing model change (on-demand → provisioned) is the direct fix"
+    }
+  },
+  {
+    "id": "L4-007",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "hard",
+    "trap_fact": "ElastiCache Redis vs Memcached — Redis has persistence and replication, Memcached is simple multi-threaded cache",
+    "constraint_terms": [
+      "cache layer",
+      "must survive node failure",
+      "complex data structures"
+    ],
+    "scenario": "A real-time leaderboard application needs an in-memory cache that supports sorted sets (for ranking), must survive node failures without data loss, and needs automatic replication across AZs for high availability. The cache holds the authoritative ranking data that takes 2 hours to rebuild from the database.",
+    "question": "Which ElastiCache engine meets these requirements?",
+    "options": {
+      "A": "Memcached with application-level replication writing to nodes in multiple AZs",
+      "B": "Redis with cluster mode — supports sorted sets natively, Multi-AZ replication for HA, and AOF persistence to survive restarts",
+      "C": "Memcached with cross-AZ node distribution — simple and fast with multi-threaded scalability",
+      "D": "Redis single-node with RDB snapshots scheduled every 5 minutes for durability"
+    },
+    "answer": "B",
+    "reasoning": "Three requirements that only Redis satisfies: (1) Sorted sets — a native Redis data structure for leaderboards (ZADD, ZRANK, ZRANGE). Memcached only supports simple key-value strings. (2) Survive node failure — Redis has Multi-AZ with automatic failover to a synchronous replica (0 data loss). Memcached has NO replication — if a node dies, its data is gone. (3) Persistence — Redis AOF logs every write operation, surviving restarts. The exam always uses 'complex data types' + 'persistence/replication needed' → Redis. 'Simple string cache, can rebuild from DB' → Memcached.",
+    "eliminated": {
+      "C": "Memcached has NO sorted sets (only string key-value), NO replication, NO persistence, NO failover — if a node fails, ALL data on that node is permanently lost. Three requirements violated simultaneously",
+      "D": "Single-node Redis has no AZ resilience — if the AZ fails, the leaderboard is down. RDB snapshots every 5 minutes means up to 5 minutes of data loss on failure. Doesn't meet 'survive node failure without data loss'",
+      "A": "Memcached doesn't support replication at the engine level. Application-level replication means writing to two Memcached clusters — complex, error-prone, and still doesn't provide sorted sets or persistence"
+    }
+  },
+  {
+    "id": "L4-008",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "DAX is DynamoDB-only — not a general cache for RDS/Aurora",
+    "constraint_terms": [
+      "DynamoDB",
+      "microsecond latency",
+      "read-heavy"
+    ],
+    "scenario": "An application reads the same popular items from DynamoDB thousands of times per second. The items are rarely updated. DynamoDB's single-digit millisecond latency doesn't meet the sub-millisecond requirement for this hot-key pattern.",
+    "question": "Which caching solution reduces DynamoDB read latency to microseconds?",
+    "options": {
+      "A": "CloudFront caching layer in front of an API that reads from DynamoDB",
+      "B": "DynamoDB with provisioned capacity increased to maximum RCU for faster reads",
+      "C": "Amazon ElastiCache Redis cluster between the application and DynamoDB",
+      "D": "DynamoDB Accelerator (DAX) — a fully managed in-memory cache purpose-built for DynamoDB with microsecond read latency"
+    },
+    "answer": "D",
+    "reasoning": "DAX is a write-through, in-memory cache that sits transparently between your application and DynamoDB. It uses the SAME DynamoDB API (drop-in replacement — change the endpoint). Read latency drops from single-digit milliseconds to MICROSECONDS for cache hits. It's purpose-built for DynamoDB hot-key mitigation. ElastiCache (B) also works but requires application code changes (different API, cache invalidation logic). CloudFront (C) adds HTTP caching but doesn't provide microsecond latency. Provisioned capacity (D) doesn't affect latency — only throughput.",
+    "eliminated": {
+      "C": "ElastiCache works as a general cache but requires: different API calls, custom cache invalidation logic, application code changes to check cache before DynamoDB. DAX is transparent with the same API",
+      "A": "CloudFront caches HTTP responses, not database queries — it adds an HTTP layer with its own latency. Not suitable for direct DynamoDB read acceleration at the SDK level",
+      "B": "Provisioned RCU controls THROUGHPUT (requests per second), not LATENCY. More RCU means you can handle more reads without throttling, but each individual read still takes single-digit milliseconds"
+    }
+  },
+  {
+    "id": "L4-009",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "hard",
+    "trap_fact": "Redshift is for OLAP/analytics — not OLTP transactional workloads",
+    "constraint_terms": [
+      "complex analytical queries",
+      "petabyte-scale data warehouse",
+      "historical data"
+    ],
+    "scenario": "A retail company collects 2 years of transactional data (5TB) in their RDS PostgreSQL database. Business analysts need to run complex queries joining sales, inventory, and customer data across the entire 2-year history. These queries currently take 30+ minutes on RDS and block transactional operations.",
+    "question": "Which service is purpose-built for this analytical workload?",
+    "options": {
+      "A": "Amazon RDS PostgreSQL with a larger instance and read replicas dedicated to analytics",
+      "B": "Amazon Athena querying the data exported to S3 in Parquet format",
+      "C": "Amazon Aurora PostgreSQL — faster than standard RDS and separates storage from compute",
+      "D": "Amazon Redshift — columnar data warehouse optimized for complex analytical queries across large datasets with parallel query execution"
+    },
+    "answer": "D",
+    "reasoning": "Redshift is a purpose-built columnar data WAREHOUSE designed for OLAP: complex joins across billions of rows, aggregations, historical analysis. It uses: columnar storage (read only needed columns), massively parallel processing (MPP across nodes), result caching, and compiled queries. RDS/Aurora are ROW-based OLTP systems — they're optimized for insertions and single-row lookups, not full-table analytical scans. Athena (D) works for ad-hoc queries on S3 but for a persistent 5TB warehouse with repeated complex queries, Redshift's distributed architecture and result caching outperforms. The trigger: 'data warehouse' + 'complex joins across large history' = Redshift.",
+    "eliminated": {
+      "A": "Scaling up RDS doesn't change its row-based architecture — complex analytical queries across TB of data still perform poorly because row stores read entire rows (including unused columns). Read replicas have the same engine architecture",
+      "C": "Aurora is faster than standard RDS for OLTP but is still a row-oriented transactional database — it's not optimized for the full-table scans and complex aggregations that analytical workloads require",
+      "B": "Athena works for infrequent ad-hoc queries but charges per TB scanned. For repeated complex queries on 5TB by analysts throughout the day, Redshift's always-on cluster with result caching is more cost-effective and faster"
+    }
+  },
+  {
+    "id": "L4-010",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "Athena cost = data scanned — unpartitioned/uncompressed data is expensive",
+    "constraint_terms": [
+      "minimize query cost",
+      "S3 data lake",
+      "Athena"
+    ],
+    "scenario": "A company uses Athena to query 10TB of JSON log data stored in S3. Each query scans the full 10TB but only retrieves data for specific dates and specific event types. Monthly Athena costs are $50,000 (at $5/TB scanned). The data engineering team needs to reduce costs by 90%.",
+    "question": "Which combination of optimizations most reduces Athena query costs?",
+    "options": {
+      "A": "Enable Athena result caching to avoid re-scanning data for repeated queries",
+      "B": "Move data to Glacier and query with Glacier Select for the lowest storage cost",
+      "C": "Increase the Athena query timeout and concurrent execution limit to process data faster",
+      "D": "Partition data by date and event type, AND convert from JSON to Parquet (columnar + compressed format) — queries scan only relevant partitions and only needed columns"
+    },
+    "answer": "D",
+    "reasoning": "Athena charges $5 per TB SCANNED. Two levers reduce scanned data: (1) PARTITIONING — organize S3 paths by date/event type. Athena reads partition metadata and skips folder paths that don't match the WHERE clause. Query for one day out of 365 → scan 1/365th of data. (2) COLUMNAR FORMAT (Parquet) — stores data by column, not row. Query needing 5 of 50 columns reads only those 5 columns' data blocks. Parquet is also compressed (typically 5-10x smaller than JSON). Combined: partition pruning + columnar projection + compression → 90%+ cost reduction is realistic.",
+    "eliminated": {
+      "A": "Athena does cache results but only for IDENTICAL queries repeated within a session. Different date parameters, different event types = different queries = full scan. Caching helps only for exact rerun scenarios",
+      "B": "Glacier Select has very high per-GB retrieval costs that can EXCEED Athena on S3 Standard for analytical queries. Also, Glacier retrieval is slow — not suitable for interactive analytics",
+      "C": "Query timeout and concurrency affect how fast/many queries run, NOT how much data is scanned. You'd still scan 10TB per query — billing is the same, you just get results sooner (but at the same cost)"
+    }
+  },
+  {
+    "id": "L4-011",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "hard",
+    "trap_fact": "RDS Proxy provides connection pooling for Lambda → RDS — solves the connection storm problem",
+    "constraint_terms": [
+      "Lambda",
+      "RDS",
+      "connection limits",
+      "serverless"
+    ],
+    "scenario": "A serverless application uses Lambda functions triggered by API Gateway. Each invocation connects to an RDS Aurora MySQL database. At peak, 2,000 concurrent Lambda executions occur. The Aurora instance supports 1,000 max connections. The application experiences 'too many connections' errors during peaks.",
+    "question": "Which solution resolves the connection exhaustion without changing the application architecture?",
+    "options": {
+      "A": "Deploy RDS Proxy between Lambda and Aurora — it multiplexes thousands of Lambda connections through a smaller pool of actual database connections",
+      "B": "Configure Lambda reserved concurrency to 1,000 to limit concurrent database connections",
+      "C": "Increase the Aurora instance size to allow more max_connections",
+      "D": "Implement connection pooling within the Lambda function code using a library like mysql2 with a pool size of 1"
+    },
+    "answer": "A",
+    "reasoning": "RDS Proxy is THE solution for Lambda-to-RDS connection management. It maintains a warm pool of persistent connections to Aurora and multiplexes incoming Lambda connection requests through this pool. 2,000 Lambda invocations might share 100 actual database connections. It also handles connection draining (when Lambda freezes/thaws) and credential management. Scaling Aurora (B) has diminishing returns and high cost. Throttling Lambda (C) throttles your API (degraded user experience). In-Lambda pooling (D) doesn't work because each Lambda execution environment is independent — pool size 1 per environment × 2,000 environments = 2,000 connections.",
+    "eliminated": {
+      "C": "Larger instances support more max_connections but it's linear with memory — you'd need massive instances to serve 2,000+ connections, and each idle connection still consumes memory. Expensive band-aid, not an architectural fix",
+      "B": "Limiting Lambda to 1,000 concurrent means API Gateway returns 429 errors to users above that threshold — this throttles your application and degrades the user experience to avoid a DB problem",
+      "D": "Connection pooling WITHIN a Lambda function doesn't help because each execution environment has its own pool. 2,000 concurrent environments × 1 connection each = still 2,000 connections to the database. The pool isn't shared across environments"
+    }
+  },
+  {
+    "id": "L4-012",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "DynamoDB Global Tables — active-active with last-writer-wins conflict resolution",
+    "constraint_terms": [
+      "multi-Region",
+      "user session data",
+      "low-latency local reads and writes"
+    ],
+    "scenario": "A gaming company needs to store player session data accessible from US-East, EU-West, and AP-Southeast simultaneously. Players in each Region must read and write their session with single-digit millisecond latency. The application can handle eventual consistency between Regions.",
+    "question": "Which database configuration provides this multi-Region active-active capability?",
+    "options": {
+      "A": "DynamoDB with cross-Region replication using DynamoDB Streams and Lambda",
+      "B": "DynamoDB Global Tables with replicas in all three Regions — each Region accepts local reads and writes independently",
+      "C": "ElastiCache Global Datastore with Redis in each Region for session access",
+      "D": "Aurora Global Database with write forwarding enabled in secondary Regions"
+    },
+    "answer": "B",
+    "reasoning": "DynamoDB Global Tables provides managed multi-Region, active-active replication. Each Region has a FULL read/write replica — writes are local (single-digit ms) and replicate to other Regions typically within 1 second. Conflict resolution uses last-writer-wins based on timestamp. Perfect for session data where: (1) writes are to user's own session (minimal conflict probability), (2) local latency matters, (3) eventual consistency is acceptable. Aurora Global (B) only allows writes at the primary Region. Custom streams (C) adds operational burden. ElastiCache (D) is an option but Global Datastore only allows writes in one Region.",
+    "eliminated": {
+      "D": "Aurora Global Database secondary Regions are READ-ONLY — write forwarding sends writes back to primary Region, adding 50-200ms cross-Region latency. Not single-digit millisecond local writes",
+      "A": "Building custom replication with Streams + Lambda is possible but reinvents what Global Tables provides managed — adds operational burden, potential failures, and doesn't improve on the managed solution",
+      "C": "ElastiCache Global Datastore (Redis) only accepts WRITES in the primary Region — secondary Regions are read-only replicas. Same single-writer limitation as Aurora Global"
+    }
+  },
+  {
+    "id": "L4-013",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "moderate",
+    "trap_fact": "Aurora Serverless v2 scales automatically — ideal for variable/unpredictable workloads",
+    "constraint_terms": [
+      "unpredictable traffic",
+      "scale to zero",
+      "relational database",
+      "minimize cost during idle"
+    ],
+    "scenario": "A development team runs a test/staging relational database that's heavily used during business hours (9am-5pm, Mon-Fri) but completely idle nights and weekends. They want MySQL compatibility, automatic scaling during active periods, and minimal cost during idle time — without managing instance sizes.",
+    "question": "Which database configuration minimizes cost while handling variable load?",
+    "options": {
+      "A": "Aurora provisioned with the smallest instance type and Auto Scaling for read replicas",
+      "B": "Aurora Serverless v2 — automatically scales ACUs between minimum (can be as low as 0.5) and maximum based on demand, pay-per-ACU-second during use",
+      "C": "RDS MySQL t3.micro with burstable performance for light test workloads",
+      "D": "RDS MySQL with a scheduled action to stop the instance at 5pm and start at 9am"
+    },
+    "answer": "B",
+    "reasoning": "Aurora Serverless v2 scales ACUs (Aurora Capacity Units) continuously from 0.5 to 128 based on load — you only pay for actual ACU-seconds consumed. During idle weekends, it drops to minimum. During peak testing, it scales up automatically. No instance management, no scheduling logic. RDS stop/start (B) works but has a 7-day maximum stop period and requires scheduling automation. It also means the DB is unavailable during off-hours (what if someone needs to test on a Saturday?). Provisioned Aurora (C) still has a fixed minimum instance cost. T3.micro (D) may be too small for peak testing.",
+    "eliminated": {
+      "D": "RDS scheduled stop/start requires automation (Lambda + CloudWatch Events), has a 7-day auto-restart limit, means database is UNAVAILABLE during off-hours, and doesn't scale during business hours",
+      "A": "Aurora provisioned requires selecting an instance size — you pay for that instance 24/7 regardless of load. Read replica Auto Scaling helps with read load but the writer instance is always on at fixed cost",
+      "C": "T3.micro has limited CPU credits that may exhaust during intensive testing periods — causes throttling. Also no auto-scaling: if the team doubles, the instance can't grow"
+    }
+  },
+  {
+    "id": "L4-014",
+    "layer": 4,
+    "category": "database",
+    "difficulty": "hard",
+    "trap_fact": "Neptune for graph, QLDB for immutable ledger, Timestream for time-series — purpose-built databases",
+    "constraint_terms": [
+      "social network",
+      "relationship traversal",
+      "highly connected data"
+    ],
+    "scenario": "A social media startup needs to store and query user relationships (who follows whom, mutual friends, friend-of-friend recommendations). The core query pattern is: 'find all users within 3 degrees of separation from User X who also like Topic Y.' The dataset has billions of relationships.",
+    "question": "Which database is optimized for this relationship traversal pattern?",
+    "options": {
+      "A": "Amazon Neptune — a graph database optimized for storing and traversing billions of relationships with Gremlin or SPARQL queries",
+      "B": "Amazon RDS PostgreSQL with recursive CTEs for multi-hop relationship queries",
+      "C": "Amazon DynamoDB with a Global Secondary Index on the relationship attribute",
+      "D": "Amazon OpenSearch Service with nested document types representing relationships"
+    },
+    "answer": "A",
+    "reasoning": "Neptune is a purpose-built GRAPH database — it stores data as nodes and edges (vertices and relationships). Graph traversal queries like 'friends of friends of friends who match condition' are executed in constant time per hop, regardless of total dataset size. This is architecturally impossible in relational (SQL joins grow exponentially per hop) or key-value (DynamoDB requires multiple queries per hop). The exam tests: 'relationship traversal,' 'degrees of separation,' 'connected data,' 'recommendation engine based on relationships' → Neptune. Always.",
+    "eliminated": {
+      "C": "DynamoDB excels at key-value lookups and single-table patterns but multi-hop relationship traversal requires multiple sequential queries — 3 degrees of separation = 3 round trips minimum, performance degrades with depth",
+      "B": "Recursive CTEs in PostgreSQL CAN traverse relationships but scale poorly — each hop multiplies the join set. At billions of relationships and 3+ hops, query time becomes minutes/hours vs Neptune's milliseconds",
+      "D": "OpenSearch is a search/analytics engine — it can handle simple nested lookups but multi-hop graph traversal isn't its design pattern. It would require complex scripted queries that scale poorly with relationship depth"
+    }
+  }
+]

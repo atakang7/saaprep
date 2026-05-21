@@ -1,0 +1,273 @@
+[
+  {
+    "id": "L6-001",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "moderate",
+    "trap_fact": "Multi-AZ is HA within a Region — NOT disaster recovery for regional outage",
+    "constraint_terms": [
+      "survive Regional failure",
+      "disaster recovery",
+      "RPO < 1 hour"
+    ],
+    "scenario": "A company's critical application runs in us-east-1 with Multi-AZ deployments for all services (RDS Multi-AZ, ELB across AZs, ASG in multiple AZs). The CTO asks: 'If the entire us-east-1 Region becomes unavailable, how long until we're operational?' The current answer is: we can't recover from a Regional failure.",
+    "question": "What additional architecture is needed to survive a Regional outage?",
+    "options": {
+      "A": "Deploy a standby environment in a second Region with cross-Region data replication and Route 53 failover — Multi-AZ only protects against AZ failure, not Regional failure",
+      "B": "Configure Auto Scaling to launch instances in any available AZ if the current ones become unhealthy",
+      "C": "Enable AWS Backup with cross-AZ copy to ensure data survives any AZ failure within the Region",
+      "D": "Add more Availability Zones in us-east-1 — distribute across all 6 AZs for maximum Regional resilience"
+    },
+    "answer": "A",
+    "reasoning": "Multi-AZ protects against SINGLE AZ failure (hardware, power, networking issues within one datacenter). A REGIONAL outage takes out ALL AZs in that Region simultaneously — Multi-AZ provides zero protection. Regional DR requires: (1) second Region with infrastructure, (2) cross-Region data replication (RDS cross-Region replica, S3 CRR, DynamoDB Global Tables), (3) DNS failover (Route 53). The exam constantly tests: 'Regional outage' ≠ 'AZ outage.' Multi-AZ = HA for AZ failure. Multi-Region = DR for Regional failure.",
+    "eliminated": {
+      "D": "ALL Availability Zones in a Region can fail simultaneously during a Regional outage — adding more AZs within the same Region provides zero protection against a Regional failure",
+      "C": "Cross-AZ backup copies stay within the SAME Region — if the Region is unavailable, backups in that Region are also inaccessible",
+      "B": "Auto Scaling launches instances within the same Region — during a Regional outage, no new instances can be launched in any AZ of that Region"
+    }
+  },
+  {
+    "id": "L6-002",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "hard",
+    "trap_fact": "Pilot light: core RUNNING (DB replicating) but app servers NOT scaled. Warm standby: full system at reduced scale",
+    "constraint_terms": [
+      "RTO under 15 minutes",
+      "cost-efficient DR",
+      "automated failover"
+    ],
+    "scenario": "A company needs a DR strategy for their 3-tier web application. Requirements: RTO of 15 minutes, RPO of 1 minute, and the DR environment should cost approximately 25% of production during normal operations. The primary runs in us-east-1 with 20 application instances and an Aurora cluster.",
+    "question": "Which DR strategy meets these RTO/RPO/cost requirements?",
+    "options": {
+      "A": "Active-active — run full capacity in both Regions simultaneously with Route 53 weighted routing",
+      "B": "Warm standby — run the full stack in the DR Region at reduced capacity (5 app instances + Aurora Global Database secondary), scale up on failover",
+      "C": "Pilot light — keep only Aurora cross-Region replica running, launch application infrastructure from AMIs during failover",
+      "D": "Backup and restore — take nightly backups, restore everything from scratch in the DR Region when needed"
+    },
+    "answer": "B",
+    "reasoning": "Warm standby runs a SCALED-DOWN copy of the full production stack at all times. During failover, you scale UP (add instances) rather than build from scratch. RTO: minutes (just scaling, not launching). RPO: Aurora Global DB replicates within ~1 second. Cost: 5 instances running (25% of 20) + Aurora secondary. Pilot light (B) only has DATABASE running — app servers must be launched from AMIs, which takes 5-15+ minutes (AMI launch, config, health check). That 15-minute RTO is tight for pilot light. Active-active (C) costs 100% (way over budget). Backup/restore (D) = hours of RTO.",
+    "eliminated": {
+      "C": "Pilot light has minimal running infrastructure (just DB) — launching 20 application instances from AMIs, waiting for boot, configuration, load balancer health checks = 10-20 minutes realistically. Risky for a hard 15-minute RTO requirement",
+      "A": "Active-active runs full capacity in both Regions = 200% cost (40 instances total) — dramatically exceeds the '25% of production cost' budget for the DR environment",
+      "D": "Backup and restore means NO infrastructure running in DR Region — restoring databases from backup + launching all infrastructure = hours of RTO, far exceeding 15 minutes"
+    }
+  },
+  {
+    "id": "L6-003",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "moderate",
+    "trap_fact": "Route 53 failover depends on TTL — DNS caching means failover takes TTL time",
+    "constraint_terms": [
+      "DNS-based failover",
+      "minimize failover time",
+      "Route 53"
+    ],
+    "scenario": "A company uses Route 53 failover routing policy to switch traffic from the primary Region to DR. During a test failover, they observe that some users continue hitting the failed primary for several minutes after Route 53 detects the failure and updates DNS.",
+    "question": "What causes the delayed failover for some users, and how can it be minimized?",
+    "options": {
+      "A": "The failover policy requires manual approval before switching — enable automatic failover in the hosted zone settings",
+      "B": "Route 53 propagation to all edge locations takes 5-10 minutes — this is an AWS infrastructure delay",
+      "C": "Route 53 health checks run every 30 seconds — switch to fast health checks (10-second interval) to detect failure faster",
+      "D": "DNS responses are cached by resolvers and clients for the duration of the TTL — reduce the TTL on the failover record set to minimize stale cache time"
+    },
+    "answer": "D",
+    "reasoning": "When Route 53 updates a DNS record, EXISTING cached responses at recursive resolvers (ISP DNS, corporate DNS, browser caches) remain valid until their TTL expires. A TTL of 300 seconds means some clients won't query Route 53 again for 5 minutes — they keep using the cached (now-failed) IP. Lower TTL (e.g., 30-60 seconds) means caches expire faster and clients re-query sooner, picking up the failover target. Trade-off: lower TTL = more DNS queries = slightly higher Route 53 cost + slightly higher latency for first request after cache expiry.",
+    "eliminated": {
+      "C": "Faster health checks reduce DETECTION time (when Route 53 knows the primary is down) but don't solve the PROPAGATION problem — once DNS is updated, cached responses at resolvers still persist until TTL expires",
+      "A": "Route 53 failover routing is fully automatic — when health check fails, Route 53 immediately returns the secondary record. There is no manual approval step. The delay is DNS caching, not Route 53 decision-making",
+      "B": "Route 53 DNS updates propagate globally within seconds (Route 53 is Anycast with 200+ locations) — the infrastructure update is near-instant. The delay is at RESOLVER caches, which respect TTL"
+    }
+  },
+  {
+    "id": "L6-004",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "hard",
+    "trap_fact": "S3 replication does NOT replicate existing objects retroactively",
+    "constraint_terms": [
+      "cross-Region replication",
+      "existing data",
+      "complete DR copy"
+    ],
+    "scenario": "A company has 50TB of existing data in an S3 bucket in us-east-1 that serves as the canonical data store. They enable Cross-Region Replication to eu-west-1 for disaster recovery. After 48 hours, they check the destination bucket and find it empty — only new objects uploaded after enabling CRR appear.",
+    "question": "How should the architect replicate the existing 50TB to the destination?",
+    "options": {
+      "A": "Delete and re-upload all 50TB of objects to trigger CRR for each object",
+      "B": "Wait 72 hours — CRR has a backlog processing delay for large existing datasets",
+      "C": "Disable and re-enable CRR — the second enablement will process all existing objects",
+      "D": "Use S3 Batch Replication to process the existing 50TB of objects — CRR only replicates objects created AFTER the rule is enabled"
+    },
+    "answer": "D",
+    "reasoning": "CRR/SRR is a LIVE rule that applies to NEW puts/copies after creation — existing objects are invisible to it. AWS provides S3 Batch Replication specifically for this gap: you run a Batch Replication job that processes all existing objects (or a filtered subset) and replicates them to the destination. After the one-time batch copy, the live CRR rule handles all future objects. This is the #2 most tested S3 replication trap (after the 'doesn't replicate deletes by default' trap).",
+    "eliminated": {
+      "A": "Deleting and re-uploading 50TB is: (1) dangerous (temporary data loss during re-upload), (2) extremely slow over the network, (3) costly (data transfer fees), (4) unnecessary when Batch Replication exists",
+      "C": "Toggling CRR off and on does NOT trigger retroactive replication — the rule still only applies to objects created after the new enablement timestamp. The existing objects remain unprocessed",
+      "B": "CRR has no 'backlog processing' feature — it simply doesn't apply to pre-existing objects, ever. No amount of waiting will cause existing objects to replicate"
+    }
+  },
+  {
+    "id": "L6-005",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "moderate",
+    "trap_fact": "RDS automated backup retention max 35 days — longer needs manual snapshots",
+    "constraint_terms": [
+      "7-year retention",
+      "database backup",
+      "compliance"
+    ],
+    "scenario": "A company's compliance framework requires database backups to be retained for 7 years. The database is Amazon RDS MySQL with automated backups enabled at the maximum retention period. An auditor points out that 35-day retention doesn't meet the 7-year requirement.",
+    "question": "How should the architect achieve 7-year backup retention for RDS?",
+    "options": {
+      "A": "Enable RDS long-term retention (LTR) feature that stores backups in Glacier for extended periods",
+      "B": "Set the RDS automated backup retention period to 2,555 days (7 years) via the AWS CLI",
+      "C": "Use AWS Backup to manage RDS snapshots with a retention policy of 7 years — AWS Backup supports long-term retention beyond the 35-day automated backup limit",
+      "D": "Export daily automated backups to S3 using a Lambda function, then apply S3 lifecycle rules for 7-year retention"
+    },
+    "answer": "C",
+    "reasoning": "AWS Backup is the centralized backup service that supports custom retention policies FAR beyond service-native limits. For RDS, automated backups max at 35 days — but AWS Backup can take and retain manual snapshots for ANY duration (years). It also supports: cross-Region copy (for DR), cross-account copy (for isolation), and compliance frameworks (Backup Vault Lock). Option C technically works but adds operational complexity (Lambda code, error handling, export logic). There's no 'RDS LTR' feature as described in D.",
+    "eliminated": {
+      "B": "RDS automated backup retention has a HARD MAXIMUM of 35 days — the parameter only accepts values between 0 and 35. This cannot be extended via CLI, console, or API",
+      "D": "Exporting to S3 via Lambda works but requires: building the export logic, scheduling, error handling, monitoring, and managing the exported data format. AWS Backup provides all of this managed with a few clicks",
+      "A": "There is no 'RDS long-term retention (LTR)' feature — this option describes a feature that doesn't exist. AWS Backup is the solution for long-term RDS backup retention"
+    }
+  },
+  {
+    "id": "L6-006",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "hard",
+    "trap_fact": "DynamoDB Point-in-Time Recovery: 35-day rolling window only",
+    "constraint_terms": [
+      "DynamoDB",
+      "recover from accidental deletion",
+      "restore to specific timestamp"
+    ],
+    "scenario": "A developer accidentally deleted a critical partition of data from a DynamoDB table 2 hours ago. The table has Point-in-Time Recovery (PITR) enabled. The operations team needs to recover the deleted data without affecting the current live data in the same table.",
+    "question": "What is the correct recovery process?",
+    "options": {
+      "A": "Query the DynamoDB Streams for the deleted records and re-insert them into the table",
+      "B": "Use PITR to restore the production table directly to the point before the deletion — this rolls back the table in place",
+      "C": "Access the DynamoDB backup stored in S3 and import the missing items",
+      "D": "Restore the table to a point-in-time just before the deletion into a NEW table, then selectively copy the deleted items back to the production table"
+    },
+    "answer": "D",
+    "reasoning": "DynamoDB PITR restores to a NEW TABLE — it never modifies the source table in place. You specify any timestamp within the 35-day PITR window, and DynamoDB creates a SEPARATE table with data as it existed at that moment. Then you identify the deleted items in the restored table and copy them back to production. This avoids losing any data written AFTER the deletion (which an in-place rollback would destroy). Streams (C) only retain records for 24 hours. DynamoDB backups aren't in user-accessible S3.",
+    "eliminated": {
+      "B": "PITR CANNOT restore in place — it always creates a new table. In-place rollback would overwrite all legitimate changes made in the 2 hours since the deletion, causing additional data loss",
+      "A": "DynamoDB Streams retain records for only 24 hours — if the deletion happened within that window, you COULD extract the old images, but this requires having a consumer already processing the stream. By default, streams aren't retained for recovery purposes",
+      "C": "DynamoDB backups and PITR don't store data in a user-accessible S3 bucket — they're managed internally by DynamoDB. You can't browse or directly import from them. You must use the Restore feature"
+    }
+  },
+  {
+    "id": "L6-007",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "moderate",
+    "trap_fact": "AWS Backup supports cross-Region and cross-account copy — centralized backup governance",
+    "constraint_terms": [
+      "centralized backup",
+      "multiple accounts",
+      "cross-Region copy",
+      "compliance"
+    ],
+    "scenario": "A company with 50 AWS accounts needs a centralized backup strategy. Requirements: daily backups of all RDS databases and EBS volumes across all accounts, copies stored in a different Region for disaster recovery, and the backup admin team in a central account must manage all policies. Individual account owners should NOT be able to delete backups.",
+    "question": "Which service architecture meets these centralized backup governance requirements?",
+    "options": {
+      "A": "AWS Backup in the central account with resource sharing via AWS RAM to access resources in member accounts",
+      "B": "Individual AWS Backup plans in each account with cross-Region copy, managed by a CloudFormation StackSet",
+      "C": "AWS Backup with Organization-wide backup policies, cross-account backup vault in the central account with Vault Lock for immutability, and cross-Region copy rules",
+      "D": "Custom Lambda functions in each account triggered by CloudWatch Events to create snapshots and copy to a central S3 bucket"
+    },
+    "answer": "C",
+    "reasoning": "AWS Backup Organizations integration provides: (1) backup policies defined centrally and applied to member accounts via Organizations, (2) cross-account copy to a vault in the central security account (member accounts can't access/delete these copies), (3) Vault Lock makes backups immutable (even root can't delete), (4) cross-Region copy within the policy for DR. This is the complete centralized governance model. StackSets (B) could deploy plans but lack the cross-account vault isolation and Vault Lock immutability. Lambda (C) is custom and error-prone. RAM (D) doesn't work this way.",
+    "eliminated": {
+      "B": "StackSets can deploy backup plans to each account but: backups stay in each account (account admins can delete them), no central vault isolation, no Vault Lock protection against insider deletion",
+      "D": "Custom Lambda in 50 accounts is operationally heavy: code maintenance, monitoring for failures, no managed cross-account delivery, no immutability guarantee. AWS Backup handles all of this managed",
+      "A": "AWS RAM shares resources FROM a central account TO others — it doesn't grant the central account access TO resources in member accounts. The direction is wrong for centralized backup management"
+    }
+  },
+  {
+    "id": "L6-008",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "moderate",
+    "trap_fact": "Route 53 health checks monitor endpoints, not entire application health",
+    "constraint_terms": [
+      "application-level health check",
+      "multiple dependencies",
+      "Route 53 failover"
+    ],
+    "scenario": "A company uses Route 53 failover routing to redirect to a DR Region if the primary is unhealthy. The Route 53 health check monitors the ALB endpoint (HTTP 200). However, the application recently experienced an outage where the ALB returned 200 but the backend couldn't connect to its RDS database — the application was effectively broken but Route 53 didn't failover.",
+    "question": "How should the architect improve the health check to detect application-level failures?",
+    "options": {
+      "A": "Configure Route 53 to monitor the RDS instance directly with a TCP health check on port 3306",
+      "B": "Create a dedicated health check endpoint (e.g., /health) that verifies database connectivity, cache availability, and returns 200 only if ALL dependencies are healthy — point Route 53 at this endpoint",
+      "C": "Switch from HTTP health check to TCP — TCP health checks detect more failure types than HTTP",
+      "D": "Use CloudWatch alarms with composite alarm logic — combine ALB and RDS metrics, then use the alarm to drive Route 53 health check status"
+    },
+    "answer": "B",
+    "reasoning": "A DEEP HEALTH CHECK endpoint in your application verifies the entire dependency chain: 'Can I reach the DB? Can I query it? Is the cache responding? Are critical external services reachable?' It returns 200 only when EVERYTHING is functional. This converts a simple 'is the ALB alive?' check into 'is the application actually serving users correctly?' Route 53 then failovers based on TRUE application health. CloudWatch composite alarms (C) also work but add complexity — the /health endpoint is the standard pattern and more direct.",
+    "eliminated": {
+      "A": "Monitoring RDS directly with TCP only tells you RDS is LISTENING on port 3306 — not that the application can authenticate, connect, and query. Also, RDS Multi-AZ handles database failover separately from application failover",
+      "D": "CloudWatch composite alarms work (alarm feeds Route 53 calculated health check) but add complexity: metric collection delay, alarm evaluation period, composite alarm logic. A direct /health endpoint responds to each health check request with real-time status",
+      "C": "TCP checks only verify that the port is OPEN — the ALB will accept TCP connections even when backend targets are unhealthy or the application is broken. TCP tells you less than HTTP, not more"
+    }
+  },
+  {
+    "id": "L6-009",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "hard",
+    "trap_fact": "Aurora Global Database failover: planned (graceful ~1min) vs unplanned (force ~minutes, data loss possible)",
+    "constraint_terms": [
+      "Aurora Global",
+      "Regional failover",
+      "RPO near zero"
+    ],
+    "scenario": "A company uses Aurora Global Database with primary in us-east-1 and secondary in eu-west-1. The us-east-1 Region experiences a major outage. The secondary Region's data has typical replication lag of <1 second. The team needs to promote the secondary to become the new primary.",
+    "question": "What happens during this unplanned failover, and what is the expected data loss?",
+    "options": {
+      "A": "Run a planned failover operation — Aurora quiesces writes, syncs completely, then promotes the secondary with zero data loss in under 60 seconds",
+      "B": "Detach the secondary Region to force-promote it as an independent cluster — potential data loss of up to the replication lag (typically <1 second of recent writes). RTO is 1-2 minutes for the promotion.",
+      "C": "The secondary cannot be promoted during a Regional outage — you must wait for the primary Region to recover",
+      "D": "The secondary automatically promotes itself when it detects the primary Region is unavailable — no manual action needed with zero data loss"
+    },
+    "answer": "B",
+    "reasoning": "During an UNPLANNED Regional outage, you cannot run a planned/graceful failover (which requires the primary to be reachable for quiescing). Instead, you DETACH the secondary cluster, which force-promotes it as a standalone primary. Any writes that were in-flight but hadn't replicated (the replication lag, typically <1 second) are LOST — this is the RPO. The RTO is the time to detach + promote (1-2 minutes) + DNS/application update. There is NO automatic promotion — you must manually trigger the detachment. Planned failover (B) only works when both Regions are healthy.",
+    "eliminated": {
+      "A": "Planned failover requires BOTH Regions to be operational — it gracefully stops writes on primary, waits for full sync to secondary, then switches. During an outage, the primary is unreachable and cannot participate in a graceful handoff",
+      "D": "Aurora Global Database does NOT automatically failover between Regions — this is a deliberate design choice because Regional failover is a major decision with application-level implications (DNS updates, connection string changes). It requires manual initiation",
+      "C": "The secondary CAN be independently promoted via the 'detach' operation — it becomes a standalone cluster that accepts writes. You don't need the primary Region to perform this operation"
+    }
+  },
+  {
+    "id": "L6-010",
+    "layer": 6,
+    "category": "resilience",
+    "difficulty": "moderate",
+    "trap_fact": "ELB cross-zone load balancing distributes traffic evenly across all registered targets in all AZs",
+    "constraint_terms": [
+      "uneven instance distribution",
+      "even load distribution",
+      "multi-AZ"
+    ],
+    "scenario": "An Auto Scaling group spans two AZs: AZ-A has 8 instances and AZ-B has 2 instances (due to AZ-A having more capacity). The ALB distributes 50% of traffic to each AZ. AZ-B instances are overloaded (each handling 25% of total traffic) while AZ-A instances are underutilized (each handling 6.25%).",
+    "question": "Which load balancer setting fixes this uneven distribution?",
+    "options": {
+      "A": "Switch from ALB to NLB which automatically balances across AZs proportionally",
+      "B": "Enable cross-zone load balancing — the ALB distributes traffic evenly across ALL 10 registered targets regardless of which AZ they're in",
+      "C": "Configure the ALB target group with weighted routing to send less traffic to AZ-B",
+      "D": "Add more instances to AZ-B to match AZ-A's count"
+    },
+    "answer": "B",
+    "reasoning": "WITHOUT cross-zone load balancing: each AZ node receives equal traffic (50/50), then distributes within its AZ. 50% ÷ 8 instances = 6.25% per AZ-A instance. 50% ÷ 2 instances = 25% per AZ-B instance. WITH cross-zone: the ALB treats all 10 instances as one pool = 10% each regardless of AZ. Note: ALB has cross-zone enabled BY DEFAULT (it's the NLB that has it disabled by default). But if it's been turned off, re-enabling it immediately balances traffic. The exam tests understanding of what cross-zone does: ignores AZ boundaries for distribution.",
+    "eliminated": {
+      "D": "Adding instances to AZ-B works but doesn't solve the root cause — what if imbalance occurs again due to scaling policies or AZ capacity? Cross-zone load balancing handles any distribution automatically",
+      "A": "NLB actually has cross-zone load balancing DISABLED by default (unlike ALB where it's on by default) — switching to NLB would make the problem potentially WORSE depending on configuration",
+      "C": "ALB target group routing doesn't support per-AZ traffic weighting — this feature doesn't exist. You'd need separate target groups or Route 53 weighted records, adding unnecessary complexity"
+    }
+  }
+]
