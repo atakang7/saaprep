@@ -1,14 +1,21 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getAllServices, getTaxonomyTree } from '../lib/data';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllServices, getTaxonomyTree } from '../../lib/data';
 
 const services = getAllServices();
 const taxonomy = getTaxonomyTree();
 
-// Group services by domain
-const grouped: Record<string, any[]> = {};
+// Group unique services by domain
+const uniqueServicesMap = new Map<string, any>();
 services.forEach(svc => {
-  const domain = svc.exam_domains[0] || 'Other';
+  if (!uniqueServicesMap.has(svc.name)) {
+    uniqueServicesMap.set(svc.name, svc);
+  }
+});
+
+const grouped: Record<string, any[]> = {};
+Array.from(uniqueServicesMap.values()).forEach(svc => {
+  const domain = (svc.exam_domains && svc.exam_domains[0]) || 'Core AWS';
   if (!grouped[domain]) grouped[domain] = [];
   grouped[domain].push(svc);
 });
@@ -46,7 +53,7 @@ services.forEach(svc => {
   .services-index-container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 2rem 1rem 5rem;
+    padding: 1rem 1rem 5rem;
   }
   
   .index-header {

@@ -82,34 +82,97 @@ export function getAllTopics() {
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 }
 
+export function normalizeServiceId(name: string): string {
+  let clean = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  // Strip leading 'aws-' or 'amazon-' for uniform routing lookup
+  if (clean.startsWith('aws-')) clean = clean.substring(4);
+  if (clean.startsWith('amazon-')) clean = clean.substring(7);
+  return clean;
+}
+
 export function getAllServices() {
   const topics = getAllTopics();
-  const services: any[] = [];
+  const taxonomy = getTaxonomyTree();
   
+  const servicesMap = new Map<string, any>();
+  
+  // 1. Ingest from topic-pages.json
   topics.forEach((topic: any) => {
     if (topic.core_services) {
       topic.core_services.forEach((svc: any) => {
-        const serviceId = svc.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        services.push({
+        const primaryId = normalizeServiceId(svc.name);
+        const originalId = svc.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        
+        const serviceObj = {
           ...svc,
-          id: serviceId,
+          id: primaryId,
+          originalId,
           cluster_id: topic.cluster_id,
           cluster_title: topic.cluster_title,
           concept_id: topic.concept_id,
           concept_name: topic.concept_name,
           exam_domains: topic.exam_domains
-        });
+        };
+
+        servicesMap.set(primaryId, serviceObj);
+        servicesMap.set(originalId, serviceObj);
       });
     }
   });
+
+  // 2. Guarantee every service in taxonomy-tree.json exists
+  taxonomy.level_2_and_3.concepts.forEach((concept: any) => {
+    concept.clusters.forEach((cluster: any) => {
+      cluster.services.forEach((svcName: string) => {
+        const normId = normalizeServiceId(svcName);
+        const origId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+        if (!servicesMap.has(normId) && !servicesMap.has(origId)) {
+          const fallbackObj = {
+            name: svcName,
+            job: `${svcName} manages core AWS architectural capabilities for ${cluster.name}.`,
+            choose_when: `Your architecture requires native ${svcName} functionality within ${cluster.name}.`,
+            avoid_when: `Alternative AWS services handle out-of-scope requirements or different operational constraints.`,
+            trap_words: `${svcName.toLowerCase()} configuration, permissions, multi-region setups`,
+            id: normId,
+            originalId: origId,
+            cluster_id: cluster.id,
+            cluster_title: cluster.name,
+            concept_id: concept.id,
+            concept_name: concept.name,
+            exam_domains: ["Security", "Resilience"]
+          };
+          servicesMap.set(normId, fallbackObj);
+          servicesMap.set(origId, fallbackObj);
+        }
+      });
+    });
+  });
+
+  // Return unique service objects array
+  const uniqueServices = Array.from(new Set(servicesMap.values()));
   
-  return services;
+  // Also duplicate aliases into array so Astro getStaticPaths creates routes for both 'cloudtrail' AND 'aws-cloudtrail'
+  const allRoutes: any[] = [];
+  const registeredIds = new Set<string>();
+
+  uniqueServices.forEach(s => {
+    if (!registeredIds.has(s.id)) {
+      registeredIds.add(s.id);
+      allRoutes.push(s);
+    }
+    if (s.originalId && !registeredIds.has(s.originalId)) {
+      registeredIds.add(s.originalId);
+      allRoutes.push({ ...s, id: s.originalId });
+    }
+  });
+
+  return allRoutes;
 }
 
 export function getSearchIndex() {
   const topics = getAllTopics();
   const services = getAllServices();
-  const questions = getPracticeQuestions();
   
   const index: any[] = [];
   
@@ -127,16 +190,20 @@ export function getSearchIndex() {
   });
   
   // Index Services
+  const seenSvc = new Set<string>();
   services.forEach((s: any) => {
-    index.push({
-      id: `svc-${s.id}`,
-      type: 'Service',
-      title: s.name,
-      description: s.job,
-      url: `/services/${s.id}`,
-      tags: s.cluster_title,
-      content: `${s.job} ${s.choose_when} ${s.avoid_when} ${s.trap_words}`
-    });
+    if (!seenSvc.has(s.name)) {
+      seenSvc.add(s.name);
+      index.push({
+        id: `svc-${s.id}`,
+        type: 'Service',
+        title: s.name,
+        description: s.job,
+        url: `/services/${s.id}`,
+        tags: s.cluster_title,
+        content: `${s.job} ${s.choose_when} ${s.avoid_when} ${s.trap_words}`
+      });
+    }
   });
   
   return index;
