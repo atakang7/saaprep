@@ -1,4 +1,8 @@
 node_modules/
 .astro/
 dist/
+.dirac-cache/
 .DS_Store
+.env
+.env.local
+.env.*.local

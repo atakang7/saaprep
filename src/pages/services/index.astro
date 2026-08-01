@@ -1,10 +1,31 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getTaxonomyTree, getAllServices } from '../../lib/data';
+import { getTaxonomyTree, getAllServices, getCanonicalServiceId, getTaxonomyEntryHref, normalizeServiceId } from '../../lib/data';
+import { absoluteUrl, normalizeSiteUrl, sitePath } from '../../lib/seo';
 
 const services = getAllServices();
 const taxonomy = getTaxonomyTree();
 const concepts = taxonomy.level_2_and_3.concepts;
+const siteUrl = normalizeSiteUrl(Astro.site);
+const serviceCount = new Set(services.map((service: any) => normalizeServiceId(service.name))).size;
+const description = `Explore ${serviceCount} AWS services for the SAA-C03 exam with decision rules, service comparisons, architecture roles, and exam trap signals.`;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'AWS Services for SAA-C03 Exam Prep',
+  description,
+  url: absoluteUrl('/services', siteUrl),
+  itemListElement: services
+    .filter((service: any, index: number, all: any[]) =>
+      all.findIndex((candidate: any) => normalizeServiceId(candidate.name) === normalizeServiceId(service.name)) === index
+    )
+    .map((service: any, index: number) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: service.name,
+      url: absoluteUrl(`/services/${getCanonicalServiceId(service.name)}/`, siteUrl)
+    }))
+};
 
 // Concept Themes with visual boundary colors
 const conceptThemes: Record<string, { color: string; label: string; tag: string; icon: string }> = {
@@ -17,7 +38,13 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
 };
 ---
 
-<BaseLayout title="AWS Service Directory | SAA-C03">
+<BaseLayout
+  title="AWS Services for SAA-C03 Exam Prep | SAA Prep"
+  description={description}
+  canonicalPath="/services"
+  pageType="CollectionPage"
+  structuredData={structuredData}
+>
   <div class="compact-services-container">
     
     <!-- COMPACT HEADER -->
@@ -27,7 +54,7 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
         <h1 class="ch-title">// AWS SERVICE ARCHITECTURE CATALOG</h1>
       </div>
       <div class="ch-right">
-        <span class="ch-stat">35+ REQUIRED AWS SERVICES</span>
+        <span class="ch-stat">{serviceCount} REQUIRED AWS SERVICES</span>
       </div>
     </header>
 
@@ -62,9 +89,9 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
                   <!-- INNER SERVICES CHIPS -->
                   <div class="compact-services-row">
                     {cluster.services.map((svcName: string) => {
-                      const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      const svcUrl = getTaxonomyEntryHref(svcName, cluster.id);
                       return (
-                        <a href={`/services/${svcId}`} class="compact-svc-chip">
+                        <a href={sitePath(svcUrl)} class="compact-svc-chip">
                           <span class="chip-dot" style={`background: ${theme.color};`}></span>
                           <span class="chip-name">{svcName}</span>
                         </a>
@@ -86,9 +113,8 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
 
 <style>
   .compact-services-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0.5rem 0 3rem;
+    width: 100%;
+    padding: 0;
   }
 
   .compact-header {
@@ -96,8 +122,10 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0.75rem;
-    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.85rem;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
   .ch-tag {
@@ -127,12 +155,14 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
   .compact-boundaries-stack {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 0.85rem;
   }
 
   .compact-boundary-box {
     background: #08090e;
     border: 1px solid #1e2230;
+    border-radius: 8px;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -141,7 +171,7 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem 1rem;
+    padding: 0.45rem 0.8rem;
     background: #0d0f17;
     border-bottom: 1px solid #1e2230;
     font-family: var(--font-mono);
@@ -177,27 +207,35 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
   }
 
   .cb-body-grid {
-    padding: 0.85rem;
+    padding: 0.6rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 0.85rem;
+    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 0.6rem;
+    align-items: start;
   }
 
   .compact-cluster-card {
     background: #10131d;
     border: 1px solid #232838;
-    padding: 0.75rem;
+    border-radius: 6px;
+    padding: 0.55rem 0.6rem 0.6rem;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .compact-cluster-card:hover {
+    background: #141824;
+    border-color: #2f3648;
   }
 
   .cluster-head {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
     border-bottom: 1px solid #1c202e;
-    padding-bottom: 0.35rem;
+    padding-bottom: 0.3rem;
     font-family: var(--font-mono);
   }
 
@@ -208,7 +246,8 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
   }
 
   .cs-title {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    line-height: 1.25;
     font-weight: 800;
     color: #ffffff;
     margin: 0;
@@ -217,27 +256,37 @@ const conceptThemes: Record<string, { color: string; label: string; tag: string;
   .compact-services-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: 0.28rem;
   }
 
   .compact-svc-chip {
     background: #161a28;
     border: 1px solid #2a3144;
-    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
     text-decoration: none;
     color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.7rem;
+    font-weight: 700;
     font-family: var(--font-mono);
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
+    line-height: 1.4;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .compact-svc-chip:hover {
+    background: #1e2434;
+    border-color: #3b4459;
+    transform: translateY(-1px);
   }
 
   .chip-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
+    flex-shrink: 0;
   }
 
   .chip-name {

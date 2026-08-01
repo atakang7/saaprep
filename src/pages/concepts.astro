@@ -1,9 +1,39 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getTaxonomyTree } from '../lib/data';
+import { getTaxonomyTree, getTaxonomyEntryHref, normalizeServiceId } from '../lib/data';
+import { absoluteUrl, normalizeSiteUrl, sitePath } from '../lib/seo';
 
 const taxonomy = getTaxonomyTree();
 const concepts = taxonomy.level_2_and_3.concepts;
+const siteUrl = normalizeSiteUrl(Astro.site);
+const clusterCount = concepts.reduce((sum: number, concept: any) => sum + concept.clusters.length, 0);
+const serviceCount = new Set(
+  concepts.flatMap((concept: any) =>
+    concept.clusters.flatMap((cluster: any) => cluster.services.map((serviceName: string) => normalizeServiceId(serviceName)))
+  )
+).size;
+const description = `Browse the AWS SAA-C03 exam taxonomy across ${concepts.length} architecture domains, ${clusterCount} topic clusters, and ${serviceCount} core AWS services.`;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'AWS SAA-C03 Architecture Taxonomy',
+  description,
+  url: absoluteUrl('/concepts', siteUrl),
+  itemListElement: concepts.map((concept: any, index: number) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: concept.name,
+    item: {
+      '@type': 'DefinedTermSet',
+      name: concept.name,
+      hasDefinedTerm: concept.clusters.map((cluster: any) => ({
+        '@type': 'DefinedTerm',
+        name: cluster.name,
+        url: absoluteUrl(`/topics/${cluster.id}`, siteUrl)
+      }))
+    }
+  }))
+};
 
 // Concept theme colors
 const conceptThemes: Record<string, { color: string; label: string; icon: string }> = {
@@ -16,7 +46,13 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
 };
 ---
 
-<BaseLayout title="Taxonomy Tree | SAA-C03">
+<BaseLayout
+  title="AWS SAA-C03 Exam Taxonomy by Architecture Domain | SAA Prep"
+  description={description}
+  canonicalPath="/concepts"
+  pageType="CollectionPage"
+  structuredData={structuredData}
+>
   <div class="pure-tree-container">
     
     <!-- PURE TREE CANVAS (NO PAGE HEADER/TITLES) -->
@@ -25,7 +61,7 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
       <!-- ROOT NODE -->
       <div class="tree-root-bar">
         <span class="tb-badge">ROOT</span>
-        <span class="tb-title">🌲 SAA-C03 ARCHITECTURAL EXAM TAXONOMY</span>
+        <h1 class="tb-title">🌲 SAA-C03 ARCHITECTURAL EXAM TAXONOMY</h1>
       </div>
 
       <!-- COMPACT BRANCHES LIST -->
@@ -57,7 +93,7 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
                       <div class="cl-head">
                         <span class="indent-code">│  </span>
                         <span class="cl-symbol">{isLastCluster ? '└──' : '├──'}</span>
-                        <a href={`/topics/${cluster.id}`} class="cl-box">
+                        <a href={sitePath(`/topics/${cluster.id}`)} class="cl-box">
                           <span class="cl-name">{cluster.name}</span>
                           <span class="cl-tag">TOPIC →</span>
                         </a>
@@ -69,9 +105,9 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
                         <span class="leaf-symbol">└──</span>
                         <div class="leaves-row">
                           {cluster.services.map((svcName: string) => {
-                            const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                            const svcUrl = getTaxonomyEntryHref(svcName, cluster.id);
                             return (
-                              <a href={`/services/${svcId}`} class="leaf-chip">
+                              <a href={sitePath(svcUrl)} class="leaf-chip">
                                 <span class="leaf-dot" style={`background: ${theme.color};`}></span>
                                 <span>{svcName}</span>
                               </a>
@@ -97,29 +133,30 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
 
 <style>
   .pure-tree-container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 0 3rem;
+    width: 100%;
+    padding: 0;
   }
 
   /* CANVAS */
   .compact-canvas {
     background: #06070a;
     border: 1px solid #1c1f2c;
-    padding: 1rem;
+    border-radius: 8px;
+    padding: 0.7rem;
     font-family: var(--font-mono);
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .tree-root-bar {
     background: #0d0f17;
     border: 1px solid var(--color-network);
-    padding: 0.5rem 0.85rem;
+    border-radius: 6px;
+    padding: 0.4rem 0.7rem;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .tb-badge {
@@ -134,18 +171,36 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
     font-size: 0.9rem;
     font-weight: 900;
     color: #ffffff;
+    margin: 0;
   }
 
   .tree-branches-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(430px, 1fr));
+    gap: 0.6rem;
+    align-items: start;
+  }
+
+  @media (max-width: 720px) {
+    .tree-branches-list {
+      grid-template-columns: 1fr;
+    }
   }
 
   .compact-branch-block {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.3rem;
+    background: #090b11;
+    border: 1px solid #191d29;
+    border-radius: 6px;
+    padding: 0.5rem 0.55rem 0.6rem;
+  }
+
+  /* Branches sit side by side now, so the top-level connector
+     glyph no longer joins anything vertically. */
+  .c-symbol {
+    display: none;
   }
 
   .c-head-row {
@@ -163,11 +218,13 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
   .c-pill {
     background: #0f121d;
     border: 1px solid #252a3b;
-    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    padding: 0.32rem 0.6rem;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     flex: 1;
+    min-width: 0;
   }
 
   .cp-icon {
@@ -181,8 +238,11 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
   }
 
   .cp-label {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .c-children-list {
@@ -204,71 +264,97 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
   }
 
   .indent-code {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: #2a3040;
+    font-size: 0.78rem;
     white-space: pre;
     font-weight: 900;
+    flex-shrink: 0;
   }
 
   .cl-symbol {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: #2a3040;
+    font-size: 0.78rem;
     font-weight: 900;
+    flex-shrink: 0;
   }
 
   .cl-box {
     background: #141824;
     border: 1px solid #283044;
-    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    padding: 0.28rem 0.55rem;
     text-decoration: none;
     color: inherit;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem;
     flex: 1;
+    min-width: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .cl-box:hover {
+    background: #1a2030;
+    border-color: #37415a;
   }
 
   .cl-name {
-    font-size: 0.85rem;
-    font-weight: 900;
+    font-size: 0.76rem;
+    font-weight: 800;
     color: #ffffff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .cl-tag {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: var(--text-secondary);
     font-weight: 800;
+    flex-shrink: 0;
   }
 
   .leaves-inline-wrap {
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
+    align-items: flex-start;
+    gap: 0.3rem;
   }
 
   .leaf-symbol {
-    color: var(--text-muted);
-    font-size: 0.8rem;
+    color: #2a3040;
+    font-size: 0.75rem;
     font-weight: 900;
+    flex-shrink: 0;
   }
 
   .leaves-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
+    gap: 0.25rem;
+    min-width: 0;
   }
 
   .leaf-chip {
     background: #181d2c;
     border: 1px solid #283046;
-    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    padding: 0.18rem 0.5rem;
     text-decoration: none;
     color: #ffffff;
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.68rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
+    line-height: 1.4;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .leaf-chip:hover {
+    background: #212838;
+    border-color: #3b4661;
+    transform: translateY(-1px);
   }
 
   .leaf-dot {

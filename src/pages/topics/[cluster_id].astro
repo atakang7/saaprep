@@ -1,11 +1,10 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import fs from 'node:fs';
-import path from 'node:path';
+import { getAllTopics, getCanonicalServiceId } from '../../lib/data';
+import { absoluteUrl, breadcrumbJsonLd, normalizeSiteUrl, sitePath, topicDescription } from '../../lib/seo';
 
 export async function getStaticPaths() {
-  const filePath = path.join(process.cwd(), 'topic-pages.json');
-  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const data = getAllTopics();
   
   return data.map((topic: any) => ({
     params: { cluster_id: topic.cluster_id },
@@ -14,6 +13,9 @@ export async function getStaticPaths() {
 }
 
 const { topic } = Astro.props;
+const siteUrl = normalizeSiteUrl(Astro.site);
+const canonicalPath = `/topics/${topic.cluster_id}`;
+const description = topicDescription(topic);
 
 // Re-use theme mapping
 const conceptThemes: Record<string, { color: string; label: string }> = {
@@ -27,16 +29,55 @@ const conceptThemes: Record<string, { color: string; label: string }> = {
 
 const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)", label: topic.concept_id.toUpperCase() };
 
-// Extract service names for diagram
-const serviceNames = topic.core_services.map((s: any) => s.name);
+const structuredData = [
+  breadcrumbJsonLd(
+    [
+      { name: 'SAA-C03 Exam Taxonomy', url: '/concepts' },
+      { name: topic.cluster_title, url: canonicalPath }
+    ],
+    siteUrl
+  ),
+  {
+    '@context': 'https://schema.org',
+    '@type': ['LearningResource', 'CollectionPage'],
+    name: `${topic.cluster_title} SAA-C03 Study Guide`,
+    url: absoluteUrl(canonicalPath, siteUrl),
+    description,
+    educationalUse: 'Certification exam preparation',
+    learningResourceType: 'Topic study guide',
+    about: [
+      {
+        '@type': 'DefinedTerm',
+        name: topic.concept_name
+      },
+      {
+        '@type': 'DefinedTerm',
+        name: 'AWS Certified Solutions Architect - Associate SAA-C03'
+      }
+    ],
+    teaches: topic.what_this_tests,
+    hasPart: topic.core_services.map((service: any) => ({
+      '@type': 'TechArticle',
+      name: service.name,
+      url: absoluteUrl(`/services/${getCanonicalServiceId(service.name)}/`, siteUrl)
+    }))
+  }
+];
 ---
 
-<BaseLayout title={`${topic.cluster_title} - SAA-C03 Architectural Cluster`}>
+<BaseLayout
+  title={`${topic.cluster_title} for AWS SAA-C03 | SAA Prep`}
+  description={description}
+  canonicalPath={canonicalPath}
+  ogType="article"
+  pageType="CollectionPage"
+  structuredData={structuredData}
+>
   <div class="clean-page">
     
     <!-- BREADCRUMB -->
     <nav class="clean-breadcrumb">
-      <a href="/concepts">Taxonomy Tree</a>
+      <a href={sitePath('/concepts')}>Taxonomy Tree</a>
       <span class="sep">/</span>
       <span class="current">{topic.cluster_title}</span>
     </nav>
@@ -59,70 +100,18 @@ const serviceNames = topic.core_services.map((s: any) => s.name);
       </div>
     </header>
 
-    <!-- ARCHITECTURAL CLUSTER DATA PIPELINE DIAGRAM -->
+    <!-- CORE SERVICES ROUTING DIRECTORY -->
     <section class="content-block">
-      <div class="block-header-row">
-        <h2 class="block-heading">// CLUSTER ARCHITECTURE DATA FLOW</h2>
-        <span class="mono-badge">[TOPOLOGY-MAP]</span>
-      </div>
+      <h2 class="block-heading">// ROUTE TO THE RIGHT SERVICE</h2>
 
-      <div class="cluster-diagram-panel">
-        <div class="cluster-flow-grid">
-          {topic.core_services.map((svc: any, idx: number) => (
-            <div class="cluster-node-card">
-              <div class="node-badge">NODE 0{idx + 1}</div>
-              <div class="node-title">{svc.name}</div>
-              <p class="node-desc">{svc.job}</p>
-            </div>
-          ))}
-        </div>
-
-        <!-- ASCII PIPELINE MAP -->
-        <div class="ascii-pipeline-box">
-          <div class="ascii-lbl">SAA-C03 ARCHITECTURAL PIPELINE TOPOLOGY</div>
-          <pre class="ascii-code">
-{serviceNames.map((s: string, i: number) => `[STAGE 0${i + 1}: ${s.padEnd(22)}] ──(Integrates With)──►`).join('\n  │\n  ▼\n')} [END: PRODUCTION SAA-C03 RESILIENT ARCHITECTURE]
-          </pre>
-        </div>
-      </div>
-    </section>
-
-    <!-- WHAT THIS TESTS -->
-    <section class="content-block">
-      <h2 class="block-heading">// WHAT THE SAA-C03 TESTS</h2>
-
-      <div class="blueprint-list">
-        {topic.what_this_tests.map((point: string, idx: number) => (
-          <div class="blueprint-row">
-            <span class="num">0{idx + 1}</span>
-            <p>{point}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <!-- CORE SERVICES DEEP DIVE DIRECTORY -->
-    <section class="content-block">
-      <h2 class="block-heading">// SERVICES IN THIS CLUSTER</h2>
-
-      <div class="services-list">
+      <div class="compact-service-grid">
         {topic.core_services.map((svc: any) => {
-          const serviceId = svc.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          const serviceId = getCanonicalServiceId(svc.name);
           return (
-            <a href={`/services/${serviceId}`} class="svc-row-link">
-              <div class="svc-row-header">
-                <h3>{svc.name}</h3>
-                <span class="link-arrow" style={`color: ${theme.color};`}>View Blueprint →</span>
-              </div>
-              <p class="svc-job">{svc.job}</p>
-              <div class="rules-row">
-                <div class="rule-chip choose">
-                  <strong>✓ Choose:</strong> {svc.choose_when}
-                </div>
-                <div class="rule-chip avoid">
-                  <strong>✕ Avoid:</strong> {svc.avoid_when}
-                </div>
-              </div>
+            <a href={sitePath(`/services/${serviceId}`)} class="compact-service-link">
+              <span class="svc-name">{svc.name}</span>
+              <span class="svc-role">{svc.job}</span>
+              <span class="svc-action" style={`color: ${theme.color};`}>Open →</span>
             </a>
           );
         })}
@@ -130,11 +119,11 @@ const serviceNames = topic.core_services.map((s: any) => s.name);
     </section>
 
     <!-- KEYWORD SIGNALS -->
-    <section class="content-block">
-      <h2 class="block-heading">// EXAM KEYWORD MAPPING</h2>
+    <section class="content-block compact-block">
+      <h2 class="block-heading">// FAST ROUTING SIGNALS</h2>
 
       <div class="signals-list">
-        {topic.signal_words.map((sw: any) => (
+        {topic.signal_words.slice(0, 6).map((sw: any) => (
           <div class="signal-row">
             <span class="phrase">"{sw.phrase}"</span>
             <span class="arrow" style={`color: ${theme.color};`}>→</span>
@@ -144,43 +133,13 @@ const serviceNames = topic.core_services.map((s: any) => s.name);
       </div>
     </section>
 
-    <!-- SERVICE COMPARISONS & EXAM MOVES -->
-    <div class="dual-block">
-      <section class="content-block">
-        <h2 class="block-heading">// SERVICE VS SERVICE</h2>
-        <div class="comp-stack">
-          {topic.comparisons.map((comp: string) => {
-            const parts = comp.split(': ');
-            return (
-              <div class="comp-item">
-                <strong style={`color: ${theme.color};`}>{parts[0]}</strong>
-                <p>{parts[1] || comp}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      <section class="content-block">
-        <h2 class="block-heading">// HIGH-YIELD EXAM MOVES</h2>
-        <div class="moves-stack">
-          {topic.exam_moves.map((move: string) => (
-            <div class="move-item">
-              <span class="icon">⚡</span>
-              <p>{move}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-
     <!-- BOTTOM ACTION -->
     <div class="bottom-action">
       <div>
         <h3>Mastered {topic.cluster_title}?</h3>
         <p>Test your knowledge in the interactive practice simulator.</p>
       </div>
-      <a href="/practice" class="btn-action" style={`background: ${theme.color};`}>Start Practice →</a>
+      <a href={sitePath('/practice')} class="btn-action" style={`background: ${theme.color};`}>Start Practice →</a>
     </div>
 
   </div>
@@ -289,6 +248,62 @@ const serviceNames = topic.core_services.map((s: any) => s.name);
     font-size: 0.65rem;
     font-family: var(--font-mono);
     color: var(--text-muted);
+  }
+
+  .compact-service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    border: 1px solid var(--border-subtle);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .compact-service-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "name action"
+      "role action";
+    gap: 0.25rem 1rem;
+    min-height: 92px;
+    padding: 1rem;
+    border-right: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .compact-service-link:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .svc-name {
+    grid-area: name;
+    color: var(--text-primary);
+    font-size: 0.98rem;
+    font-weight: 850;
+    line-height: 1.25;
+  }
+
+  .svc-role {
+    grid-area: role;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .svc-action {
+    grid-area: action;
+    align-self: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .compact-block {
+    margin-bottom: 2.25rem;
   }
 
   /* CLUSTER DIAGRAM PANEL */
@@ -448,6 +463,77 @@ const serviceNames = topic.core_services.map((s: any) => s.name);
 
   .rule-chip.choose strong { color: var(--color-database); }
   .rule-chip.avoid strong { color: var(--color-security); }
+
+  /* VERIFIED AWS FACTS */
+  .verified-list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .verified-list li {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+  }
+
+  .verified-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    border: 1px solid currentColor;
+    padding: 0.1rem 0.3rem;
+    flex-shrink: 0;
+  }
+
+  /* OFFICIAL SOURCES */
+  .sources-note {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .sources-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sources-list a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.6rem 0.85rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-subtle);
+    border-left-width: 3px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .sources-list a:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .src-title {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  .src-url {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    word-break: break-all;
+  }
 
   /* SIGNALS */
   .signals-list {

@@ -1,11 +1,47 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getTaxonomyTree, getPracticeQuestions } from '../lib/data';
+import { absoluteUrl, DEFAULT_TITLE, normalizeSiteUrl, sitePath } from '../lib/seo';
 
 const taxonomy = getTaxonomyTree();
 const questions = getPracticeQuestions();
 const domains = taxonomy.level_1.domains;
 const concepts = taxonomy.level_2_and_3.concepts;
+const siteUrl = normalizeSiteUrl(Astro.site);
+const description = `Free AWS SAA-C03 exam prep with ${questions.length} scenario questions, service decision guides, and a searchable architecture taxonomy for Solutions Architect Associate study.`;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': ['LearningResource', 'WebApplication'],
+  name: 'AWS SAA-C03 Practice Platform',
+  url: absoluteUrl('/', siteUrl),
+  description,
+  applicationCategory: 'EducationalApplication',
+  operatingSystem: 'Web',
+  educationalUse: 'Certification exam preparation',
+  learningResourceType: 'Practice questions and study guide',
+  about: {
+    '@type': 'DefinedTerm',
+    name: 'AWS Certified Solutions Architect - Associate SAA-C03'
+  },
+  teaches: concepts.map((concept: any) => concept.name),
+  hasPart: [
+    {
+      '@type': 'WebPage',
+      name: 'AWS SAA-C03 Practice Questions',
+      url: absoluteUrl('/practice', siteUrl)
+    },
+    {
+      '@type': 'CollectionPage',
+      name: 'AWS Service Directory',
+      url: absoluteUrl('/services', siteUrl)
+    },
+    {
+      '@type': 'CollectionPage',
+      name: 'SAA-C03 Exam Taxonomy',
+      url: absoluteUrl('/concepts', siteUrl)
+    }
+  ]
+};
 
 // High contrast accessible domain colors
 const domainColors: Record<string, string> = {
@@ -16,7 +52,7 @@ const domainColors: Record<string, string> = {
 };
 ---
 
-<BaseLayout title="SAA-C03 | Practice Platform">
+<BaseLayout title={DEFAULT_TITLE} description={description} canonicalPath="/" structuredData={structuredData}>
   <section class="hero-section">
     <div class="hero-badge">AWS SAA-C03 PREP</div>
     <h1 class="hero-title">
@@ -25,8 +61,8 @@ const domainColors: Record<string, string> = {
     </h1>
 
     <div class="hero-cta-group">
-      <a href="/practice" class="btn btn-primary">Start Practice Arena →</a>
-      <a href="/concepts" class="btn btn-secondary">Explore Taxonomy</a>
+      <a href={sitePath('/practice')} class="btn btn-primary">Start Practice Arena →</a>
+      <a href={sitePath('/concepts')} class="btn btn-secondary">Explore Taxonomy</a>
     </div>
   </section>
 

@@ -1,9 +1,10 @@
 ---
-import { getTaxonomyTree } from '../lib/data';
+import { getTaxonomyTree, getTaxonomyEntryHref } from '../lib/data';
+import { sitePath, stripSiteBase } from '../lib/seo';
 
 const taxonomy = getTaxonomyTree();
 const concepts = taxonomy.level_2_and_3.concepts;
-const currentPath = Astro.url.pathname;
+const currentPath = stripSiteBase(Astro.url.pathname);
 
 const conceptThemes: Record<string, string> = {
   "c1": "var(--color-security)",
@@ -25,15 +26,15 @@ const conceptThemes: Record<string, string> = {
     <nav class="sidebar-nav">
       <!-- CORE NAVIGATION -->
       <div class="sb-section">
-        <a href="/practice" class={`sb-nav-link ${currentPath === '/practice' ? 'active' : ''}`}>
+        <a href={sitePath('/practice')} class={`sb-nav-link ${currentPath === '/practice' ? 'active' : ''}`}>
           <span class="sb-mono">[ARENA]</span>
           <span>Practice Arena</span>
         </a>
-        <a href="/services" class={`sb-nav-link ${currentPath === '/services' ? 'active' : ''}`}>
+        <a href={sitePath('/services')} class={`sb-nav-link ${currentPath === '/services' ? 'active' : ''}`}>
           <span class="sb-mono">[CATALOG]</span>
           <span>Services Directory</span>
         </a>
-        <a href="/concepts" class={`sb-nav-link ${currentPath === '/concepts' ? 'active' : ''}`}>
+        <a href={sitePath('/concepts')} class={`sb-nav-link ${currentPath === '/concepts' ? 'active' : ''}`}>
           <span class="sb-mono">[TREE]</span>
           <span>Taxonomy Tree</span>
         </a>
@@ -57,18 +58,17 @@ const conceptThemes: Record<string, string> = {
                 const isTopicActive = currentPath === topicUrl;
                 return (
                   <div class="sb-cluster-item">
-                    <a href={topicUrl} class={`sb-cluster-link ${isTopicActive ? 'active' : ''}`}>
+                    <a href={sitePath(topicUrl)} class={`sb-cluster-link ${isTopicActive ? 'active' : ''}`}>
                       <span class="sb-square" style={`background: ${themeColor};`}></span>
                       <span>{cluster.name}</span>
                     </a>
 
                     <div class="sb-services-sublist">
                       {cluster.services.map((svcName: string) => {
-                        const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                        const svcUrl = `/services/${svcId}`;
+                        const svcUrl = getTaxonomyEntryHref(svcName, cluster.id);
                         const isSvcActive = currentPath === svcUrl;
                         return (
-                          <a href={svcUrl} class={`sb-svc-link ${isSvcActive ? 'active' : ''}`}>
+                          <a href={sitePath(svcUrl)} class={`sb-svc-link ${isSvcActive ? 'active' : ''}`}>
                             {svcName}
                           </a>
                         );

@@ -3,12 +3,80 @@ import '../styles/global.css';
 import SearchModal from '../components/SearchModal.astro';
 import SidebarNav from '../components/SidebarNav.astro';
 import AccessibilityToolbar from '../components/AccessibilityToolbar.astro';
+import {
+  absoluteUrl,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_TITLE,
+  SITE_NAME,
+  canonicalPathname,
+  excerpt,
+  normalizeSiteUrl,
+  sitePath
+} from '../lib/seo';
 
 interface Props {
   title?: string;
+  description?: string;
+  canonicalPath?: string;
+  image?: string;
+  ogType?: 'website' | 'article';
+  pageType?: string | string[];
+  robots?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
-const { title = "SAA-C03" } = Astro.props;
+const {
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+  canonicalPath = Astro.url.pathname,
+  image = DEFAULT_OG_IMAGE,
+  ogType = 'website',
+  pageType = 'WebPage',
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+  structuredData = []
+} = Astro.props;
+
+const siteUrl = normalizeSiteUrl(Astro.site);
+const canonicalUrl = absoluteUrl(canonicalPathname(canonicalPath), siteUrl);
+const imageUrl = absoluteUrl(image, siteUrl);
+const metaDescription = excerpt(description, 158);
+const websiteId = absoluteUrl('/#website', siteUrl);
+const structuredDataItems = Array.isArray(structuredData) ? structuredData : [structuredData];
+const jsonLdItems = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': websiteId,
+    name: SITE_NAME,
+    url: absoluteUrl('/', siteUrl),
+    description: DEFAULT_DESCRIPTION,
+    inLanguage: 'en-US',
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_NAME,
+      url: absoluteUrl('/', siteUrl)
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': pageType,
+    '@id': `${canonicalUrl}#webpage`,
+    url: canonicalUrl,
+    name: title,
+    description: metaDescription,
+    isPartOf: { '@id': websiteId },
+    inLanguage: 'en-US',
+    about: {
+      '@type': 'Thing',
+      name: 'AWS Certified Solutions Architect - Associate SAA-C03'
+    }
+  },
+  ...structuredDataItems
+];
+
+const serializeJsonLd = (item: Record<string, unknown>) =>
+  JSON.stringify(item).replace(/</g, '\\u003c');
 ---
 
 <!DOCTYPE html>
@@ -17,14 +85,38 @@ const { title = "SAA-C03" } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
-    <meta name="description" content="AWS SAA-C03 Practice Platform" />
+    <meta name="description" content={metaDescription} />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#050608" />
+    <meta name="application-name" content={SITE_NAME} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="sitemap" href={sitePath('/sitemap-index.xml')} />
+    <link rel="icon" href={sitePath('/favicon.ico')} sizes="any" />
+    <link rel="icon" href={sitePath('/favicon.svg')} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={sitePath('/favicon.svg')} />
+
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    {jsonLdItems.map((item) => (
+      <script type="application/ld+json" set:html={serializeJsonLd(item)}></script>
+    ))}
   </head>
   <body>
     <!-- EXTREME LEFT-TO-RIGHT FULL-WIDTH NAVBAR -->
     <header class="navbar">
       <div class="nav-container">
         <div class="brand-group">
-          <a href="/" class="brand">SAA-C03</a>
+          <a href={sitePath('/')} class="brand">SAA-C03</a>
           <span class="brand-badge">[TACTICAL-DRILL]</span>
         </div>
         <nav class="nav-links">
@@ -37,9 +129,9 @@ const { title = "SAA-C03" } = Astro.props;
           <!-- ACCESSIBILITY CONTROLS TOOLBAR -->
           <AccessibilityToolbar />
 
-          <a href="/practice" class="nav-item">PRACTICE</a>
-          <a href="/services" class="nav-item">SERVICES</a>
-          <a href="/concepts" class="nav-item">TAXONOMY</a>
+          <a href={sitePath('/practice')} class="nav-item">PRACTICE</a>
+          <a href={sitePath('/services')} class="nav-item">SERVICES</a>
+          <a href={sitePath('/concepts')} class="nav-item">TAXONOMY</a>
         </nav>
       </div>
     </header>
@@ -52,11 +144,6 @@ const { title = "SAA-C03" } = Astro.props;
       <!-- MAIN CONTENT AREA -->
       <main class="main-content">
         <slot />
-        
-        <!-- AI GENERATED CONTENT DISCLAIMER FOOTER -->
-        <footer class="ai-disclaimer-footer">
-          <span>AI-generated study materials for AWS SAA-C03 preparation. Verify against official AWS Documentation.</span>
-        </footer>
       </main>
     </div>
 
@@ -159,30 +246,62 @@ const { title = "SAA-C03" } = Astro.props;
   .main-content {
     flex-grow: 1;
     min-width: 0;
-    padding: 2.5rem 3rem;
-    max-width: 1200px;
+    padding: 1.4rem 2rem 2rem;
+    max-width: 1720px;
+    margin: 0 auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
 
-  /* AI GENERATED DISCLAIMER FOOTER */
-  .ai-disclaimer-footer {
-    margin-top: 2.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--border-subtle);
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    text-align: center;
+  @media (max-width: 1400px) {
+    .main-content {
+      padding: 1.2rem 1.5rem 1.75rem;
+    }
   }
 
   @media (max-width: 900px) {
     .main-content {
-      padding: 1.5rem 1rem;
+      padding: 1rem 1rem 1.5rem;
     }
     .nav-container {
       padding: 0.65rem 1rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .nav-container {
+      gap: 0.65rem;
+      padding: 0.55rem 0.75rem;
+      overflow: hidden;
+    }
+    .brand-group {
+      min-width: 0;
+      gap: 0.45rem;
+      flex-shrink: 1;
+    }
+    .brand {
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .brand-badge,
+    .nav-item,
+    .nav-kbd {
+      display: none;
+    }
+    .nav-links {
+      min-width: 0;
+      flex-shrink: 0;
+      gap: 0.5rem;
+    }
+    .search-trigger {
+      display: flex;
+      gap: 0.35rem;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
     }
   }
 </style>

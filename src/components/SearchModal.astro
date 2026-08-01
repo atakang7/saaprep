@@ -1,7 +1,8 @@
 ---
+import { sitePath } from '../lib/seo';
 ---
 
-<div id="command-palette" class="cp-modal hidden" aria-expanded="false" role="dialog">
+<div id="command-palette" class="cp-modal hidden" aria-expanded="false" role="dialog" data-search-url={sitePath('/api/search.json')}>
   <div class="cp-backdrop" id="cp-backdrop"></div>
   <div class="cp-dialog glass-card">
     <div class="cp-search-bar">
@@ -22,22 +23,22 @@
     <div class="cp-results-container" id="cp-results">
       <div class="cp-suggestions" id="cp-default-suggestions">
         <div class="cp-section-title">QUICK SUGGESTIONS</div>
-        <a href="/services/iam" class="cp-item">
+        <a href={sitePath('/services/iam')} class="cp-item">
           <span class="cp-item-badge badge-security">SERVICE</span>
           <span class="cp-item-title">IAM</span>
           <span class="cp-item-desc">Identity and Access Management</span>
         </a>
-        <a href="/services/amazon-s3" class="cp-item">
+        <a href={sitePath('/services/s3')} class="cp-item">
           <span class="cp-item-badge badge-storage">SERVICE</span>
           <span class="cp-item-title">Amazon S3</span>
           <span class="cp-item-desc">Simple Storage Service & Bucket Policies</span>
         </a>
-        <a href="/topics/c2_1" class="cp-item">
+        <a href={sitePath('/topics/c2_1')} class="cp-item">
           <span class="cp-item-badge badge-network">TOPIC</span>
           <span class="cp-item-title">VPC Foundations</span>
           <span class="cp-item-desc">Subnets, Route Tables, IGW, NAT Gateways</span>
         </a>
-        <a href="/practice" class="cp-item">
+        <a href={sitePath('/practice')} class="cp-item">
           <span class="cp-item-badge badge-compute">ARENA</span>
           <span class="cp-item-title">Launch Practice Simulator</span>
           <span class="cp-item-desc">Start answering SAA-C03 questions</span>
@@ -68,11 +69,12 @@
   const input = document.getElementById('cp-input') as HTMLInputElement;
   const resultsContainer = document.getElementById('cp-results');
   const suggestions = document.getElementById('cp-default-suggestions');
+  const searchUrl = palette?.getAttribute('data-search-url') || '/api/search.json';
 
   async function initFuse() {
     if (fuse) return;
     try {
-      const res = await fetch('/api/search.json');
+      const res = await fetch(searchUrl);
       rawIndex = await res.json();
       
       fuse = new Fuse(rawIndex, {

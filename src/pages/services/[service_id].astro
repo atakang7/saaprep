@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllServices, getPracticeQuestions, getServiceDiagramFlow } from '../../lib/data';
-import ProArchitectureDiagram from '../../components/ProArchitectureDiagram.astro';
+import { getAllServices, getPracticeQuestions, questionMatchesService, getCanonicalServiceId, normalizeServiceId } from '../../lib/data';
+import { absoluteUrl, breadcrumbJsonLd, normalizeSiteUrl, serviceDescription, sitePath } from '../../lib/seo';
 
 export async function getStaticPaths() {
   const services = getAllServices();
@@ -12,20 +12,25 @@ export async function getStaticPaths() {
 }
 
 const { svc } = Astro.props;
+const siteUrl = normalizeSiteUrl(Astro.site);
+const canonicalServiceId = svc.canonicalId || getCanonicalServiceId(svc.name);
+const canonicalPath = `/services/${canonicalServiceId}`;
+const description = serviceDescription(svc);
 const allQuestions = getPracticeQuestions();
-const diagramFlow = getServiceDiagramFlow(svc.name);
+const verifiedClaims = Array.isArray(svc.verified_claims) ? svc.verified_claims : [];
+const serviceTakeaways = [
+  { label: 'Role', text: svc.job },
+  { label: 'Choose', text: svc.choose_when },
+  { label: 'Avoid', text: svc.avoid_when },
+  { label: 'Trap', text: svc.trap_words ? `Watch for exam signals like ${svc.trap_words}.` : '' },
+  ...verifiedClaims.slice(0, 3).map((claim: string) => ({ label: 'Fact', text: claim }))
+].filter((item) => item.text);
 
-// Match questions related to this service
-const relatedQuestions = allQuestions.filter(q => {
-  const matchQuestion = (q.question || '').toLowerCase().includes(svc.name.toLowerCase());
-  let matchExplanation = false;
-  if (Array.isArray(q.explanation)) {
-    matchExplanation = q.explanation.some(e => (e || '').toLowerCase().includes(svc.name.toLowerCase()));
-  } else if (typeof q.explanation === 'string') {
-    matchExplanation = q.explanation.toLowerCase().includes(svc.name.toLowerCase());
-  }
-  return matchQuestion || matchExplanation;
-}).slice(0, 3);
+// Match questions related to this service. Uses the same matcher as the
+// practice arena so the CTA count and the filtered deck always agree.
+const matchedQuestions = allQuestions.filter(q => questionMatchesService(q, svc.name));
+const totalRelated = matchedQuestions.length;
+const relatedQuestions = matchedQuestions.slice(0, 3);
 
 // Concept themes
 const conceptThemes: Record<string, { color: string; label: string }> = {
@@ -43,25 +48,65 @@ const theme = conceptThemes[svc.concept_id] || { color: "var(--color-network)", 
 const serviceSpecs: Record<string, { scope: string; ha: string; resilience: string }> = {
   'iam': { scope: 'Global', ha: 'Global Fault Tolerance', resilience: '99.999% SLA' },
   'vpc': { scope: 'Regional', ha: 'Multi-AZ Subnets', resilience: 'High Availability' },
-  'amazon-s3': { scope: 'Regional', ha: 'Min 3 AZs', resilience: '11 9s Durability' },
-  'amazon-ec2': { scope: 'Single AZ / Regional', ha: 'Auto Scaling Groups', resilience: '99.99% SLA' },
-  'amazon-rds': { scope: 'Regional', ha: 'Multi-AZ Replication', resilience: 'Auto Failover' },
-  'amazon-dynamodb': { scope: 'Regional', ha: 'Built-in 3 AZ Replication', resilience: '99.999% SLA' },
-  'aws-lambda': { scope: 'Regional Serverless', ha: 'Multi-AZ Execution', resilience: 'Fault Tolerant' },
-  'aws-kms': { scope: 'Regional', ha: 'Multi-AZ HSMs', resilience: '99.999% SLA' }
+  's3': { scope: 'Regional', ha: 'Min 3 AZs', resilience: '11 9s Durability' },
+  'ec2': { scope: 'Single AZ / Regional', ha: 'Auto Scaling Groups', resilience: '99.99% SLA' },
+  'rds': { scope: 'Regional', ha: 'Multi-AZ Replication', resilience: 'Auto Failover' },
+  'dynamodb': { scope: 'Regional', ha: 'Built-in 3 AZ Replication', resilience: '99.999% SLA' },
+  'lambda': { scope: 'Regional Serverless', ha: 'Multi-AZ Execution', resilience: 'Fault Tolerant' },
+  'kms': { scope: 'Regional', ha: 'Multi-AZ HSMs', resilience: '99.999% SLA' }
 };
 
-const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatible', resilience: 'Production Grade' };
+const spec = serviceSpecs[canonicalServiceId] || serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatible', resilience: 'Production Grade' };
+const structuredData = [
+  breadcrumbJsonLd(
+    [
+      { name: 'AWS Services', url: '/services' },
+      { name: svc.cluster_title, url: `/topics/${svc.cluster_id}` },
+      { name: svc.name, url: canonicalPath }
+    ],
+    siteUrl
+  ),
+  {
+    '@context': 'https://schema.org',
+    '@type': ['TechArticle', 'LearningResource'],
+    headline: `${svc.name} SAA-C03 Exam Guide`,
+    name: `${svc.name} SAA-C03 Exam Guide`,
+    url: absoluteUrl(canonicalPath, siteUrl),
+    description,
+    educationalUse: 'Certification exam preparation',
+    learningResourceType: 'AWS service study guide',
+    proficiencyLevel: 'Intermediate',
+    articleSection: svc.cluster_title,
+    about: [
+      {
+        '@type': 'DefinedTerm',
+        name: svc.name
+      },
+      {
+        '@type': 'DefinedTerm',
+        name: 'AWS Certified Solutions Architect - Associate SAA-C03'
+      }
+    ],
+    teaches: [svc.job, svc.choose_when, svc.avoid_when, svc.trap_words],
+    citation: svc.aws_reference_url
+  }
+];
 ---
 
-<BaseLayout title={`${svc.name} - Deep Dive & SAA-C03 Blueprint`}>
+<BaseLayout
+  title={`${svc.name} SAA-C03 Exam Guide | SAA Prep`}
+  description={description}
+  canonicalPath={canonicalPath}
+  ogType="article"
+  structuredData={structuredData}
+>
   <div class="clean-page">
     
     <!-- BREADCRUMB -->
     <nav class="clean-breadcrumb">
-      <a href="/services">Services</a>
+      <a href={sitePath('/services')}>Services</a>
       <span class="sep">/</span>
-      <a href={`/topics/${svc.cluster_id}`}>{svc.cluster_title}</a>
+      <a href={sitePath(`/topics/${svc.cluster_id}`)}>{svc.cluster_title}</a>
       <span class="sep">/</span>
       <span class="current">{svc.name}</span>
     </nav>
@@ -77,6 +122,14 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
       <h1 class="hero-title">{svc.name}</h1>
       <p class="hero-lead">{svc.job}</p>
+
+      {svc.aws_reference_url && (
+        <a href={svc.aws_reference_url} target="_blank" rel="noopener noreferrer" class="hero-reference-link">
+          <span class="hero-reference-label">Official AWS Reference</span>
+          <span class="hero-reference-url">{svc.aws_reference_url}</span>
+          <span class="link-arrow">↗</span>
+        </a>
+      )}
 
       <!-- SPECIFICATION INLINE ROW -->
       <div class="spec-row">
@@ -94,11 +147,6 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
         </div>
       </div>
     </header>
-
-    <!-- PRO ARCHITECTURE DATA FLOW DIAGRAM PIPELINE -->
-    <section class="content-block">
-      <ProArchitectureDiagram title={`${svc.name.toUpperCase()} PRODUCTION ARCHITECTURE PIPELINE`} serviceName={svc.name} nodes={diagramFlow} color={theme.color} />
-    </section>
 
     <!-- DECISION MATRIX -->
     <section class="content-block">
@@ -129,33 +177,49 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
       
       <div class="trap-panel">
         <div class="code-keywords">{svc.trap_words}</div>
-        <ul class="clean-list">
-          <li>Watch out for choices specifying static access credentials when IAM Roles or STS temporary credentials apply.</li>
-          <li>Eliminate complex custom-scripted solutions when AWS provides a managed zero-maintenance feature.</li>
-          <li>Look for key indicators like <em>"least operational overhead"</em> or <em>"most cost-effective"</em> to narrow down options.</li>
-        </ul>
       </div>
     </section>
 
-    <!-- NON-NEGOTIABLE FACTS -->
+    <!-- OFFICIAL AWS REFERENCE -->
     <section class="content-block">
-      <h2 class="block-heading">// CORE SAA-C03 TAKEAWAYS</h2>
+      <h2 class="block-heading">// OFFICIAL AWS REFERENCE</h2>
+      <div class="aws-reference-box">
+        {svc.aws_reference_url && (
+          <a href={svc.aws_reference_url} target="_blank" rel="noopener noreferrer" class="aws-link">
+            <span class="aws-icon">AWS</span>
+            <span class="aws-url">{svc.aws_reference_url}</span>
+            <span class="link-arrow">↗</span>
+          </a>
+        )}
+        {svc.aws_official_description && (
+          <p class="aws-desc">"{svc.aws_official_description}"</p>
+        )}
 
-      <div class="facts-list">
-        <div class="fact-row">
-          <span class="num">01</span>
-          <p><strong>Permissions & Policies:</strong> Resource-based policies allow cross-account access without assuming IAM roles directly.</p>
-        </div>
-        <div class="fact-row">
-          <span class="num">02</span>
-          <p><strong>High Availability:</strong> Deploy across minimum 2-3 Availability Zones to ensure zero single point of failure.</p>
-        </div>
-        <div class="fact-row">
-          <span class="num">03</span>
-          <p><strong>Security Defaults:</strong> KMS Customer Managed Keys allow rotation tracking, whereas AWS Managed Keys provide effortless default encryption.</p>
-        </div>
+        {svc.verified_claims && svc.verified_claims.length > 0 && (
+          <ul class="verified-facts">
+            {svc.verified_claims.map((claim: string) => (
+              <li>{claim}</li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
+
+    <!-- SERVICE-SCOPED TAKEAWAYS -->
+    {serviceTakeaways.length > 0 && (
+      <section class="content-block">
+        <h2 class="block-heading">// {svc.name.toUpperCase()} TAKEAWAYS</h2>
+
+        <div class="facts-list">
+          {serviceTakeaways.map((takeaway, idx: number) => (
+            <div class="fact-row">
+              <span class="num">0{idx + 1}</span>
+              <p><strong>{takeaway.label}:</strong> {takeaway.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
 
     <!-- RELATED PRACTICE QUESTIONS -->
     {relatedQuestions.length > 0 && (
@@ -163,7 +227,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
         <h2 class="block-heading">// PRACTICE QUESTIONS</h2>
         <div class="questions-stack">
           {relatedQuestions.map(q => (
-            <a href={`/practice?q=${q.id}`} class="q-link">
+            <a href={sitePath(`/practice?q=${q.id}`)} class="q-link">
               <div class="q-num">QUESTION #{q.id}</div>
               <div class="q-body">{q.question}</div>
               <div class="q-action">Solve Question →</div>
@@ -174,13 +238,17 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     )}
 
     <!-- CTA -->
-    <div class="bottom-action">
-      <div>
-        <h3>Ready to test your {svc.name} knowledge?</h3>
-        <p>Launch the interactive practice simulator now.</p>
+    {relatedQuestions.length > 0 && (
+      <div class="bottom-action">
+        <div>
+          <h3>Ready to test your {svc.name} knowledge?</h3>
+          <p>
+            {totalRelated} practice {totalRelated === 1 ? 'question covers' : 'questions cover'} {svc.name}.
+          </p>
+        </div>
+        <a href={sitePath(`/practice?service=${svc.id}`)} class="btn-action" style={`background: ${theme.color};`}>Start Practice →</a>
       </div>
-      <a href="/practice" class="btn-action" style={`background: ${theme.color};`}>Start Practice →</a>
-    </div>
+    )}
 
   </div>
 </BaseLayout>
@@ -253,7 +321,59 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-size: 1.15rem;
     color: var(--text-secondary);
     line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .hero-reference-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    max-width: 100%;
     margin-bottom: 2rem;
+    padding: 0.55rem 0.75rem;
+    background: rgba(255, 153, 0, 0.08);
+    border: 1px solid rgba(255, 153, 0, 0.55);
+    border-left: 3px solid #ff9900;
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .hero-reference-label {
+    flex-shrink: 0;
+    color: #ff9900;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .hero-reference-url {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  .hero-reference-link:hover {
+    border-color: #ff9900;
+    background: rgba(255, 153, 0, 0.12);
+  }
+
+  @media (max-width: 768px) {
+    .hero-reference-link {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .hero-reference-url {
+      white-space: normal;
+      word-break: break-all;
+    }
   }
 
   .spec-row {
@@ -307,103 +427,6 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-size: 0.65rem;
     font-family: var(--font-mono);
     color: var(--text-muted);
-  }
-
-  /* DIAGRAM PIPELINE BOX */
-  .diagram-pipeline-box {
-    background: #090a0d;
-    border: 1px solid var(--border-subtle);
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .diagram-flow-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 1rem;
-    position: relative;
-  }
-
-  .flow-step-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-subtle);
-    padding: 1rem;
-    position: relative;
-  }
-
-  .step-meta {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-  }
-
-  .step-num {
-    font-size: 0.65rem;
-    font-family: var(--font-mono);
-    font-weight: 900;
-    color: var(--color-network);
-  }
-
-  .step-protocol {
-    font-size: 0.6rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-  }
-
-  .step-node-title {
-    font-size: 0.95rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.35rem;
-  }
-
-  .step-details {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-  }
-
-  .flow-arrow-indicator {
-    position: absolute;
-    right: -14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    z-index: 10;
-  }
-
-  @media (max-width: 768px) {
-    .flow-arrow-indicator {
-      display: none;
-    }
-  }
-
-  .ascii-topology-map {
-    border-top: 1px solid var(--border-subtle);
-    padding-top: 1rem;
-  }
-
-  .ascii-lbl {
-    font-size: 0.6rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    font-weight: 900;
-    margin-bottom: 0.5rem;
-  }
-
-  .ascii-code {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    background: #040507;
-    padding: 1rem;
-    border: 1px solid var(--border-subtle);
-    overflow-x: auto;
-    line-height: 1.5;
   }
 
   /* DECISION DUAL */
@@ -594,4 +617,78 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     white-space: nowrap;
     font-family: var(--font-mono);
   }
+
+  /* AWS REFERENCE */
+  .aws-reference-box {
+    background: rgba(255, 153, 0, 0.05); /* AWS Orange tint */
+    border: 1px solid #ff9900;
+    border-left: 4px solid #ff9900;
+    padding: 1.5rem;
+  }
+  
+  .aws-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+    width: fit-content;
+  }
+  
+  .aws-icon {
+    background: #ff9900;
+    color: #232f3e; /* AWS dark blue */
+    font-size: 0.7rem;
+    font-weight: 900;
+    padding: 0.15rem 0.4rem;
+    border-radius: 2px;
+  }
+  
+  .aws-url {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.2);
+    text-underline-offset: 4px;
+  }
+  
+  .aws-link:hover .aws-url {
+    text-decoration-color: #ff9900;
+  }
+  
+  .aws-desc {
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .verified-facts {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 1rem 0 0;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .verified-facts li {
+    position: relative;
+    padding-left: 1.1rem;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .verified-facts li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--color-database);
+  }
+
 </style>

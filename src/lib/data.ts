@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { serviceDescription, sitePath, topicDescription } from './seo';
 
 export interface Question {
   id: number | string;
@@ -114,11 +115,60 @@ export function getAllTopics() {
   return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
 }
 
+/**
+ * taxonomy-tree.json uses short colloquial names; topic-pages.json uses the
+ * full AWS service names. Map the short forms onto the real, fact-checked
+ * entries so those pages show verified content instead of placeholder text.
+ */
+const SERVICE_ALIASES: Record<string, string> = {
+  'vpcs': 'Amazon VPC',
+  'subnets': 'VPC subnets',
+  'parameter store': 'AWS Systems Manager Parameter Store',
+  'shield': 'AWS Shield Advanced',
+  'nacls': 'Network ACLs (NACLs)',
+  'route tables': 'Route Table',
+  'internet gateways': 'Internet Gateway (IGW)',
+  'nat gateways': 'NAT Gateway',
+  'vpc endpoints (gateway, interface)': 'Gateway VPC Endpoint',
+  'privatelink': 'Interface VPC Endpoint (AWS PrivateLink)',
+  'alb': 'Application Load Balancer (ALB)',
+  'nlb': 'Network Load Balancer (NLB)',
+  'glb': 'Gateway Load Balancer',
+  'fsx': 'Amazon FSx for Windows File Server',
+  'lifecycle rules': 'S3 Lifecycle configuration',
+  'object lock': 'S3 Object Lock',
+  'snow family': 'AWS Snowball Edge',
+  'elasticache': 'Amazon ElastiCache for Valkey / Redis OSS',
+  'dax': 'DAX (DynamoDB Accelerator)',
+  'opensearch': 'Amazon OpenSearch Service',
+  'kinesis': 'Amazon Kinesis Data Streams',
+  'sqs': 'Amazon SQS (Simple Queue Service)',
+  'sns': 'Amazon SNS (Simple Notification Service)',
+  'route 53 routing': 'Amazon Route 53'
+};
+
+export function resolveServiceAlias(name: string): string {
+  return SERVICE_ALIASES[name.trim().toLowerCase()] || name;
+}
+
 export function normalizeServiceId(name: string): string {
   let clean = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   if (clean.startsWith('aws-')) clean = clean.substring(4);
   if (clean.startsWith('amazon-')) clean = clean.substring(7);
   return clean;
+}
+
+export function getCanonicalServiceId(name: string): string {
+  const normalized = normalizeServiceId(name);
+  const preferredAlias = Object.entries(SERVICE_ALIASES).find(
+    ([, canonicalName]) => normalizeServiceId(canonicalName) === normalized
+  );
+
+  return preferredAlias ? normalizeServiceId(preferredAlias[0]) : normalized;
+}
+
+export function getTaxonomyEntryHref(name: string, clusterId: string): string {
+  return `/services/${getCanonicalServiceId(name)}`;
 }
 
 export function getAllServices() {
@@ -133,11 +183,13 @@ export function getAllServices() {
       topic.core_services.forEach((svc: any) => {
         const primaryId = normalizeServiceId(svc.name);
         const originalId = svc.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const canonicalId = getCanonicalServiceId(svc.name);
         
         const serviceObj = {
           ...svc,
           id: primaryId,
           originalId,
+          canonicalId,
           cluster_id: topic.cluster_id,
           cluster_title: topic.cluster_title,
           concept_id: topic.concept_id,
@@ -151,30 +203,28 @@ export function getAllServices() {
     }
   });
 
-  // 2. Guarantee every service in taxonomy-tree.json exists
+  // 2. Point taxonomy-tree.json's short names at the real, fact-checked
+  //    entries. We never invent service content: an entry that has no
+  //    verified counterpart gets no service page at all.
   taxonomy.level_2_and_3.concepts.forEach((concept: any) => {
     concept.clusters.forEach((cluster: any) => {
       cluster.services.forEach((svcName: string) => {
         const normId = normalizeServiceId(svcName);
         const origId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        if (servicesMap.has(normId) || servicesMap.has(origId)) return;
 
-        if (!servicesMap.has(normId) && !servicesMap.has(origId)) {
-          const fallbackObj = {
-            name: svcName,
-            job: `${svcName} manages core AWS architectural capabilities for ${cluster.name}.`,
-            choose_when: `Your architecture requires native ${svcName} functionality within ${cluster.name}.`,
-            avoid_when: `Alternative AWS services handle out-of-scope requirements or different operational constraints.`,
-            trap_words: `${svcName.toLowerCase()} configuration, permissions, multi-region setups`,
+        const canonical = servicesMap.get(normalizeServiceId(resolveServiceAlias(svcName)));
+        if (canonical) {
+          // Alias route: same verified content, reachable by the short name.
+          const aliasObj = {
+            ...canonical,
             id: normId,
             originalId: origId,
-            cluster_id: cluster.id,
-            cluster_title: cluster.name,
-            concept_id: concept.id,
-            concept_name: concept.name,
-            exam_domains: ["Security", "Resilience"]
+            canonicalId: normId,
+            aliasOfId: canonical.id
           };
-          servicesMap.set(normId, fallbackObj);
-          servicesMap.set(origId, fallbackObj);
+          servicesMap.set(normId, aliasObj);
+          servicesMap.set(origId, aliasObj);
         }
       });
     });
@@ -189,6 +239,10 @@ export function getAllServices() {
       registeredIds.add(s.id);
       allRoutes.push(s);
     }
+    if (s.canonicalId && !registeredIds.has(s.canonicalId)) {
+      registeredIds.add(s.canonicalId);
+      allRoutes.push({ ...s, id: s.canonicalId });
+    }
     if (s.originalId && !registeredIds.has(s.originalId)) {
       registeredIds.add(s.originalId);
       allRoutes.push({ ...s, id: s.originalId });
@@ -196,63 +250,6 @@ export function getAllServices() {
   });
 
   return allRoutes;
-}
-
-export interface ArchitectureStep {
-  step: string;
-  node: string;
-  protocol: string;
-  role: string;
-  details: string;
-  haTag: string;
-}
-
-export function getServiceDiagramFlow(serviceName: string): ArchitectureStep[] {
-  const norm = normalizeServiceId(serviceName);
-
-  if (norm.includes('s3')) {
-    return [
-      { step: "01", node: "Client Application", protocol: "HTTPS / REST API", role: "INGRESS", details: "Issues PutObject / GetObject requests with SigV4 authentication.", haTag: "TLS 1.3 Encryption" },
-      { step: "02", node: "Amazon S3 Endpoint", protocol: "IAM / Bucket Policy", role: "AUTH & GUARD", details: "Evaluates bucket policies, KMS encryption keys, and lifecycle rules.", haTag: "IAM Authorization" },
-      { step: "03", node: "Multi-AZ Storage Engine", protocol: "Erasure Coding", role: "STORAGE TIER", details: "Persists data synchronously across minimum 3 Availability Zones.", haTag: "11 9s Durability" },
-      { step: "04", node: "Event Notification Trigger", protocol: "SQS / SNS / Lambda", role: "EVENT BUS", details: "Dispatches async event payloads for downstream processing.", haTag: "Event-Driven Async" }
-    ];
-  }
-
-  if (norm.includes('iam') || norm.includes('sts')) {
-    return [
-      { step: "01", node: "Identity Provider / User", protocol: "SAML 2.0 / OIDC", role: "CLIENT AUTH", details: "Authenticates user against Identity Center or external IdP.", haTag: "MFA Enforced" },
-      { step: "02", node: "AWS STS (AssumeRole)", protocol: "STS API Call", role: "CREDENTIAL ISSUER", details: "Issues short-lived temporary security credentials (Access Key + Secret + Session Token).", haTag: "15min - 12hr Expiry" },
-      { step: "03", node: "AWS Policy Engine", protocol: "IAM Policy Evaluation", role: "DECISION ENGINE", details: "Evaluates SCPs, Permissions Boundaries, Identity & Resource policies.", haTag: "Least Privilege" },
-      { step: "04", node: "Target AWS Resource", protocol: "SigV4 Authorized Call", role: "PROTECTED TARGET", details: "Grants or denies access based on explicit allow / default deny logic.", haTag: "Global Fault Tolerance" }
-    ];
-  }
-
-  if (norm.includes('vpc') || norm.includes('route53') || norm.includes('cloudfront')) {
-    return [
-      { step: "01", node: "Public Internet User", protocol: "DNS / Anycast IP", role: "EDGE INGRESS", details: "Resolves DNS record via Route 53 to nearest CloudFront Edge Location.", haTag: "Anycast Routing" },
-      { step: "02", node: "Internet Gateway / WAF", protocol: "HTTPS / Inspection", role: "SECURITY GATEWAY", details: "Filters malicious traffic via WAF rules and routes through IGW.", haTag: "DDoS Mitigation" },
-      { step: "03", node: "Public Subnet ALB", protocol: "HTTP/2 -> HTTP/1.1", role: "LOAD BALANCER", details: "Terminates TLS, evaluates routing rules, and forwards to target group.", haTag: "Cross-AZ Balancing" },
-      { step: "04", node: "Private Subnet EC2/ECS", protocol: "Security Group / NACL", role: "COMPUTE TIER", details: "Executes workload inside isolated private subnets across Multi-AZ.", haTag: "Multi-AZ Auto Scaling" }
-    ];
-  }
-
-  if (norm.includes('rds') || norm.includes('aurora') || norm.includes('dynamodb')) {
-    return [
-      { step: "01", node: "Compute Tier (EC2/Lambda)", protocol: "TCP / TLS Socket", role: "APP CONNECTION", details: "Initiates database connection via RDS Proxy or IAM database auth.", haTag: "Connection Pooling" },
-      { step: "02", node: "Primary DB Instance", protocol: "SQL / Key-Value", role: "WRITE ENGINE", details: "Executes read/write query against primary storage engine.", haTag: "Primary Write Node" },
-      { step: "03", node: "Synchronous Replication", protocol: "Multi-AZ Storage Net", role: "STANDBY TIER", details: "Replicates write operations synchronously to Standby instance in 2nd AZ.", haTag: "Zero Data Loss (RPO=0)" },
-      { step: "04", node: "Automated Failover", protocol: "DNS CNAME Swap", role: "RESILIENCE AGENT", details: "Triggers automatic DNS endpoint failover under 60s if Primary fails.", haTag: "<60s Auto Failover" }
-    ];
-  }
-
-  // Default generic architecture pipeline
-  return [
-    { step: "01", node: "Ingress / Trigger Event", protocol: "AWS SDK / EventBridge", role: "EVENT ENTRY", details: "Sends operational payload or event payload into the pipeline.", haTag: "Event Trigger" },
-    { step: "02", node: `${serviceName} Engine`, protocol: "IAM Policy Check", role: "PROCESSING NODE", details: "Validates security boundary, processes payload according to config.", haTag: "IAM Authorized" },
-    { step: "03", node: "Multi-AZ Resilience Tier", protocol: "Internal AWS Bus", role: "HIGH AVAILABILITY", details: "Maintains high availability across regional Availability Zones.", haTag: "99.99% SLA" },
-    { step: "04", node: "Downstream Target", protocol: "API / KMS / CloudWatch", role: "PERSISTENCE TIER", details: "Persists state, emits CloudWatch metrics, and returns payload response.", haTag: "Audit Logged" }
-  ];
 }
 
 export function getSearchIndex() {
@@ -267,8 +264,8 @@ export function getSearchIndex() {
       id: `topic-${t.cluster_id}`,
       type: 'Topic',
       title: t.cluster_title,
-      description: `Cluster mapping to ${t.concept_name}`,
-      url: `/topics/${t.cluster_id}`,
+      description: topicDescription(t),
+      url: sitePath(`/topics/${t.cluster_id}`),
       tags: t.exam_domains.join(', '),
       content: t.what_this_tests.join(' ')
     });
@@ -283,8 +280,8 @@ export function getSearchIndex() {
         id: `svc-${s.id}`,
         type: 'Service',
         title: s.name,
-        description: s.job,
-        url: `/services/${s.id}`,
+        description: serviceDescription(s),
+        url: sitePath(`/services/${s.canonicalId || getCanonicalServiceId(s.name)}`),
         tags: s.cluster_title,
         content: `${s.job} ${s.choose_when} ${s.avoid_when} ${s.trap_words}`
       });
@@ -292,4 +289,45 @@ export function getSearchIndex() {
   });
   
   return index;
+}
+
+/**
+ * Does a practice question actually cover this service?
+ * Shared by the service deep-dive page and the practice arena so both agree
+ * on what "related" means. Matches on the service name appearing in the
+ * question stem, the options, or the explanation.
+ */
+export function questionMatchesService(q: any, serviceName: string): boolean {
+  const needle = serviceName.toLowerCase();
+  if (needle.length < 3) return false;
+
+  const haystacks: string[] = [q.question || ''];
+  if (Array.isArray(q.options)) haystacks.push(...q.options);
+  if (Array.isArray(q.explanation)) haystacks.push(...q.explanation);
+  else if (typeof q.explanation === 'string') haystacks.push(q.explanation);
+
+  return haystacks.some(h => (h || '').toLowerCase().includes(needle));
+}
+
+/**
+ * Map of question id -> service ids that question is relevant to.
+ * Built once at build time so the practice page can filter client-side.
+ */
+export function getQuestionServiceMap(): Record<string, string[]> {
+  const questions = getPracticeQuestions();
+  const services = getAllServices();
+
+  // getAllServices registers each service under several alias keys; dedupe by id.
+  const uniqueServices = new Map<string, any>();
+  services.forEach((s: any) => uniqueServices.set(s.id, s));
+
+  const map: Record<string, string[]> = {};
+  questions.forEach((q: any) => {
+    const ids: string[] = [];
+    uniqueServices.forEach((svc, id) => {
+      if (questionMatchesService(q, svc.name)) ids.push(id);
+    });
+    if (ids.length) map[String(q.id)] = ids;
+  });
+  return map;
 }

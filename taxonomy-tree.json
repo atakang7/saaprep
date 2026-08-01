@@ -38,22 +38,48 @@
           {
             "id": "c1_1",
             "name": "Identity and permissions",
-            "services": ["IAM", "IAM Identity Center", "Organizations SCPs", "Cognito"]
+            "services": [
+              "IAM",
+              "IAM Identity Center",
+              "Organizations SCPs",
+              "Cognito"
+            ]
           },
           {
             "id": "c1_2",
             "name": "Encryption and secrets",
-            "services": ["KMS", "CloudHSM", "Secrets Manager", "Parameter Store", "Macie"]
+            "services": [
+              "KMS",
+              "CloudHSM",
+              "Secrets Manager",
+              "Parameter Store",
+              "Macie",
+              "S3 Server-Side Encryption (SSE)"
+            ]
           },
           {
             "id": "c1_3",
             "name": "Network/application protection",
-            "services": ["WAF", "Shield", "Security Groups", "NACLs", "Network Firewall"]
+            "services": [
+              "WAF",
+              "Shield",
+              "Security Groups",
+              "NACLs",
+              "Network Firewall"
+            ]
           },
           {
             "id": "c1_4",
             "name": "Audit, detection, compliance",
-            "services": ["CloudTrail", "GuardDuty", "Security Hub", "Inspector", "Config"]
+            "services": [
+              "CloudTrail",
+              "GuardDuty",
+              "Security Hub",
+              "Inspector",
+              "Config",
+              "AWS X-Ray",
+              "CloudWatch Logs Insights"
+            ]
           }
         ]
       },
@@ -64,22 +90,47 @@
           {
             "id": "c2_1",
             "name": "VPC foundations",
-            "services": ["VPCs", "Subnets", "Route Tables", "Internet Gateways", "NAT Gateways"]
+            "services": [
+              "VPCs",
+              "Subnets",
+              "Route Tables",
+              "Internet Gateways",
+              "NAT Gateways",
+              "NAT Instance",
+              "Elastic IP (EIP)"
+            ]
           },
           {
             "id": "c2_2",
             "name": "Private AWS access",
-            "services": ["VPC Endpoints (Gateway, Interface)", "PrivateLink"]
+            "services": [
+              "VPC Endpoints (Gateway, Interface)",
+              "PrivateLink"
+            ]
           },
           {
             "id": "c2_3",
             "name": "Load balancing, DNS, edge",
-            "services": ["Route 53", "CloudFront", "Global Accelerator", "ALB", "NLB", "GLB"]
+            "services": [
+              "Route 53",
+              "CloudFront",
+              "Global Accelerator",
+              "ALB",
+              "NLB",
+              "GLB"
+            ]
           },
           {
             "id": "c2_4",
             "name": "Hybrid and multi-VPC networking",
-            "services": ["Site-to-Site VPN", "Direct Connect", "Transit Gateway"]
+            "services": [
+              "Site-to-Site VPN",
+              "Direct Connect",
+              "Transit Gateway",
+              "VPC peering",
+              "AWS VPN CloudHub",
+              "AWS Resource Access Manager (RAM)"
+            ]
           }
         ]
       },
@@ -90,22 +141,43 @@
           {
             "id": "c3_1",
             "name": "Compute choice",
-            "services": ["EC2", "Elastic Beanstalk"]
+            "services": [
+              "EC2",
+              "Elastic Beanstalk",
+              "EC2 Spot Instances",
+              "EC2 Reserved Instances",
+              "EC2 Placement Groups",
+              "AWS CloudFormation"
+            ]
           },
           {
             "id": "c3_2",
             "name": "Scaling",
-            "services": ["Auto Scaling Groups (ASG)", "Launch Templates"]
+            "services": [
+              "Auto Scaling Groups (ASG)",
+              "Launch Templates",
+              "Amazon CloudWatch",
+              "Elastic Load Balancing (ELB)"
+            ]
           },
           {
             "id": "c3_3",
             "name": "Serverless",
-            "services": ["Lambda"]
+            "services": [
+              "Lambda",
+              "Lambda reserved concurrency",
+              "Compute Savings Plans"
+            ]
           },
           {
             "id": "c3_4",
             "name": "Containers and APIs",
-            "services": ["ECS", "EKS", "Fargate", "API Gateway"]
+            "services": [
+              "ECS",
+              "EKS",
+              "Fargate",
+              "API Gateway"
+            ]
           }
         ]
       },
@@ -116,22 +188,45 @@
           {
             "id": "c4_1",
             "name": "Storage shape",
-            "services": ["EBS", "EFS", "FSx"]
+            "services": [
+              "EBS",
+              "EFS",
+              "FSx",
+              "EC2 instance store"
+            ]
           },
           {
             "id": "c4_2",
             "name": "S3 lifecycle/archive/protection",
-            "services": ["S3 Storage Classes", "Lifecycle Rules", "Object Lock"]
+            "services": [
+              "S3 Storage Classes",
+              "Lifecycle Rules",
+              "Object Lock",
+              "S3 Versioning",
+              "S3 Multipart Upload",
+              "S3 Reduced Redundancy Storage (RRS)"
+            ]
           },
           {
             "id": "c4_3",
             "name": "Backup and migration",
-            "services": ["AWS Backup", "DataSync", "Snow Family"]
+            "services": [
+              "AWS Backup",
+              "DataSync",
+              "Snow Family",
+              "Amazon EBS snapshots",
+              "AWS Storage Gateway"
+            ]
           },
           {
             "id": "c4_4",
             "name": "Hybrid storage",
-            "services": ["Storage Gateway"]
+            "services": [
+              "Storage Gateway",
+              "AWS Storage Gateway File Gateway",
+              "AWS Storage Gateway Volume Gateway (cached)",
+              "AWS Storage Gateway Volume Gateway (stored)"
+            ]
           }
         ]
       },
@@ -142,27 +237,49 @@
           {
             "id": "c5_1",
             "name": "Relational databases",
-            "services": ["RDS", "Aurora"]
+            "services": [
+              "RDS",
+              "Aurora",
+              "RDS Multi-AZ",
+              "RDS Read Replicas",
+              "RDS Proxy",
+              "AWS DMS"
+            ]
           },
           {
             "id": "c5_2",
             "name": "NoSQL",
-            "services": ["DynamoDB"]
+            "services": [
+              "DynamoDB"
+            ]
           },
           {
             "id": "c5_3",
             "name": "Cache",
-            "services": ["ElastiCache", "DAX"]
+            "services": [
+              "ElastiCache",
+              "DAX",
+              "Amazon ElastiCache for Memcached"
+            ]
           },
           {
             "id": "c5_4",
             "name": "Search",
-            "services": ["OpenSearch"]
+            "services": [
+              "OpenSearch"
+            ]
           },
           {
             "id": "c5_5",
             "name": "Analytics and streaming",
-            "services": ["Redshift", "Athena", "EMR", "Kinesis", "Glue"]
+            "services": [
+              "Redshift",
+              "Athena",
+              "EMR",
+              "Kinesis",
+              "Glue",
+              "Amazon Data Firehose"
+            ]
           }
         ]
       },
@@ -173,22 +290,44 @@
           {
             "id": "c6_1",
             "name": "Messaging",
-            "services": ["SQS", "SNS"]
+            "services": [
+              "SQS",
+              "SNS",
+              "Amazon SES (Simple Email Service)"
+            ]
           },
           {
             "id": "c6_2",
             "name": "Events & Workflows",
-            "services": ["EventBridge", "Step Functions"]
+            "services": [
+              "EventBridge",
+              "Step Functions",
+              "Amazon SWF (Simple Workflow Service)"
+            ]
           },
           {
             "id": "c6_3",
             "name": "DR and availability",
-            "services": ["Route 53 routing", "Multi-Region setups"]
+            "services": [
+              "Route 53 routing",
+              "Multi-Region setups",
+              "Amazon EC2 AMIs (Amazon Machine Images)",
+              "Elastic Load Balancing (ELB)",
+              "Amazon RDS",
+              "Amazon S3"
+            ]
           },
           {
             "id": "c6_4",
             "name": "Cost and governance",
-            "services": ["Cost Explorer", "AWS Budgets", "Organizations"]
+            "services": [
+              "Cost Explorer",
+              "AWS Budgets",
+              "Organizations",
+              "AWS Control Tower",
+              "Compute Savings Plans",
+              "Consolidated billing (AWS Organizations)"
+            ]
           }
         ]
       }
