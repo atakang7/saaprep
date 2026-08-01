@@ -1,0 +1,212 @@
+---
+import { ArrowLeft, Shield, Zap, Database, Server, Settings, Activity } from "lucide-astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { clusterMeta, conceptStyles, summaryFor, topicById } from "../../lib/data";
+
+export function getStaticPaths() {
+  return [
+    { params: { id: "c1" }, props: { icon: Shield, desc: "Access, Identity & Security" } },
+    { params: { id: "c2" }, props: { icon: Activity, desc: "Networking & Traffic" } },
+    { params: { id: "c3" }, props: { icon: Zap, desc: "Compute & Workloads" } },
+    { params: { id: "c4" }, props: { icon: Database, desc: "Data Storage & Archiving" } },
+    { params: { id: "c5" }, props: { icon: Server, desc: "Databases & Analytics" } },
+    { params: { id: "c6" }, props: { icon: Settings, desc: "Decoupling & Management" } },
+  ];
+}
+
+const { id } = Astro.params;
+const { icon: Icon, desc } = Astro.props;
+
+const concept = conceptStyles[id];
+const accent = concept?.color ?? "var(--teal)";
+const label = concept?.label ?? "Concept";
+
+const allClusters = clusterMeta();
+const conceptClusters = allClusters.filter((c) => c.conceptId === id);
+---
+
+<BaseLayout title={`${label} - AWS SAA`}>
+  <div class="concept-page" style={`--accent: ${accent};`}>
+    <header class="concept-header">
+      <a class="back-link" href="/"><ArrowLeft size={16} /> Home</a>
+      
+      <div class="concept-hero">
+        <div class="concept-icon glass-icon">
+          <Icon size={48} />
+        </div>
+        <div class="concept-title-group">
+          <span class="eyebrow glow-text">Core Concept</span>
+          <h1 class="concept-title">{label}</h1>
+          <p class="concept-desc">{desc}</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="concept-body">
+      <div class="block-head">
+        <h2>Topics in {label}</h2>
+        <span class="chip chip-accent">{conceptClusters.length} Modules</span>
+      </div>
+
+      <div class="topic-grid">
+        {
+          conceptClusters.map((cluster) => {
+            const topic = topicById.get(cluster.id);
+            const summary = topic ? summaryFor(topic) : "";
+            
+            return (
+              <a class="topic-card glass-card" href={`/topics/${cluster.id}/`}>
+                <div class="card-inner">
+                  <h3>{cluster.title}</h3>
+                  <p class="topic-summary muted">{summary}</p>
+                  
+                  <div class="card-footer">
+                    <span class="chip chip-quiet">{cluster.domain}</span>
+                    <span class="small muted fw-600">{cluster.count} Practice Questions</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })
+        }
+      </div>
+    </main>
+  </div>
+
+  <style>
+    .concept-page {
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      padding-bottom: 4rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2rem;
+      color: var(--muted);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: var(--ink);
+    }
+
+    .concept-header {
+      position: relative;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 100%);
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+      border-radius: 24px;
+      padding: 3rem;
+      overflow: hidden;
+    }
+
+    .concept-hero {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 600px) {
+      .concept-hero {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    .glass-icon {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      background: color-mix(in srgb, var(--surface) 80%, transparent);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 30%, transparent);
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .glow-text {
+      color: var(--accent);
+      text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 50%, transparent);
+    }
+
+    .concept-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin: 0.5rem 0;
+      font-weight: 800;
+    }
+
+    .concept-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .glass-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+
+    .card-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .glass-card h3 {
+      font-size: 1.25rem;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .topic-summary {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--line);
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+
+    .fw-600 {
+      font-weight: 600;
+    }
+
+    .chip-quiet {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+    }
+  </style>
+</BaseLayout>

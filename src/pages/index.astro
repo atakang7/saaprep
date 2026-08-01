@@ -1,0 +1,415 @@
+---
+import { Search, Shield, Zap, Database, Server, Settings, Activity } from "lucide-astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { clusterMeta, conceptStyles, totalQuestions, totalTopics } from "../lib/data";
+
+const clusters = clusterMeta();
+
+const concepts = [
+  { id: "c1", icon: Shield, label: "Guard", desc: "Access, Identity & Security", color: "var(--teal)" },
+  { id: "c2", icon: Activity, label: "Connect", desc: "Networking & Traffic", color: "var(--blue)" },
+  { id: "c3", icon: Zap, label: "Run", desc: "Compute & Workloads", color: "var(--rose)" },
+  { id: "c4", icon: Database, label: "Store", desc: "Data Storage & Archiving", color: "var(--green)" },
+  { id: "c5", icon: Server, label: "Query", desc: "Databases & Analytics", color: "var(--violet)" },
+  { id: "c6", icon: Settings, label: "Operate", desc: "Decoupling & Management", color: "var(--amber)" },
+];
+
+const counts = concepts.map(c => {
+  const conceptClusters = clusters.filter(cl => cl.conceptId === c.id);
+  const qCount = conceptClusters.reduce((acc, cl) => acc + cl.count, 0);
+  return { ...c, topicCount: conceptClusters.length, qCount };
+});
+---
+
+<BaseLayout title="AWS SAA-C03 Masterclass">
+  <div class="home-container">
+    <header class="hero glass-hero">
+      <div class="hero-content">
+        <span class="eyebrow pulse-glow">AWS Solutions Architect Associate</span>
+        <h1 class="hero-title">Pass the SAA-C03.<br/><span class="gradient-text">Master the Cloud.</span></h1>
+        <p class="hero-subtitle">
+          Stop memorizing brain dumps. Learn the hard facts, master the architecture rules, and pass the AWS Solutions Architect Associate exam with absolute confidence.
+        </p>
+
+        <div class="searchbox glass-search">
+          <Search size={22} />
+          <input
+            type="search"
+            data-search
+            placeholder="Search topics or questions — try “cheapest storage” or “multi-az”"
+            autocomplete="off"
+          />
+          <kbd class="glass-kbd">/</kbd>
+        </div>
+        <div class="results glass-results" data-results hidden></div>
+      </div>
+      <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
+    </header>
+
+    <main class="main-content" data-browse>
+      <div class="concepts-header">
+        <h2>Core Concepts</h2>
+        <p class="muted">Select a domain to start mastering the foundational topics.</p>
+      </div>
+
+      <div class="concept-grid">
+        {
+          counts.map((concept) => (
+            <a class="concept-card glass-card" href={`/concepts/${concept.id}/`} style={`--accent:${concept.color}`}>
+              <div class="card-icon-wrapper">
+                <concept.icon size={28} />
+              </div>
+              <div class="card-content">
+                <h3>{concept.label}</h3>
+                <p class="muted">{concept.desc}</p>
+                <div class="card-stats">
+                  <span class="chip chip-accent">{concept.topicCount} Topics</span>
+                  <span class="small muted">{concept.qCount} Questions</span>
+                </div>
+              </div>
+              <div class="card-hover-fx"></div>
+            </a>
+          ))
+        }
+      </div>
+    </main>
+  </div>
+
+  <style>
+    .home-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4rem;
+      padding-bottom: 4rem;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      padding: 6rem 2rem;
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      text-align: center;
+      margin-top: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    }
+    
+    .glass-hero {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    :global(body[data-theme="dark"]) .glass-hero {
+      background: linear-gradient(135deg, rgba(20,25,22,0.6) 0%, rgba(20,25,22,0.2) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin: 1rem 0;
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--teal), var(--blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin-bottom: 3rem;
+      line-height: 1.6;
+    }
+
+    .pulse-glow {
+      color: var(--teal);
+      text-shadow: 0 0 20px color-mix(in srgb, var(--teal) 40%, transparent);
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 1; text-shadow: 0 0 30px color-mix(in srgb, var(--teal) 60%, transparent); }
+    }
+
+    /* Background Shapes */
+    .hero-bg-shapes {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+    }
+
+    .shape-1 {
+      top: -20%; left: -10%;
+      width: 500px; height: 500px;
+      background: var(--teal);
+      animation: float 15s infinite ease-in-out alternate;
+    }
+    
+    .shape-2 {
+      bottom: -20%; right: -10%;
+      width: 600px; height: 600px;
+      background: var(--blue);
+      animation: float 18s infinite ease-in-out alternate-reverse;
+    }
+
+    .shape-3 {
+      top: 20%; left: 40%;
+      width: 400px; height: 400px;
+      background: var(--rose);
+      opacity: 0.2;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(30px, -50px) scale(1.1); }
+    }
+
+    /* Searchbox */
+    .glass-search {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 99px;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+    
+    :global(body[prefers-color-scheme="dark"]) .glass-search {
+      background: rgba(20, 25, 22, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-search:focus-within {
+      box-shadow: 0 0 0 2px var(--teal), 0 15px 50px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .glass-search input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+
+    .glass-kbd {
+      background: var(--surface-soft);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    /* Concept Grid */
+    .main-content {
+      padding: 0 1rem;
+    }
+
+    .concepts-header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    
+    .concepts-header h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .concept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .glass-card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      text-decoration: none;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px color-mix(in srgb, var(--accent) 15%, transparent);
+    }
+
+    .card-icon-wrapper {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--accent) 15%, transparent);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+    
+    .glass-card:hover .card-icon-wrapper {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    .card-content h3 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: var(--ink);
+    }
+
+    .card-stats {
+      margin-top: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .card-hover-fx {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+
+    .glass-card:hover .card-hover-fx {
+      opacity: 1;
+    }
+  </style>
+
+  <script>
+    import { search, highlight, type Row } from "../lib/search";
+
+    const input = document.querySelector<HTMLInputElement>("[data-search]");
+    const results = document.querySelector<HTMLElement>("[data-results]");
+    const browse = document.querySelector<HTMLElement>("[data-browse]");
+
+    let rows: Row[] | null = null;
+    let loading: Promise<void> | null = null;
+
+    function ensureIndex() {
+      if (rows) return Promise.resolve();
+      if (!loading) {
+        loading = fetch("/search-index.json")
+          .then((response) => response.json())
+          .then((data) => {
+            rows = data;
+          })
+          .catch(() => {
+            rows = [];
+          });
+      }
+      return loading;
+    }
+
+    function render(query: string) {
+      if (!results || !browse) return;
+      const hits = search(rows ?? [], query, 30);
+
+      if (!query.trim()) {
+        results.hidden = true;
+        browse.hidden = false;
+        return;
+      }
+
+      browse.hidden = true;
+      results.hidden = false;
+
+      if (hits.length === 0) {
+        results.innerHTML = `<p class="empty">Nothing matches “${query}”.</p>`;
+        return;
+      }
+
+      results.innerHTML = hits
+        .map(({ row }) =>
+          row.k === "t"
+            ? `<a class="hit" href="/topics/${row.id}/">
+                 <span class="chip">Topic</span>
+                 <span><b>${highlight(row.t, query)}</b></span>
+               </a>`
+            : `<a class="hit" href="/questions/${row.id}/">
+                 <span class="chip chip-quiet">Question</span>
+                 <span>
+                   <span class="hit-text">${highlight(row.t, query)}</span>
+                   <span class="small muted">${row.c ?? ""}${row.s ? ` · ${row.s}` : ""}</span>
+                 </span>
+               </a>`,
+        )
+        .join("");
+    }
+
+    let timer: number | undefined;
+    input?.addEventListener("input", () => {
+      window.clearTimeout(timer);
+      const query = input.value;
+      timer = window.setTimeout(async () => {
+        await ensureIndex();
+        render(query);
+      }, 90);
+    });
+
+    input?.addEventListener("focus", ensureIndex, { once: true });
+
+    // "/" focuses search from anywhere on the page.
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "/" && document.activeElement !== input) {
+        event.preventDefault();
+        input?.focus();
+      }
+      if (event.key === "Escape" && input) {
+        input.value = "";
+        render("");
+        input.blur();
+      }
+    });
+  </script>
+</BaseLayout>

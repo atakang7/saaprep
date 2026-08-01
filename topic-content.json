@@ -1,0 +1,910 @@
+{
+  "c1_1": {
+    "one_liner": "Control exactly who and what can access your AWS resources.",
+    "core_concept": [
+      "Every action in AWS is an API call. IAM decides if that call is allowed based on the identity making it and the policies attached.",
+      "The default is always 'Implicit Deny'. A specific 'Allow' is required, but an explicit 'Deny' always wins over any 'Allow'."
+    ],
+    "hard_facts": [
+      {
+        "name": "IAM Roles",
+        "facts": ["Temporary credentials via AWS STS.", "No passwords or long-term access keys.", "Used by EC2, Lambda, and cross-account users."]
+      },
+      {
+        "name": "Cognito",
+        "facts": ["User Pools: Sign-up/Sign-in directory for your app users (JWT tokens).", "Identity Pools: Exchange tokens for temporary AWS credentials."]
+      },
+      {
+        "name": "IAM Identity Center",
+        "facts": ["Single Sign-On (SSO) across multiple AWS accounts.", "Connects to active directories or SAML providers."]
+      },
+      {
+        "name": "Organizations SCPs",
+        "facts": ["Service Control Policies set a maximum boundary of permissions.", "Cannot grant permissions, only restrict them.", "Applies even to the root user of member accounts."]
+      }
+    ],
+    "architecture_rules": [
+      "Never embed long-term access keys in code or AMIs; use IAM Roles instead.",
+      "Always apply the principle of least privilege.",
+      "Use resource-based policies for anonymous access (e.g., public S3 buckets) or cross-account access without role assumption."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "An EC2 instance needs to read from S3.",
+        "choice": "IAM Role with an Instance Profile.",
+        "why": "It securely delivers short-lived rotating credentials automatically."
+      },
+      {
+        "scenario": "A mobile app needs users to sign in and upload photos.",
+        "choice": "Cognito User Pool + Identity Pool.",
+        "why": "Manages user identities and gives them direct, scoped AWS access without a backend server."
+      }
+    ]
+  },
+  "c1_2": {
+    "one_liner": "Protect data at rest and manage application secrets securely.",
+    "core_concept": [
+      "Encryption at rest ensures data cannot be read if physical disks are stolen. AWS splits this into Keys (protecting data, managed by KMS) and Secrets (passwords/API tokens used by apps)."
+    ],
+    "hard_facts": [
+      {
+        "name": "AWS KMS",
+        "facts": ["Centralized key management.", "Keys never leave KMS; encryption/decryption happens via API.", "Customer Managed Keys allow custom rotation (yearly) and cross-account sharing."]
+      },
+      {
+        "name": "Secrets Manager",
+        "facts": ["Stores passwords and API keys.", "Natively supports automatic rotation via Lambda for RDS/Aurora.", "Costs money per secret per month."]
+      },
+      {
+        "name": "SSM Parameter Store",
+        "facts": ["Stores configuration and secrets.", "No native automatic rotation.", "Standard parameters are free."]
+      },
+      {
+        "name": "CloudHSM",
+        "facts": ["Dedicated hardware security module.", "FIPS 140-2 Level 3 compliance.", "You manage the keys completely; AWS cannot recover them."]
+      }
+    ],
+    "architecture_rules": [
+      "Separate KMS administrators from data users using KMS Key Policies.",
+      "EBS snapshots and AMIs encrypted in one region must be re-encrypted to be copied to another region.",
+      "Use envelope encryption: KMS encrypts a Data Key, which encrypts the actual massive payload."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "Store a database password that must rotate automatically every 30 days.",
+        "choice": "Secrets Manager.",
+        "why": "It has built-in rotation integration for databases, unlike Parameter Store."
+      },
+      {
+        "scenario": "Strict regulation requires single-tenant, FIPS 140-2 Level 3 hardware encryption.",
+        "choice": "CloudHSM.",
+        "why": "KMS is multi-tenant and only Level 3 in its backend, CloudHSM gives you dedicated control."
+      }
+    ]
+  },
+  "c1_3": {
+    "one_liner": "Filter inbound and outbound traffic across all network layers.",
+    "core_concept": [
+      "Network protection works in layers. The edge absorbs massive attacks and HTTP exploits. Subnets block IP ranges. Security Groups act as stateful firewalls for individual resources."
+    ],
+    "hard_facts": [
+      {
+        "name": "Security Groups",
+        "facts": ["Tied to ENIs/Instances.", "Stateful (return traffic is automatically allowed).", "Default deny all inbound. ONLY Allow rules."]
+      },
+      {
+        "name": "Network ACLs (NACLs)",
+        "facts": ["Tied to Subnets.", "Stateless (must explicitly allow return traffic on ephemeral ports).", "Evaluated in number order. Supports Deny rules."]
+      },
+      {
+        "name": "AWS WAF",
+        "facts": ["Layer 7 HTTP/S firewall.", "Attaches to ALB, CloudFront, API Gateway.", "Blocks SQL injection, XSS, and implements rate-limiting."]
+      },
+      {
+        "name": "AWS Shield",
+        "facts": ["DDoS protection.", "Standard is free and automatic.", "Advanced provides 24/7 expert response and scaling cost protection."]
+      }
+    ],
+    "architecture_rules": [
+      "Chain Security Groups: A database SG should allow inbound traffic only from the Application SG, not from an IP range.",
+      "Use NACLs to explicitly block known malicious IPs globally.",
+      "Always account for ephemeral ports (1024-65535) when writing NACL outbound rules."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "Block a specific IP address that is flooding your network.",
+        "choice": "Network ACL (NACL).",
+        "why": "Security Groups do not support 'Deny' rules."
+      },
+      {
+        "scenario": "Protect a public-facing API from SQL injection and rate-limit aggressive callers.",
+        "choice": "AWS WAF.",
+        "why": "It inspects HTTP request payloads (Layer 7) where these attacks occur."
+      }
+    ]
+  },
+  "c1_4": {
+    "one_liner": "Track API usage, monitor configurations, and detect threats.",
+    "core_concept": [
+      "Visibility is required for security. You must know who made an API call (CloudTrail), how a resource was configured (Config), and if active threats exist (GuardDuty)."
+    ],
+    "hard_facts": [
+      {
+        "name": "CloudTrail",
+        "facts": ["Records 'Who did What, When, and from Where'.", "Management events are free for 90 days.", "Data events (like S3 object reads) cost extra and must be explicitly enabled."]
+      },
+      {
+        "name": "AWS Config",
+        "facts": ["Records point-in-time configuration state of resources.", "Evaluates compliance against rules.", "Can trigger auto-remediation via Systems Manager (SSM)."]
+      },
+      {
+        "name": "GuardDuty",
+        "facts": ["Intelligent threat detection.", "Uses machine learning to analyze CloudTrail, DNS, and VPC Flow Logs.", "Requires zero architecture changes or agents."]
+      },
+      {
+        "name": "Amazon Inspector",
+        "facts": ["Scans EC2, Lambda, and ECR for software vulnerabilities (CVEs) and network exposure."]
+      },
+      {
+        "name": "Macie",
+        "facts": ["Uses ML to discover sensitive data (PII) specifically in S3 buckets."]
+      }
+    ],
+    "architecture_rules": [
+      "Send Organization CloudTrail logs to a central, restricted S3 bucket in a separate logging account.",
+      "Use EventBridge to capture GuardDuty findings and trigger automated isolation workflows via Lambda."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "You need to prove to auditors exactly who deleted a production EC2 instance.",
+        "choice": "CloudTrail.",
+        "why": "It is the only service that tracks user identity for API actions."
+      },
+      {
+        "scenario": "You need to automatically revert any Security Group that opens port 22 to the world.",
+        "choice": "AWS Config with SSM Auto-remediation.",
+        "why": "Config detects the state change, and remediation executes the fix."
+      }
+    ]
+  },
+  "c2_1": {
+    "one_liner": "The foundational private network where your compute lives.",
+    "core_concept": [
+      "A VPC is an isolated network. Subnets divide it by Availability Zone. Route tables dictate where traffic goes, separating public (internet-facing) from private (internal-only) workloads."
+    ],
+    "hard_facts": [
+      {
+        "name": "VPC & Subnets",
+        "facts": ["A VPC spans all AZs in a region.", "A subnet is locked to exactly ONE AZ.", "AWS reserves 5 IP addresses per subnet."]
+      },
+      {
+        "name": "Internet Gateway (IGW)",
+        "facts": ["Allows two-way traffic to the internet.", "A subnet is 'public' ONLY if its route table points 0.0.0.0/0 to an IGW."]
+      },
+      {
+        "name": "NAT Gateway",
+        "facts": ["Allows outbound-only internet access for private subnets.", "Must be placed in a PUBLIC subnet.", "Tied to a single AZ (use multiple for high availability)."]
+      }
+    ],
+    "architecture_rules": [
+      "Never put databases in a public subnet.",
+      "High Availability requires deploying resources across at least two subnets in different AZs.",
+      "VPC CIDR blocks cannot overlap if you intend to peer them."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "EC2 instances in a private subnet need to download software updates.",
+        "choice": "NAT Gateway.",
+        "why": "It routes traffic out to the internet and returns the response, but blocks unsolicited inbound requests."
+      },
+      {
+        "scenario": "Design a highly available architecture.",
+        "choice": "Multi-AZ Subnets.",
+        "why": "An AZ is a distinct physical data center. Spanning subnets across AZs protects against facility failures."
+      }
+    ]
+  },
+  "c2_2": {
+    "one_liner": "Access AWS services without traffic traversing the public internet.",
+    "core_concept": [
+      "By default, reaching S3 or DynamoDB from a private subnet requires a NAT Gateway, which costs money and uses public IPs. VPC Endpoints keep traffic entirely on the AWS private backbone."
+    ],
+    "hard_facts": [
+      {
+        "name": "Gateway Endpoints",
+        "facts": ["Free of charge.", "Supports ONLY S3 and DynamoDB.", "Works via a Route Table entry (not an IP address)."]
+      },
+      {
+        "name": "Interface Endpoints (PrivateLink)",
+        "facts": ["Costs an hourly fee + data transfer.", "Places an Elastic Network Interface (ENI) with a private IP in your subnet.", "Supports almost all other AWS services (SQS, SNS, KMS).", "Can be accessed from on-premises via Direct Connect/VPN."]
+      },
+      {
+        "name": "Endpoint Policies",
+        "facts": ["IAM resource policies attached to the endpoint.", "Can restrict access so only specific buckets or APIs are allowed through the path."]
+      }
+    ],
+    "architecture_rules": [
+      "Always use Gateway Endpoints for S3/DynamoDB when accessed purely from within the VPC to save NAT costs.",
+      "Use Interface Endpoints if on-premises servers need private access to AWS services over Direct Connect."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A fleet of private instances transfers 50TB of data to S3 daily, causing huge NAT Gateway bills.",
+        "choice": "Gateway VPC Endpoint for S3.",
+        "why": "It routes S3 traffic privately and entirely removes the NAT data processing costs."
+      },
+      {
+        "scenario": "You must expose your backend service to a partner's VPC without overlapping CIDR issues.",
+        "choice": "AWS PrivateLink Endpoint Service.",
+        "why": "It allows unidirectional access via ENIs, avoiding complex routing or IP conflicts."
+      }
+    ]
+  },
+  "c2_3": {
+    "one_liner": "Route, balance, and accelerate traffic across the globe.",
+    "core_concept": [
+      "Route 53 maps names to IPs. CloudFront caches at the edge. Load Balancers distribute traffic to healthy compute targets. Global Accelerator optimizes paths over the AWS backbone."
+    ],
+    "hard_facts": [
+      {
+        "name": "Route 53",
+        "facts": ["DNS service with routing policies (Latency, Geolocation, Failover).", "Alias records connect apex domains (example.com) to AWS resources for free."]
+      },
+      {
+        "name": "CloudFront",
+        "facts": ["Global CDN.", "Caches static and dynamic HTTP content.", "Uses Origin Access Control (OAC) to secure S3 origins."]
+      },
+      {
+        "name": "Application Load Balancer (ALB)",
+        "facts": ["Layer 7 (HTTP/HTTPS).", "Routes based on URL path, host, or headers.", "Targets EC2, ECS, Lambda."]
+      },
+      {
+        "name": "Network Load Balancer (NLB)",
+        "facts": ["Layer 4 (TCP/UDP).", "Ultra-low latency, handles millions of requests.", "Provides a Static IP per AZ."]
+      },
+      {
+        "name": "Global Accelerator",
+        "facts": ["Provides 2 static Anycast IPs.", "Routes non-HTTP and HTTP traffic over the AWS backbone to the nearest healthy region.", "Sub-second failover."]
+      }
+    ],
+    "architecture_rules": [
+      "For cross-region active-passive disaster recovery, use Route 53 Failover Routing with Health Checks.",
+      "If a client requires a static whitelist IP but you need load balancing, you must use an NLB."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "API requests to /users must go to one target group, and /orders to another.",
+        "choice": "Application Load Balancer (ALB).",
+        "why": "It is the only load balancer that inspects Layer 7 HTTP paths."
+      },
+      {
+        "scenario": "A global gaming app using UDP requires ultra-fast multi-region failover.",
+        "choice": "AWS Global Accelerator.",
+        "why": "It supports UDP, bypasses DNS TTL limits, and uses the optimized AWS network."
+      }
+    ]
+  },
+  "c2_4": {
+    "one_liner": "Connect on-premises networks to AWS, and AWS VPCs to each other.",
+    "core_concept": [
+      "Connecting networks requires managing routes and encryption. Peering connects two VPCs directly. Transit Gateway acts as a central hub. Direct Connect provides a physical, private fiber line."
+    ],
+    "hard_facts": [
+      {
+        "name": "VPC Peering",
+        "facts": ["Direct 1-to-1 connection.", "Not transitive (A connected to B, and B to C, does NOT connect A to C).", "CIDR blocks cannot overlap."]
+      },
+      {
+        "name": "Transit Gateway",
+        "facts": ["Hub-and-spoke routing architecture.", "Connects thousands of VPCs and VPNs.", "Supports transitive routing and multicast."]
+      },
+      {
+        "name": "Site-to-Site VPN",
+        "facts": ["Encrypted IPsec tunnel over the public internet.", "Fast to set up, but bandwidth and latency are subject to internet weather."]
+      },
+      {
+        "name": "Direct Connect (DX)",
+        "facts": ["Private physical fiber connection.", "Takes weeks to provision.", "Not encrypted by default (requires VPN over DX or MACsec)."]
+      }
+    ],
+    "architecture_rules": [
+      "Use Transit Gateway when you have more than a handful of VPCs to avoid a complex full-mesh peering nightmare.",
+      "For strict compliance requiring encryption over a private line, run a Site-to-Site VPN over a Direct Connect connection."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A company requires consistent, predictable 10 Gbps throughput to their data center.",
+        "choice": "AWS Direct Connect.",
+        "why": "VPNs traverse the public internet and cannot guarantee consistent high bandwidth."
+      },
+      {
+        "scenario": "You have 50 VPCs that all need to share a central security inspection VPC.",
+        "choice": "Transit Gateway.",
+        "why": "It provides centralized, transitive routing out of the box."
+      }
+    ]
+  },
+  "c3_1": {
+    "one_liner": "The raw virtual machines and the platform that deploys them for you.",
+    "core_concept": [
+      "EC2 gives you total control over the OS and hardware specs. Elastic Beanstalk takes your code and provisions the EC2, Load Balancers, and ASGs automatically."
+    ],
+    "hard_facts": [
+      {
+        "name": "EC2 Pricing Models",
+        "facts": ["On-Demand: Pay by the second. No commitment.", "Spot: Up to 90% off, but AWS can reclaim it with 2 minutes notice.", "Reserved Instances: 1-3 year commitment for steady workloads.", "Dedicated Hosts: Physical server for licensing compliance."]
+      },
+      {
+        "name": "Elastic Beanstalk",
+        "facts": ["PaaS for web apps (Java, Node, Python).", "You only manage code; AWS provisions capacity, load balancing, and scaling.", "You retain full root access to the EC2 instances."]
+      }
+    ],
+    "architecture_rules": [
+      "Never use Spot instances for stateful, critical, or inflexible workloads.",
+      "Decouple state from EC2 instances (use S3 or EFS) so instances can be terminated without data loss."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A massive batch processing job runs nightly, can be interrupted, and needs to be as cheap as possible.",
+        "choice": "EC2 Spot Instances.",
+        "why": "The workload is fault-tolerant and flexible, perfectly matching Spot's aggressive discounts."
+      },
+      {
+        "scenario": "A dev team wants to deploy a Node.js web app without managing infrastructure, but keep OS access.",
+        "choice": "Elastic Beanstalk.",
+        "why": "It handles the deployment pipeline but still provisions visible, accessible EC2 instances."
+      }
+    ]
+  },
+  "c3_2": {
+    "one_liner": "Automatically adjust compute capacity to meet demand.",
+    "core_concept": [
+      "Auto Scaling Groups (ASGs) ensure you always have the right number of instances running. They kill unhealthy instances and spin up new ones based on CPU, network, or custom metrics."
+    ],
+    "hard_facts": [
+      {
+        "name": "Launch Templates",
+        "facts": ["Defines what to launch: AMI, instance type, security groups, SSH key, and user data script.", "Supports versioning (unlike deprecated Launch Configurations)."]
+      },
+      {
+        "name": "Auto Scaling Group (ASG)",
+        "facts": ["Defines where and how to launch: Subnets (VPC), Min/Max/Desired capacity.", "Integrates with ALB target groups to automatically register new instances."]
+      },
+      {
+        "name": "Scaling Policies",
+        "facts": ["Target Tracking: 'Keep average CPU at 50%'.", "Step Scaling: Add exactly 2 instances when alarm breaches.", "Scheduled: Scale up Friday at 8 AM."]
+      }
+    ],
+    "architecture_rules": [
+      "Always configure ASGs to span multiple Availability Zones for fault tolerance.",
+      "Use Target Tracking policies for the simplest, most reliable scaling logic.",
+      "Use Lifecycle Hooks to pause instances for custom setup scripts or draining before termination."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "Traffic spikes unpredictably, causing EC2 instances to crash from CPU overload.",
+        "choice": "ASG with Target Tracking scaling policy.",
+        "why": "It dynamically adds compute capacity precisely when metrics rise, and removes it when they drop."
+      },
+      {
+        "scenario": "A retail site knows traffic will quadruple every Black Friday at midnight.",
+        "choice": "Scheduled Scaling.",
+        "why": "Predictive spikes should be provisioned ahead of time rather than waiting for reactive metrics to trip."
+      }
+    ]
+  },
+  "c3_3": {
+    "one_liner": "Run code without provisioning or managing any servers.",
+    "core_concept": [
+      "Lambda executes your code only when triggered by an event. You pay only for the exact milliseconds your code runs. Scaling is automatic and instantaneous."
+    ],
+    "hard_facts": [
+      {
+        "name": "AWS Lambda Limits",
+        "facts": ["Maximum execution time: 15 minutes.", "Maximum memory: 10 GB.", "Deployment package size: 50MB zipped (250MB unzipped).", "/tmp storage: Up to 10 GB."]
+      },
+      {
+        "name": "Concurrency",
+        "facts": ["Reserved Concurrency: Guarantees capacity for a function and caps its max scale.", "Provisioned Concurrency: Keeps functions initialized to prevent 'cold starts'."]
+      }
+    ],
+    "architecture_rules": [
+      "Lambda functions run in AWS-managed VPCs by default. To access your private RDS, you must attach the Lambda to your private subnets.",
+      "Use Dead Letter Queues (DLQ) or On-Failure destinations to catch asynchronous invocations that fail."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A script needs to resize images immediately every time a file is uploaded to S3.",
+        "choice": "Lambda triggered by S3 Events.",
+        "why": "It is completely event-driven, scales infinitely with uploads, and costs zero when idle."
+      },
+      {
+        "scenario": "A synchronous Java API on Lambda is experiencing high latency on the first request of the day.",
+        "choice": "Provisioned Concurrency.",
+        "why": "It pre-warms the execution environments, eliminating the cold start latency."
+      }
+    ]
+  },
+  "c3_4": {
+    "one_liner": "Deploy and orchestrate Docker containers securely at scale.",
+    "core_concept": [
+      "ECS and EKS orchestrate containers. The underlying compute for those containers can be EC2 (you manage servers) or Fargate (serverless, AWS manages servers)."
+    ],
+    "hard_facts": [
+      {
+        "name": "Amazon ECS",
+        "facts": ["AWS-native container orchestration.", "Uses Task Definitions to define images, CPU/RAM, and networking.", "Deeply integrated with IAM and ALB."]
+      },
+      {
+        "name": "Amazon EKS",
+        "facts": ["Managed Kubernetes.", "Standard for open-source container orchestration.", "Higher operational overhead than ECS."]
+      },
+      {
+        "name": "AWS Fargate",
+        "facts": ["Serverless compute engine for containers.", "No EC2 instances to patch or manage.", "Priced by CPU/RAM requested per task."]
+      },
+      {
+        "name": "API Gateway",
+        "facts": ["Front door for APIs.", "Handles rate limiting, throttling, and Cognito auth.", "Connects directly to Lambda or container endpoints."]
+      }
+    ],
+    "architecture_rules": [
+      "Assign IAM roles directly to ECS Tasks (Task Role), not to the underlying EC2 instance, for least privilege.",
+      "Store container images in Amazon ECR securely."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A team wants to run Docker containers but refuses to manage or patch any EC2 instances.",
+        "choice": "ECS with Fargate launch type.",
+        "why": "Fargate handles all underlying infrastructure abstraction."
+      },
+      {
+        "scenario": "An API is receiving overwhelming traffic and needs rate-limiting and authorization before hitting backend containers.",
+        "choice": "API Gateway.",
+        "why": "It provides a managed tier for throttling, API keys, and auth offloading."
+      }
+    ]
+  },
+  "c4_1": {
+    "one_liner": "Disks for EC2 instances, and shared file systems for fleets.",
+    "core_concept": [
+      "EBS is a physical hard drive attached to one instance. EFS is a network drive shared by thousands of Linux instances. FSx provides specialized file systems for Windows and HPC."
+    ],
+    "hard_facts": [
+      {
+        "name": "EBS (Elastic Block Store)",
+        "facts": ["Locked to a single AZ.", "Types: gp3 (general purpose), io2 (high IOPS databases), st1/sc1 (cheap HDD for big data).", "Snapshots are backed up to S3 asynchronously."]
+      },
+      {
+        "name": "EFS (Elastic File System)",
+        "facts": ["Regional service (spans multiple AZs).", "NFS protocol for Linux only.", "Can be mounted by thousands of EC2 instances simultaneously.", "Scales automatically."]
+      },
+      {
+        "name": "FSx",
+        "facts": ["FSx for Windows: Native SMB, integrates with Active Directory.", "FSx for Lustre: Sub-millisecond latency for High-Performance Computing (HPC) and ML."]
+      }
+    ],
+    "architecture_rules": [
+      "To move an EBS volume to another AZ, take a snapshot and restore it in the target AZ.",
+      "Never use EFS for database storage; it is network-attached and has higher latency than EBS."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A legacy Windows application requires an SMB file share and Active Directory integration.",
+        "choice": "FSx for Windows File Server.",
+        "why": "EFS does not support Windows or SMB. FSx is built exactly for this."
+      },
+      {
+        "scenario": "A fleet of web servers running in multiple AZs need read/write access to a shared directory of images.",
+        "choice": "Amazon EFS.",
+        "why": "It spans AZs naturally and allows concurrent connections from Linux instances."
+      }
+    ]
+  },
+  "c4_2": {
+    "one_liner": "Infinitely scalable object storage and intelligent cost management.",
+    "core_concept": [
+      "S3 stores flat files (objects). To save money, move infrequently accessed objects to cheaper tiers using Lifecycle Rules. To prevent deletion, use Object Lock."
+    ],
+    "hard_facts": [
+      {
+        "name": "S3 Storage Classes",
+        "facts": ["Standard: Millisecond access, highly durable.", "Standard-IA: Cheaper storage, but charges for retrieval. Min 30 days.", "Glacier Flexible: Minutes to hours retrieval, extremely cheap.", "Glacier Deep Archive: 12-48 hours retrieval, lowest cost.", "Intelligent-Tiering: Moves objects automatically based on access patterns (small monitoring fee)."]
+      },
+      {
+        "name": "Object Lock & Versioning",
+        "facts": ["Versioning keeps all modifications of an object.", "Object Lock writes data as WORM (Write Once Read Many).", "Compliance Mode means NO ONE (not even root) can delete it until the date passes."]
+      }
+    ],
+    "architecture_rules": [
+      "If access patterns are completely unknown, default to S3 Intelligent-Tiering.",
+      "Lifecycle rules cascade downwards: Standard -> IA -> Glacier. You cannot go backwards automatically."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "Compliance laws require audit logs to be retained for 7 years and absolutely immune to deletion.",
+        "choice": "S3 Glacier with Object Lock in Compliance Mode.",
+        "why": "It enforces mathematical immutability that satisfies strict regulatory WORM requirements."
+      },
+      {
+        "scenario": "You have petabytes of data, some accessed daily, some never, and you don't know which is which.",
+        "choice": "S3 Intelligent-Tiering.",
+        "why": "It automates the lifecycle transitions based on actual usage without retrieval fees."
+      }
+    ]
+  },
+  "c4_3": {
+    "one_liner": "Moving data into AWS and backing up what is already there.",
+    "core_concept": [
+      "Network bandwidth is limited. If moving data over the wire takes years, AWS sends physical trucks (Snow). If syncing files continuously, use DataSync. AWS Backup centralizes snapshot orchestration."
+    ],
+    "hard_facts": [
+      {
+        "name": "AWS DataSync",
+        "facts": ["Agent-based transfer service.", "Syncs on-premises NFS/SMB to S3, EFS, or FSx over Direct Connect/VPN.", "Automates scheduling and validation."]
+      },
+      {
+        "name": "AWS Snow Family",
+        "facts": ["Snowcone: 8 TB, ships via mail.", "Snowball Edge: 80 TB, includes compute.", "Snowmobile: 100 PB, literally an 18-wheeler truck.", "Bypasses the internet completely."]
+      },
+      {
+        "name": "AWS Backup",
+        "facts": ["Centralized backup policies (plans) across multiple services.", "Supports cross-region and cross-account automated backups.", "Governed by Organizations."]
+      }
+    ],
+    "architecture_rules": [
+      "If the math shows internet transfer takes longer than 1 week, you must use a Snowball device.",
+      "Use AWS Backup to guarantee enterprise-wide compliance RPO/RTO across EBS, RDS, and EFS."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "Migrating 500 Terabytes of data from a remote data center with a 10 Mbps connection.",
+        "choice": "Multiple Snowball Edge devices.",
+        "why": "Transferring 500TB over 10Mbps takes years. Physical transport takes days."
+      },
+      {
+        "scenario": "Continuously replicate an on-premises NAS to Amazon EFS for a hybrid cloud deployment.",
+        "choice": "AWS DataSync.",
+        "why": "It is optimized for fast, scheduled, over-the-wire synchronization to AWS storage."
+      }
+    ]
+  },
+  "c4_4": {
+    "one_liner": "Bridge on-premises servers seamlessly to AWS storage.",
+    "core_concept": [
+      "When local data centers run out of disk space, Storage Gateway makes AWS S3 or EBS look like local network drives to on-premises servers."
+    ],
+    "hard_facts": [
+      {
+        "name": "File Gateway",
+        "facts": ["Presents an NFS/SMB mount locally.", "Saves files natively as objects in S3.", "Local cache keeps frequently accessed files fast."]
+      },
+      {
+        "name": "Volume Gateway",
+        "facts": ["Presents iSCSI block storage locally.", "Cached Volumes: Entire dataset in S3, hot data cached locally.", "Stored Volumes: Entire dataset stored locally, asynchronous backups to S3 as EBS snapshots."]
+      },
+      {
+        "name": "Tape Gateway",
+        "facts": ["Presents a Virtual Tape Library (VTL).", "Drops into existing backup software (Veeam, NetBackup) perfectly.", "Archives to Glacier."]
+      }
+    ],
+    "architecture_rules": [
+      "If the application needs to read the data directly from the S3 bucket later, you MUST use File Gateway.",
+      "Volume Gateway data cannot be directly read as objects; it translates to block storage."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A company wants to replace their physical tape backups without changing their legacy backup software.",
+        "choice": "Tape Gateway.",
+        "why": "It emulates physical tapes via iSCSI and quietly archives to Glacier, requiring no software changes."
+      },
+      {
+        "scenario": "On-premises servers need to drop files into a folder, which a Lambda function in AWS must immediately process.",
+        "choice": "File Gateway.",
+        "why": "It stores files directly as native S3 objects, which can then trigger AWS Lambda events."
+      }
+    ]
+  },
+  "c5_1": {
+    "one_liner": "Managed SQL databases and high-performance cloud-native relational engines.",
+    "core_concept": [
+      "RDS removes the pain of patching and backing up traditional SQL databases. Aurora is a re-engineered, cloud-native engine that abstracts storage from compute for extreme performance and scaling."
+    ],
+    "hard_facts": [
+      {
+        "name": "Amazon RDS",
+        "facts": ["Supports Postgres, MySQL, MariaDB, Oracle, SQL Server.", "Multi-AZ provides a synchronous standby in another AZ for automatic failover.", "Read Replicas provide asynchronous copies to scale read traffic."]
+      },
+      {
+        "name": "Amazon Aurora",
+        "facts": ["Compatible with Postgres and MySQL.", "Storage automatically grows in 10GB increments up to 128TB.", "Data is replicated 6 ways across 3 AZs automatically.", "Supports up to 15 Read Replicas (RDS only supports 5)."]
+      },
+      {
+        "name": "Aurora Global Database",
+        "facts": ["Cross-region replication with sub-second latency.", "Perfect for global reads and disaster recovery."]
+      }
+    ],
+    "architecture_rules": [
+      "Multi-AZ is for Disaster Recovery (availability). Read Replicas are for Performance (scaling).",
+      "You cannot encrypt an existing unencrypted RDS instance directly; you must snapshot it, copy the snapshot as encrypted, and restore."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A heavily read-intensive SQL application is overwhelming the primary database.",
+        "choice": "Add RDS Read Replicas and point reporting/read queries to them.",
+        "why": "It offloads read pressure from the primary instance."
+      },
+      {
+        "scenario": "An enterprise requires a MySQL database that scales instantly, survives an AZ failure automatically, and supports rapid failover.",
+        "choice": "Amazon Aurora.",
+        "why": "Its 6-way storage replication across 3 AZs and rapid failover mechanism outperforms standard RDS."
+      }
+    ]
+  },
+  "c5_2": {
+    "one_liner": "Serverless, single-digit millisecond NoSQL at any scale.",
+    "core_concept": [
+      "DynamoDB is a key-value and document database. It has no instances to manage, scales infinitely, and guarantees extreme low latency—provided your data access patterns are well-understood."
+    ],
+    "hard_facts": [
+      {
+        "name": "DynamoDB Basics",
+        "facts": ["Fully serverless NoSQL.", "Max item size is 400KB.", "Provisioned Capacity (predictable) vs On-Demand Capacity (unpredictable traffic)."]
+      },
+      {
+        "name": "Global Tables",
+        "facts": ["Active-active replication across multiple AWS regions.", "Allows users to write and read from their local region with eventual consistency."]
+      },
+      {
+        "name": "DynamoDB Streams",
+        "facts": ["Time-ordered log of item changes (Insert, Update, Delete).", "Used to trigger Lambda functions asynchronously."]
+      }
+    ],
+    "architecture_rules": [
+      "If the payload exceeds 400KB, store the file in S3 and store the S3 URL in DynamoDB.",
+      "Use Global Tables for multi-region active-active architectures."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A mobile game needs a global leaderboard with massive, unpredictable write spikes.",
+        "choice": "DynamoDB On-Demand.",
+        "why": "It automatically absorbs massive spikes without throttling, and NoSQL is perfect for key-value leaderboards."
+      },
+      {
+        "scenario": "Whenever a user profile is updated, a welcome email must be sent.",
+        "choice": "DynamoDB Streams triggering an AWS Lambda function.",
+        "why": "Streams capture the exact modification and natively invoke Lambda to process the event."
+      }
+    ]
+  },
+  "c5_3": {
+    "one_liner": "In-memory caching to offload database pressure and reduce latency.",
+    "core_concept": [
+      "Databases are slow compared to RAM. ElastiCache provides managed Redis or Memcached to store frequent queries in memory. DAX does the exact same thing specifically for DynamoDB."
+    ],
+    "hard_facts": [
+      {
+        "name": "ElastiCache for Redis",
+        "facts": ["Supports complex data structures.", "High availability, persistence, and failover (Multi-AZ).", "Used for session state, leaderboards, and pub/sub."]
+      },
+      {
+        "name": "ElastiCache for Memcached",
+        "facts": ["Simple key-value store.", "Multi-threaded but NO persistence or failover.", "Good for basic object caching."]
+      },
+      {
+        "name": "DynamoDB Accelerator (DAX)",
+        "facts": ["In-memory cache explicitly and only for DynamoDB.", "Microsecond latency.", "Requires ZERO application code rewrites (API compatible)."]
+      }
+    ],
+    "architecture_rules": [
+      "Cache database queries that are heavily read and rarely updated.",
+      "Always select Redis over Memcached if the exam mentions high availability, persistence, or failover."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "An RDS database is overloaded with the same read queries. The app needs highly available caching.",
+        "choice": "ElastiCache for Redis.",
+        "why": "It offloads the DB and supports Multi-AZ failover, which Memcached lacks."
+      },
+      {
+        "scenario": "A DynamoDB application needs microsecond read times without changing any application query logic.",
+        "choice": "DAX.",
+        "why": "It sits seamlessly in front of DynamoDB and handles the cache logic without code changes."
+      }
+    ]
+  },
+  "c5_4": {
+    "one_liner": "Full-text search and complex log analytics.",
+    "core_concept": [
+      "Relational databases are terrible at searching through massive blocks of text. OpenSearch (formerly Elasticsearch) indexes documents so you can search millions of text records instantly."
+    ],
+    "hard_facts": [
+      {
+        "name": "Amazon OpenSearch",
+        "facts": ["Requires provisioning of compute instances (domains).", "Excellent for full-text search, fuzzy matching, and autocomplete.", "Often paired with Logstash and Kibana (OpenSearch Dashboards) for log analysis."]
+      }
+    ],
+    "architecture_rules": [
+      "Never use RDS or DynamoDB for complex text queries like 'find all documents containing words similar to X'.",
+      "Stream CloudWatch Logs via Kinesis or Lambda into OpenSearch for centralized log analytics."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "An e-commerce catalog requires fast autocomplete, typo-tolerance, and full-text search.",
+        "choice": "Amazon OpenSearch.",
+        "why": "It is a purpose-built search engine that handles indexing and fuzzy matching efficiently."
+      }
+    ]
+  },
+  "c5_5": {
+    "one_liner": "Process, query, and analyze massive amounts of data.",
+    "core_concept": [
+      "Data Analytics requires different tools. Athena queries data directly in S3. Redshift warehouses structured data. Glue prepares the data. Kinesis ingests real-time streams."
+    ],
+    "hard_facts": [
+      {
+        "name": "Amazon Redshift",
+        "facts": ["Petabyte-scale Data Warehouse.", "Columnar storage optimized for complex SQL analytics/OLAP.", "Redshift Spectrum queries S3 data directly without loading it."]
+      },
+      {
+        "name": "Amazon Athena",
+        "facts": ["Serverless interactive query service.", "Uses standard SQL to query raw files (CSV, JSON, Parquet) sitting in S3.", "Priced per TB of data scanned."]
+      },
+      {
+        "name": "AWS Glue",
+        "facts": ["Serverless ETL (Extract, Transform, Load).", "Glue Data Catalog acts as a central metadata repository used by Athena, Redshift, and EMR."]
+      },
+      {
+        "name": "Amazon Kinesis",
+        "facts": ["Data Streams: Ingests massive real-time data (IoT, logs). Requires custom consumers.", "Data Firehose: Automatically batches, compresses, and dumps streaming data into S3 or Redshift."]
+      }
+    ],
+    "architecture_rules": [
+      "Convert raw files in S3 to Parquet format before querying with Athena to dramatically reduce cost and improve speed.",
+      "Use Kinesis Data Firehose when you just need to safely transport streaming data into a storage service with zero coding."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A business analyst wants to run ad-hoc SQL queries against raw VPC Flow Logs stored in S3.",
+        "choice": "Amazon Athena.",
+        "why": "Serverless, requires no infrastructure, and queries S3 data directly."
+      },
+      {
+        "scenario": "An IoT platform receives 100,000 sensor readings per second and needs to save them to S3.",
+        "choice": "Kinesis Data Firehose.",
+        "why": "It natively absorbs high-throughput streams and automatically delivers them to S3."
+      }
+    ]
+  },
+  "c6_1": {
+    "one_liner": "Decouple microservices using queues and publish-subscribe messages.",
+    "core_concept": [
+      "Direct API calls fail if the target is down. SQS places a queue between services so messages wait safely. SNS broadcasts one message to many subscribers."
+    ],
+    "hard_facts": [
+      {
+        "name": "Amazon SQS",
+        "facts": ["Pull-based architecture (consumers poll the queue).", "Standard: Unlimited throughput, occasional duplicates, best-effort ordering.", "FIFO: Exactly-once processing, strict ordering, limited throughput.", "Visibility Timeout: Hides a message while being processed to prevent duplicates."]
+      },
+      {
+        "name": "Amazon SNS",
+        "facts": ["Push-based architecture (Pub/Sub).", "Sends messages to Emails, SMS, HTTP endpoints, or SQS queues.", "Fan-out pattern: SNS pushes a single event to multiple SQS queues."]
+      },
+      {
+        "name": "Amazon MQ",
+        "facts": ["Managed Apache ActiveMQ or RabbitMQ.", "Used ONLY when migrating legacy apps that require industry-standard protocols (MQTT, AMQP)."]
+      }
+    ],
+    "architecture_rules": [
+      "Use a Dead Letter Queue (DLQ) to catch messages that repeatedly fail processing.",
+      "If order absolutely matters (e.g., banking transactions), you must select SQS FIFO."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A video processing service crashes under heavy load, causing lost video uploads.",
+        "choice": "Decouple with SQS.",
+        "why": "The queue absorbs the spike. The processing instances pull videos at their own pace without crashing."
+      },
+      {
+        "scenario": "When an order is placed, the Billing, Shipping, and Email services must all be notified instantly.",
+        "choice": "SNS 'Fan-out' to multiple SQS queues.",
+        "why": "SNS broadcasts the event once, and each downstream service gets its own reliable queue to process it."
+      }
+    ]
+  },
+  "c6_2": {
+    "one_liner": "Orchestrate complex workflows and react to AWS account events.",
+    "core_concept": [
+      "EventBridge is the central nervous system for routing AWS events. Step Functions provides visual state machines to orchestrate complex, multi-step Lambda workflows."
+    ],
+    "hard_facts": [
+      {
+        "name": "Amazon EventBridge",
+        "facts": ["Formerly CloudWatch Events.", "Intercepts AWS API calls (via CloudTrail) and resource state changes.", "Routes events to targets (Lambda, SNS, SQS) using rules."]
+      },
+      {
+        "name": "AWS Step Functions",
+        "facts": ["Visual state machine workflow orchestration.", "Handles branching, parallel execution, retries, and manual approvals.", "Standard workflows (up to 1 year) vs Express workflows (up to 5 minutes)."]
+      }
+    ],
+    "architecture_rules": [
+      "Do not chain Lambdas directly by having them call each other; orchestrate them via Step Functions to avoid tangled failures.",
+      "Use EventBridge as the trigger for all auto-remediation (e.g., 'A Security Group was changed -> trigger Lambda to revert')."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "An e-commerce order process requires payment validation, inventory check, and shipping, with retries on failure.",
+        "choice": "AWS Step Functions.",
+        "why": "It natively handles complex multi-step orchestration, state management, and error handling."
+      },
+      {
+        "scenario": "Run a Lambda script every day at 2:00 AM.",
+        "choice": "EventBridge Scheduled Rule (Cron).",
+        "why": "It acts as the native Cron scheduler for AWS."
+      }
+    ]
+  },
+  "c6_3": {
+    "one_liner": "Design systems to survive regional disasters.",
+    "core_concept": [
+      "Disaster Recovery (DR) balances cost vs RTO/RPO (how fast to recover, how much data lost). Multi-region is expensive but necessary for absolute maximum availability."
+    ],
+    "hard_facts": [
+      {
+        "name": "DR Strategies (Cheapest to Most Expensive)",
+        "facts": ["1. Backup and Restore: Hours to days. Cheapest.", "2. Pilot Light: Critical core runs in standby. Requires scaling up. Minutes to hours.", "3. Warm Standby: Scaled-down version of full environment running. Minutes.", "4. Multi-Site Active/Active: Full traffic served from both regions. Zero downtime. Most expensive."]
+      },
+      {
+        "name": "Key Mechanisms",
+        "facts": ["Route 53 Failover Routing handles the DNS switch.", "Aurora Global Databases handle sub-second data replication.", "Cross-Region S3 Replication ensures data exists in both regions."]
+      }
+    ],
+    "architecture_rules": [
+      "RTO (Recovery Time Objective) dictates the strategy. If RTO is 5 minutes, Backup and Restore is impossible.",
+      "Active/Active requires stateless application tiers and a globally replicated data store (DynamoDB Global Tables or Aurora Global)."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "A company requires strict 15-minute RTO and RPO for a regional outage, keeping costs reasonable.",
+        "choice": "Warm Standby.",
+        "why": "It keeps a small version running to meet the tight RTO, but saves money compared to full Active/Active."
+      }
+    ]
+  },
+  "c6_4": {
+    "one_liner": "Control costs, consolidate billing, and enforce governance at scale.",
+    "core_concept": [
+      "As AWS grows, you must manage multiple accounts. Organizations provides a hierarchy. Cost Explorer shows where money went. Budgets alert you before you go bankrupt."
+    ],
+    "hard_facts": [
+      {
+        "name": "AWS Organizations",
+        "facts": ["Consolidated billing (one invoice).", "Volume discounts combine usage across all accounts.", "Organizational Units (OUs) group accounts logically."]
+      },
+      {
+        "name": "AWS Cost Explorer",
+        "facts": ["Visualizes historical usage.", "Forecasts future costs based on trends.", "Suggests Reserved Instance and Savings Plan purchases."]
+      },
+      {
+        "name": "AWS Budgets",
+        "facts": ["Proactive alerts.", "Can send emails or trigger SNS when costs exceed (or are forecasted to exceed) a threshold."]
+      }
+    ],
+    "architecture_rules": [
+      "Apply Service Control Policies (SCPs) to OUs, not individual accounts, for scalable governance.",
+      "Use AWS Compute Optimizer to find over-provisioned EC2 instances before buying Reserved Instances."
+    ],
+    "when_to_choose": [
+      {
+        "scenario": "You need an alert before the monthly EC2 bill crosses $1,000.",
+        "choice": "AWS Budgets.",
+        "why": "It is the only tool that actively alerts based on current or forecasted thresholds."
+      },
+      {
+        "scenario": "You need to prevent developers in the 'Dev' account from ever deploying expensive GPU instances.",
+        "choice": "Organizations SCP on the Dev OU.",
+        "why": "It creates an unbreakable ceiling that even Dev account root administrators cannot bypass."
+      }
+    ]
+  }
+}

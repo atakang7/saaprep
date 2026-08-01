@@ -1,0 +1,6296 @@
+[
+  {
+    "question_id": "ditectrev_001",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Object Versioning"
+  },
+  {
+    "question_id": "ditectrev_002",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_003",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_004",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Lifecycle Management"
+  },
+  {
+    "question_id": "ditectrev_005",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "IDS/IPS"
+  },
+  {
+    "question_id": "ditectrev_006",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_007",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 Alias record"
+  },
+  {
+    "question_id": "ditectrev_008",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_009",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Storage Classes"
+  },
+  {
+    "question_id": "ditectrev_010",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_011",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_012",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "ECS"
+  },
+  {
+    "question_id": "ditectrev_013",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_014",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EC2 Instance Store"
+  },
+  {
+    "question_id": "ditectrev_015",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Security Groups"
+  },
+  {
+    "question_id": "ditectrev_016",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "Elastic IP Address"
+  },
+  {
+    "question_id": "ditectrev_017",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_018",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "KMS"
+  },
+  {
+    "question_id": "ditectrev_019",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_020",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_021",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_022",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 latency routing"
+  },
+  {
+    "question_id": "ditectrev_023",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_024",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_025",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Reduced Redundancy Storage (RRS)"
+  },
+  {
+    "question_id": "ditectrev_026",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_027",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_028",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_029",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_030",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_031",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_032",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "NACLs"
+  },
+  {
+    "question_id": "ditectrev_033",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_034",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_035",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "Elastic Beanstalk"
+  },
+  {
+    "question_id": "ditectrev_036",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SES"
+  },
+  {
+    "question_id": "ditectrev_037",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_038",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Redshift"
+  },
+  {
+    "question_id": "ditectrev_039",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Route Tables"
+  },
+  {
+    "question_id": "ditectrev_040",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Redshift"
+  },
+  {
+    "question_id": "ditectrev_041",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_042",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 bucket policies and ACLs"
+  },
+  {
+    "question_id": "ditectrev_043",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_044",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_045",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_046",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_047",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_048",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_049",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Reserved Instances"
+  },
+  {
+    "question_id": "ditectrev_050",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Subnets"
+  },
+  {
+    "question_id": "ditectrev_051",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "NACLs"
+  },
+  {
+    "question_id": "ditectrev_052",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_053",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 weighted routing"
+  },
+  {
+    "question_id": "ditectrev_054",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "EBS encryption"
+  },
+  {
+    "question_id": "ditectrev_055",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_056",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_057",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_058",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_059",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_060",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_061",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_062",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_063",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_064",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_065",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB health check protocol"
+  },
+  {
+    "question_id": "ditectrev_066",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Elastic Load Balancing"
+  },
+  {
+    "question_id": "ditectrev_067",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT instances"
+  },
+  {
+    "question_id": "ditectrev_068",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Amazon SES"
+  },
+  {
+    "question_id": "ditectrev_069",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_070",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "Amazon SWF"
+  },
+  {
+    "question_id": "ditectrev_071",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS SQL Server bulk copy"
+  },
+  {
+    "question_id": "ditectrev_072",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_073",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_074",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_075",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "ditectrev_076",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_077",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_078",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_079",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_080",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 bucket policy"
+  },
+  {
+    "question_id": "ditectrev_081",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Disaster recovery"
+  },
+  {
+    "question_id": "ditectrev_082",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_083",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_084",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_085",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_086",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "WAF"
+  },
+  {
+    "question_id": "ditectrev_087",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC routing"
+  },
+  {
+    "question_id": "ditectrev_088",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPN CloudHub"
+  },
+  {
+    "question_id": "ditectrev_089",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_090",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_091",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_092",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS for MySQL"
+  },
+  {
+    "question_id": "ditectrev_093",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "ditectrev_094",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudTrail"
+  },
+  {
+    "question_id": "ditectrev_095",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_096",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 tenancy"
+  },
+  {
+    "question_id": "ditectrev_097",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_098",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_099",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_100",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_101",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_102",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_103",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_104",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_105",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_106",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "ElastiCache"
+  },
+  {
+    "question_id": "ditectrev_107",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Organizations Consolidated Billing"
+  },
+  {
+    "question_id": "ditectrev_108",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_109",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 BitTorrent support"
+  },
+  {
+    "question_id": "ditectrev_110",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_111",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_112",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_113",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_114",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_115",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_116",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_117",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Reserved Instances"
+  },
+  {
+    "question_id": "ditectrev_118",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_119",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_120",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC foundations"
+  },
+  {
+    "question_id": "ditectrev_121",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "Elastic Beanstalk"
+  },
+  {
+    "question_id": "ditectrev_122",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replica"
+  },
+  {
+    "question_id": "ditectrev_123",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_124",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_125",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "CloudFormation"
+  },
+  {
+    "question_id": "ditectrev_126",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_127",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Provisioned IOPS"
+  },
+  {
+    "question_id": "ditectrev_128",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_129",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_130",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_131",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 instance store"
+  },
+  {
+    "question_id": "ditectrev_132",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Shield"
+  },
+  {
+    "question_id": "ditectrev_133",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_134",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_135",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC foundations"
+  },
+  {
+    "question_id": "ditectrev_136",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_137",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Multipart Upload"
+  },
+  {
+    "question_id": "ditectrev_138",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_139",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_140",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ failover CNAME"
+  },
+  {
+    "question_id": "ditectrev_141",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_142",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_143",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudTrail"
+  },
+  {
+    "question_id": "ditectrev_144",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "EC2 internal DNS"
+  },
+  {
+    "question_id": "ditectrev_145",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "KMS"
+  },
+  {
+    "question_id": "ditectrev_146",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "S3 server-side encryption with KMS"
+  },
+  {
+    "question_id": "ditectrev_147",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 billing"
+  },
+  {
+    "question_id": "ditectrev_148",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "ditectrev_149",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "ECS"
+  },
+  {
+    "question_id": "ditectrev_150",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM cross-account roles"
+  },
+  {
+    "question_id": "ditectrev_151",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_152",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_153",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "Availability Zones"
+  },
+  {
+    "question_id": "ditectrev_154",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_155",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_156",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_157",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Regions"
+  },
+  {
+    "question_id": "ditectrev_158",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_159",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM policy"
+  },
+  {
+    "question_id": "ditectrev_160",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Subnets"
+  },
+  {
+    "question_id": "ditectrev_161",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_162",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_163",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_164",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Disaster Recovery"
+  },
+  {
+    "question_id": "ditectrev_165",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_166",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_167",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS Provisioned IOPS"
+  },
+  {
+    "question_id": "ditectrev_168",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_169",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_170",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_171",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Standard Storage Class"
+  },
+  {
+    "question_id": "ditectrev_172",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM bucket policy"
+  },
+  {
+    "question_id": "ditectrev_173",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_174",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_175",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Web Identity Federation"
+  },
+  {
+    "question_id": "ditectrev_176",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Tagging"
+  },
+  {
+    "question_id": "ditectrev_177",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_178",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_179",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS penetration testing policy"
+  },
+  {
+    "question_id": "ditectrev_180",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront Origin Access Identity"
+  },
+  {
+    "question_id": "ditectrev_181",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "EMR"
+  },
+  {
+    "question_id": "ditectrev_182",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_183",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_184",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_185",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_186",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_187",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_188",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_189",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch Alarms"
+  },
+  {
+    "question_id": "ditectrev_190",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_191",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Support Plans"
+  },
+  {
+    "question_id": "ditectrev_192",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_193",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups (ASG)"
+  },
+  {
+    "question_id": "ditectrev_194",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_195",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_196",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_197",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Oracle SQL Developer"
+  },
+  {
+    "question_id": "ditectrev_198",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups and NACLs"
+  },
+  {
+    "question_id": "ditectrev_199",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_200",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_201",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Instance Metadata"
+  },
+  {
+    "question_id": "ditectrev_202",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS Snapshots"
+  },
+  {
+    "question_id": "ditectrev_203",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_204",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS-optimized throughput"
+  },
+  {
+    "question_id": "ditectrev_205",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_206",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_207",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "CloudHSM"
+  },
+  {
+    "question_id": "ditectrev_208",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Network Firewall"
+  },
+  {
+    "question_id": "ditectrev_209",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 signed URLs"
+  },
+  {
+    "question_id": "ditectrev_210",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_211",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "ditectrev_212",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_213",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_214",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_215",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_216",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "DynamoDB Fine-Grained Access Control"
+  },
+  {
+    "question_id": "ditectrev_217",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_218",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_219",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 tags"
+  },
+  {
+    "question_id": "ditectrev_220",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_221",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Storage Gateway billing"
+  },
+  {
+    "question_id": "ditectrev_222",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replica"
+  },
+  {
+    "question_id": "ditectrev_223",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SNS"
+  },
+  {
+    "question_id": "ditectrev_224",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_225",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "EBS encryption"
+  },
+  {
+    "question_id": "ditectrev_226",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_227",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_228",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_229",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_230",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 VM Import"
+  },
+  {
+    "question_id": "ditectrev_231",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_232",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "Glacier encryption"
+  },
+  {
+    "question_id": "ditectrev_233",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_234",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPCs"
+  },
+  {
+    "question_id": "ditectrev_235",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_236",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_237",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Network/application protection"
+  },
+  {
+    "question_id": "ditectrev_238",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Reserved Instances"
+  },
+  {
+    "question_id": "ditectrev_239",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudTrail"
+  },
+  {
+    "question_id": "ditectrev_240",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Trusted Advisor"
+  },
+  {
+    "question_id": "ditectrev_241",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_242",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SES"
+  },
+  {
+    "question_id": "ditectrev_243",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_244",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "ditectrev_245",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_246",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_247",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_248",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_249",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Multi-Region DR data transfer"
+  },
+  {
+    "question_id": "ditectrev_250",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC foundations"
+  },
+  {
+    "question_id": "ditectrev_251",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_252",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS for Oracle"
+  },
+  {
+    "question_id": "ditectrev_253",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_254",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Elastic Load Balancer"
+  },
+  {
+    "question_id": "ditectrev_255",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Disaster Recovery"
+  },
+  {
+    "question_id": "ditectrev_256",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups and NACLs"
+  },
+  {
+    "question_id": "ditectrev_257",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Public Data Sets"
+  },
+  {
+    "question_id": "ditectrev_258",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_259",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_260",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_261",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_262",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB with Proxy Protocol"
+  },
+  {
+    "question_id": "ditectrev_263",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_264",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_265",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_266",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_267",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Consolidated billing"
+  },
+  {
+    "question_id": "ditectrev_268",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_269",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_270",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 instance metadata"
+  },
+  {
+    "question_id": "ditectrev_271",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_272",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_273",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_274",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 placement groups"
+  },
+  {
+    "question_id": "ditectrev_275",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "CloudFormation"
+  },
+  {
+    "question_id": "ditectrev_276",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_277",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "ditectrev_278",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "SWF"
+  },
+  {
+    "question_id": "ditectrev_279",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_280",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_281",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replicas"
+  },
+  {
+    "question_id": "ditectrev_282",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "Glacier"
+  },
+  {
+    "question_id": "ditectrev_283",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_284",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_285",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS Snapshot permissions"
+  },
+  {
+    "question_id": "ditectrev_286",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling launch configuration"
+  },
+  {
+    "question_id": "ditectrev_287",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_288",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPC Peering"
+  },
+  {
+    "question_id": "ditectrev_289",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_290",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_291",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS VPN CloudHub"
+  },
+  {
+    "question_id": "ditectrev_292",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC network interfaces"
+  },
+  {
+    "question_id": "ditectrev_293",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_294",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS MySQL read replica"
+  },
+  {
+    "question_id": "ditectrev_295",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_296",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Import/Export"
+  },
+  {
+    "question_id": "ditectrev_297",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_298",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_299",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Placement Groups"
+  },
+  {
+    "question_id": "ditectrev_300",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_301",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Subnets"
+  },
+  {
+    "question_id": "ditectrev_302",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_303",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_304",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS Snapshots"
+  },
+  {
+    "question_id": "ditectrev_305",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_306",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_307",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_308",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_309",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_310",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Standard"
+  },
+  {
+    "question_id": "ditectrev_311",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_312",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_313",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Peering"
+  },
+  {
+    "question_id": "ditectrev_314",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_315",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Redshift"
+  },
+  {
+    "question_id": "ditectrev_316",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB Sticky Sessions"
+  },
+  {
+    "question_id": "ditectrev_317",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "CloudFormation Outputs"
+  },
+  {
+    "question_id": "ditectrev_318",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "CloudFormation"
+  },
+  {
+    "question_id": "ditectrev_319",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "ditectrev_320",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_321",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_322",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "ditectrev_323",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Oracle Edition"
+  },
+  {
+    "question_id": "ditectrev_324",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_325",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM Role"
+  },
+  {
+    "question_id": "ditectrev_326",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_327",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_328",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_329",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "Glacier"
+  },
+  {
+    "question_id": "ditectrev_330",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_331",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instances"
+  },
+  {
+    "question_id": "ditectrev_332",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "SWF"
+  },
+  {
+    "question_id": "ditectrev_333",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_334",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_335",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_336",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_337",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_338",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_339",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon EMR"
+  },
+  {
+    "question_id": "ditectrev_340",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_341",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replicas"
+  },
+  {
+    "question_id": "ditectrev_342",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_343",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_344",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_345",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Redshift"
+  },
+  {
+    "question_id": "ditectrev_346",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_347",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_348",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 placement groups"
+  },
+  {
+    "question_id": "ditectrev_349",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_350",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_351",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_352",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS volume types"
+  },
+  {
+    "question_id": "ditectrev_353",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Disaster Recovery"
+  },
+  {
+    "question_id": "ditectrev_354",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_355",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis"
+  },
+  {
+    "question_id": "ditectrev_356",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_357",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_358",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_359",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_360",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_361",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_362",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudTrail"
+  },
+  {
+    "question_id": "ditectrev_363",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_364",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 bucket policy"
+  },
+  {
+    "question_id": "ditectrev_365",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_366",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_367",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "ditectrev_368",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_369",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM Web Identity Federation"
+  },
+  {
+    "question_id": "ditectrev_370",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_371",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_372",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Placement Groups"
+  },
+  {
+    "question_id": "ditectrev_373",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_374",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Reduced Redundancy Storage"
+  },
+  {
+    "question_id": "ditectrev_375",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_376",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "SWF"
+  },
+  {
+    "question_id": "ditectrev_377",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_378",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_379",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Elastic Load Balancing"
+  },
+  {
+    "question_id": "ditectrev_380",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_381",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Key Pairs"
+  },
+  {
+    "question_id": "ditectrev_382",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "ElastiCache"
+  },
+  {
+    "question_id": "ditectrev_383",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_384",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "CloudHSM"
+  },
+  {
+    "question_id": "ditectrev_385",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Object Lock"
+  },
+  {
+    "question_id": "ditectrev_386",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis"
+  },
+  {
+    "question_id": "ditectrev_387",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_388",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instances"
+  },
+  {
+    "question_id": "ditectrev_389",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_390",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Redshift"
+  },
+  {
+    "question_id": "ditectrev_391",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_392",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Support Plans"
+  },
+  {
+    "question_id": "ditectrev_393",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Acceptable Use Policy"
+  },
+  {
+    "question_id": "ditectrev_394",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_395",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_396",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_397",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "ditectrev_398",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Gateway/Instance"
+  },
+  {
+    "question_id": "ditectrev_399",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "EMR"
+  },
+  {
+    "question_id": "ditectrev_400",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_401",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replica"
+  },
+  {
+    "question_id": "ditectrev_402",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_403",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_404",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_405",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_406",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_407",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "CloudHSM"
+  },
+  {
+    "question_id": "ditectrev_408",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 billing"
+  },
+  {
+    "question_id": "ditectrev_409",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Reserved Instances"
+  },
+  {
+    "question_id": "ditectrev_410",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_411",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "CloudFormation"
+  },
+  {
+    "question_id": "ditectrev_412",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_413",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_414",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM federation"
+  },
+  {
+    "question_id": "ditectrev_415",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_416",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_417",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_418",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Route 53 routing"
+  },
+  {
+    "question_id": "ditectrev_419",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Query API"
+  },
+  {
+    "question_id": "ditectrev_420",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_421",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_422",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Elastic IP"
+  },
+  {
+    "question_id": "ditectrev_423",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "ditectrev_424",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudTrail"
+  },
+  {
+    "question_id": "ditectrev_425",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_426",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_427",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "NACLs"
+  },
+  {
+    "question_id": "ditectrev_428",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_429",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_430",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS OpsWorks"
+  },
+  {
+    "question_id": "ditectrev_431",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_432",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_433",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_434",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_435",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_436",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "EBS encryption"
+  },
+  {
+    "question_id": "ditectrev_437",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_438",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS SSL encryption"
+  },
+  {
+    "question_id": "ditectrev_439",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Consolidated Billing"
+  },
+  {
+    "question_id": "ditectrev_440",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_441",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "ditectrev_442",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "EC2, ELB"
+  },
+  {
+    "question_id": "ditectrev_443",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_444",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda"
+  },
+  {
+    "question_id": "ditectrev_445",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Elastic Load Balancing"
+  },
+  {
+    "question_id": "ditectrev_446",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_447",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 instance types"
+  },
+  {
+    "question_id": "ditectrev_448",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_449",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudTrail"
+  },
+  {
+    "question_id": "ditectrev_450",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_451",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "EMR"
+  },
+  {
+    "question_id": "ditectrev_452",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_453",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Gateway"
+  },
+  {
+    "question_id": "ditectrev_454",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Elastic IP Address"
+  },
+  {
+    "question_id": "ditectrev_455",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB connection draining"
+  },
+  {
+    "question_id": "ditectrev_456",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_457",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_458",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Reserved Instances"
+  },
+  {
+    "question_id": "ditectrev_459",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling termination policy"
+  },
+  {
+    "question_id": "ditectrev_460",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "Elastic IP"
+  },
+  {
+    "question_id": "ditectrev_461",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Server-Side Encryption"
+  },
+  {
+    "question_id": "ditectrev_462",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 placement groups"
+  },
+  {
+    "question_id": "ditectrev_463",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_464",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_465",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_466",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_467",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replica"
+  },
+  {
+    "question_id": "ditectrev_468",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_469",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_470",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS snapshot"
+  },
+  {
+    "question_id": "ditectrev_471",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_472",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "ditectrev_473",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS"
+  },
+  {
+    "question_id": "ditectrev_474",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS"
+  },
+  {
+    "question_id": "ditectrev_475",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_476",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Instance"
+  },
+  {
+    "question_id": "ditectrev_477",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Import/Export"
+  },
+  {
+    "question_id": "ditectrev_478",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles with web identity federation"
+  },
+  {
+    "question_id": "ditectrev_479",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_480",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "ElastiCache"
+  },
+  {
+    "question_id": "ditectrev_481",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "Elastic IP"
+  },
+  {
+    "question_id": "ditectrev_482",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_483",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_484",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPN Gateway"
+  },
+  {
+    "question_id": "ditectrev_485",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "Amazon Glacier"
+  },
+  {
+    "question_id": "ditectrev_486",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_487",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_488",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_489",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_490",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 instance sizing and network throughput"
+  },
+  {
+    "question_id": "ditectrev_491",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS CloudFormation billing"
+  },
+  {
+    "question_id": "ditectrev_492",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "CloudFormation"
+  },
+  {
+    "question_id": "ditectrev_493",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_494",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_495",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SES"
+  },
+  {
+    "question_id": "ditectrev_496",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Cost Explorer"
+  },
+  {
+    "question_id": "ditectrev_497",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_498",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "AMI copy for DR"
+  },
+  {
+    "question_id": "ditectrev_499",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_500",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_501",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_502",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_503",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_504",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_505",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_506",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS compliance and data destruction"
+  },
+  {
+    "question_id": "ditectrev_507",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Subnets"
+  },
+  {
+    "question_id": "ditectrev_508",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_509",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "NACLs"
+  },
+  {
+    "question_id": "ditectrev_510",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_511",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "SES DKIM"
+  },
+  {
+    "question_id": "ditectrev_512",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_513",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_514",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_515",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replica"
+  },
+  {
+    "question_id": "ditectrev_516",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_517",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_518",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_519",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Wizard"
+  },
+  {
+    "question_id": "ditectrev_520",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_521",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_522",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "TLS/SSL encryption"
+  },
+  {
+    "question_id": "ditectrev_523",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_524",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS SSL encryption"
+  },
+  {
+    "question_id": "ditectrev_525",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM Role"
+  },
+  {
+    "question_id": "ditectrev_526",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 On-Demand"
+  },
+  {
+    "question_id": "ditectrev_527",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Elastic IP"
+  },
+  {
+    "question_id": "ditectrev_528",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_529",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Reduced Redundancy Storage"
+  },
+  {
+    "question_id": "ditectrev_530",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_531",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_532",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_533",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_534",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM resource-based policies"
+  },
+  {
+    "question_id": "ditectrev_535",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_536",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_537",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_538",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_539",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_540",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 AMI"
+  },
+  {
+    "question_id": "ditectrev_541",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_542",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "Glacier Vault Inventory"
+  },
+  {
+    "question_id": "ditectrev_543",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM federation"
+  },
+  {
+    "question_id": "ditectrev_544",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "EBS encryption"
+  },
+  {
+    "question_id": "ditectrev_545",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_546",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_547",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Import/Export"
+  },
+  {
+    "question_id": "ditectrev_548",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis"
+  },
+  {
+    "question_id": "ditectrev_549",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_550",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_551",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Reserved Instance"
+  },
+  {
+    "question_id": "ditectrev_552",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_553",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "Amazon SWF"
+  },
+  {
+    "question_id": "ditectrev_554",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM federation with SAML"
+  },
+  {
+    "question_id": "ditectrev_555",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_556",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_557",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instance"
+  },
+  {
+    "question_id": "ditectrev_558",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "EC2 billing"
+  },
+  {
+    "question_id": "ditectrev_559",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_560",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Import/Export"
+  },
+  {
+    "question_id": "ditectrev_561",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_562",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "EC2 Security Groups"
+  },
+  {
+    "question_id": "ditectrev_563",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "S3 server-side encryption"
+  },
+  {
+    "question_id": "ditectrev_564",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_565",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_566",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_567",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_568",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_569",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_570",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_571",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_572",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis"
+  },
+  {
+    "question_id": "ditectrev_573",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS"
+  },
+  {
+    "question_id": "ditectrev_574",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "Amazon WorkSpaces"
+  },
+  {
+    "question_id": "ditectrev_575",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB"
+  },
+  {
+    "question_id": "ditectrev_576",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "Amazon S3"
+  },
+  {
+    "question_id": "ditectrev_577",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC"
+  },
+  {
+    "question_id": "ditectrev_578",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "KMS"
+  },
+  {
+    "question_id": "ditectrev_579",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_580",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "Amazon S3"
+  },
+  {
+    "question_id": "ditectrev_581",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 multipart upload"
+  },
+  {
+    "question_id": "ditectrev_582",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_583",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_584",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch Alarms"
+  },
+  {
+    "question_id": "ditectrev_585",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_586",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_587",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_588",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_589",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "Amazon VPC"
+  },
+  {
+    "question_id": "ditectrev_590",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_591",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Import/Export"
+  },
+  {
+    "question_id": "ditectrev_592",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_593",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Read Replicas"
+  },
+  {
+    "question_id": "ditectrev_594",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_595",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon EMR"
+  },
+  {
+    "question_id": "ditectrev_596",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_597",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_598",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS CloudFormation"
+  },
+  {
+    "question_id": "ditectrev_599",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles for EC2"
+  },
+  {
+    "question_id": "ditectrev_600",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "VPC Subnets"
+  },
+  {
+    "question_id": "ditectrev_601",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS snapshots"
+  },
+  {
+    "question_id": "ditectrev_602",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_603",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_604",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_605",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3"
+  },
+  {
+    "question_id": "ditectrev_606",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_607",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_608",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_609",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_610",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "NACLs"
+  },
+  {
+    "question_id": "ditectrev_611",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "ditectrev_612",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_613",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 RRS"
+  },
+  {
+    "question_id": "ditectrev_614",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "ditectrev_615",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ALB/NLB"
+  },
+  {
+    "question_id": "ditectrev_616",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_617",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "AWS OpsWorks"
+  },
+  {
+    "question_id": "ditectrev_618",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS"
+  },
+  {
+    "question_id": "ditectrev_619",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Reserved Instances"
+  },
+  {
+    "question_id": "ditectrev_620",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "RDS SSL certificate"
+  },
+  {
+    "question_id": "ditectrev_621",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_622",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Instance"
+  },
+  {
+    "question_id": "ditectrev_623",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Multipart Upload"
+  },
+  {
+    "question_id": "ditectrev_624",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 tags"
+  },
+  {
+    "question_id": "ditectrev_625",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EBS"
+  },
+  {
+    "question_id": "ditectrev_626",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_627",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS"
+  },
+  {
+    "question_id": "ditectrev_628",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "Placement Groups"
+  },
+  {
+    "question_id": "ditectrev_629",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 ENI"
+  },
+  {
+    "question_id": "ditectrev_630",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_631",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Config Service"
+  },
+  {
+    "question_id": "ditectrev_632",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "EBS Snapshot Sharing"
+  },
+  {
+    "question_id": "ditectrev_633",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_634",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "ELB connection draining"
+  },
+  {
+    "question_id": "ditectrev_635",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Service Health Dashboard"
+  },
+  {
+    "question_id": "ditectrev_636",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "ditectrev_637",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "ditectrev_638",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_639",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "ditectrev_640",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "ditectrev_641",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_642",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "ditectrev_643",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "DynamoDB"
+  },
+  {
+    "question_id": "ditectrev_644",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Placement Groups"
+  },
+  {
+    "question_id": "ditectrev_645",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "Storage Gateway"
+  },
+  {
+    "question_id": "ditectrev_646",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Aurora Serverless"
+  },
+  {
+    "question_id": "ditectrev_647",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "EFS"
+  },
+  {
+    "question_id": "ditectrev_648",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "GuardDuty"
+  },
+  {
+    "question_id": "ditectrev_649",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM database authentication"
+  },
+  {
+    "question_id": "ditectrev_650",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Certificate Manager (ACM)"
+  },
+  {
+    "question_id": "ditectrev_651",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "S3 presigned URL"
+  },
+  {
+    "question_id": "ditectrev_652",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 placement groups"
+  },
+  {
+    "question_id": "ditectrev_653",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Direct Connect"
+  },
+  {
+    "question_id": "ditectrev_654",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Trusted Advisor"
+  },
+  {
+    "question_id": "ditectrev_655",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "ditectrev_656",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS for MySQL"
+  },
+  {
+    "question_id": "ditectrev_657",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "KMS"
+  },
+  {
+    "question_id": "ditectrev_658",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS automated backups"
+  },
+  {
+    "question_id": "ditectrev_659",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Aurora Auto Scaling"
+  },
+  {
+    "question_id": "ditectrev_660",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Aurora read replica"
+  },
+  {
+    "question_id": "ditectrev_661",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Kinesis Data Firehose"
+  },
+  {
+    "question_id": "ditectrev_662",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "ditectrev_663",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Compute Optimizer"
+  },
+  {
+    "question_id": "ditectrev_664",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Storage Lens"
+  },
+  {
+    "question_id": "ditectrev_665",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS FIFO"
+  },
+  {
+    "question_id": "ditectrev_666",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "ditectrev_667",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Amazon Cognito"
+  },
+  {
+    "question_id": "ditectrev_668",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Organizations SCPs"
+  },
+  {
+    "question_id": "ditectrev_669",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "Amazon Inspector"
+  },
+  {
+    "question_id": "ditectrev_670",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Route 53 routing"
+  },
+  {
+    "question_id": "ditectrev_671",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "ditectrev_672",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Network Load Balancer"
+  },
+  {
+    "question_id": "ditectrev_673",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda"
+  },
+  {
+    "question_id": "ditectrev_674",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Organizations"
+  },
+  {
+    "question_id": "ditectrev_675",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_676",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Cost and Usage Report"
+  },
+  {
+    "question_id": "ditectrev_677",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "ditectrev_678",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda"
+  },
+  {
+    "question_id": "ditectrev_679",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon QuickSight"
+  },
+  {
+    "question_id": "ditectrev_680",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Aurora"
+  },
+  {
+    "question_id": "ditectrev_681",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SNS, SQS"
+  },
+  {
+    "question_id": "ditectrev_682",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_683",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Gateway Load Balancer"
+  },
+  {
+    "question_id": "ditectrev_684",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "EBS fast snapshot restore"
+  },
+  {
+    "question_id": "ditectrev_685",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda"
+  },
+  {
+    "question_id": "ditectrev_686",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Intelligent-Tiering"
+  },
+  {
+    "question_id": "ditectrev_687",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Lifecycle"
+  },
+  {
+    "question_id": "ditectrev_688",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Cost Explorer"
+  },
+  {
+    "question_id": "ditectrev_689",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "SQS"
+  },
+  {
+    "question_id": "ditectrev_690",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "ditectrev_691",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "CloudWatch Dashboard sharing"
+  },
+  {
+    "question_id": "ditectrev_692",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "AWS SSO"
+  },
+  {
+    "question_id": "ditectrev_693",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Global Accelerator"
+  },
+  {
+    "question_id": "ditectrev_694",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS"
+  },
+  {
+    "question_id": "ditectrev_695",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "ditectrev_696",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Kinesis Data Streams"
+  },
+  {
+    "question_id": "ditectrev_697",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS Shield"
+  },
+  {
+    "question_id": "ditectrev_698",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "KMS multi-Region key"
+  },
+  {
+    "question_id": "ditectrev_699",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "AWS Systems Manager Session Manager"
+  },
+  {
+    "question_id": "ditectrev_700",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 static website hosting"
+  },
+  {
+    "question_id": "ditectrev_701",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS Systems Manager Run Command"
+  },
+  {
+    "question_id": "ditectrev_702",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Secrets Manager"
+  },
+  {
+    "question_id": "ditectrev_703",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Custom for Oracle"
+  },
+  {
+    "question_id": "ditectrev_704",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "ditectrev_705",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Lifecycle Rules"
+  },
+  {
+    "question_id": "ditectrev_706",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "Security Groups"
+  },
+  {
+    "question_id": "ditectrev_707",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Savings Plans"
+  },
+  {
+    "question_id": "ditectrev_708",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Aurora PostgreSQL with Babelfish"
+  },
+  {
+    "question_id": "ditectrev_709",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "ditectrev_710",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Kinesis Data Streams"
+  },
+  {
+    "question_id": "supplemental_001",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "supplemental_002",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "supplemental_003",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "supplemental_004",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "supplemental_005",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Intelligent-Tiering"
+  },
+  {
+    "question_id": "supplemental_006",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Intelligent-Tiering"
+  },
+  {
+    "question_id": "supplemental_007",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Intelligent-Tiering"
+  },
+  {
+    "question_id": "supplemental_008",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Intelligent-Tiering"
+  },
+  {
+    "question_id": "supplemental_009",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Object Lock"
+  },
+  {
+    "question_id": "supplemental_010",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Object Lock"
+  },
+  {
+    "question_id": "supplemental_011",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Object Lock"
+  },
+  {
+    "question_id": "supplemental_012",
+    "concept_id": "c4",
+    "cluster_id": "c4_2",
+    "primary_service_tested": "S3 Object Lock"
+  },
+  {
+    "question_id": "supplemental_013",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EFS"
+  },
+  {
+    "question_id": "supplemental_014",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EFS"
+  },
+  {
+    "question_id": "supplemental_015",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EFS"
+  },
+  {
+    "question_id": "supplemental_016",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EFS"
+  },
+  {
+    "question_id": "supplemental_017",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon FSx for Windows File Server"
+  },
+  {
+    "question_id": "supplemental_018",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon FSx for Windows File Server"
+  },
+  {
+    "question_id": "supplemental_019",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon FSx for Windows File Server"
+  },
+  {
+    "question_id": "supplemental_020",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon FSx for Windows File Server"
+  },
+  {
+    "question_id": "supplemental_021",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "supplemental_022",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "supplemental_023",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "supplemental_024",
+    "concept_id": "c4",
+    "cluster_id": "c4_1",
+    "primary_service_tested": "Amazon EBS"
+  },
+  {
+    "question_id": "supplemental_025",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "supplemental_026",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "supplemental_027",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "supplemental_028",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups"
+  },
+  {
+    "question_id": "supplemental_029",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Application Load Balancer"
+  },
+  {
+    "question_id": "supplemental_030",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Application Load Balancer"
+  },
+  {
+    "question_id": "supplemental_031",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Application Load Balancer"
+  },
+  {
+    "question_id": "supplemental_032",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Application Load Balancer"
+  },
+  {
+    "question_id": "supplemental_033",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Network Load Balancer"
+  },
+  {
+    "question_id": "supplemental_034",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Network Load Balancer"
+  },
+  {
+    "question_id": "supplemental_035",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Network Load Balancer"
+  },
+  {
+    "question_id": "supplemental_036",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Network Load Balancer"
+  },
+  {
+    "question_id": "supplemental_037",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Gateway Load Balancer"
+  },
+  {
+    "question_id": "supplemental_038",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Gateway Load Balancer"
+  },
+  {
+    "question_id": "supplemental_039",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Gateway Load Balancer"
+  },
+  {
+    "question_id": "supplemental_040",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Gateway Load Balancer"
+  },
+  {
+    "question_id": "supplemental_041",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "AWS Lambda"
+  },
+  {
+    "question_id": "supplemental_042",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "AWS Lambda"
+  },
+  {
+    "question_id": "supplemental_043",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "AWS Lambda"
+  },
+  {
+    "question_id": "supplemental_044",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "AWS Lambda"
+  },
+  {
+    "question_id": "supplemental_045",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda reserved concurrency"
+  },
+  {
+    "question_id": "supplemental_046",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda reserved concurrency"
+  },
+  {
+    "question_id": "supplemental_047",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda reserved concurrency"
+  },
+  {
+    "question_id": "supplemental_048",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda reserved concurrency"
+  },
+  {
+    "question_id": "supplemental_049",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Proxy"
+  },
+  {
+    "question_id": "supplemental_050",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Proxy"
+  },
+  {
+    "question_id": "supplemental_051",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS Proxy"
+  },
+  {
+    "question_id": "supplemental_052",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Proxy"
+  },
+  {
+    "question_id": "supplemental_053",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "AWS Fargate"
+  },
+  {
+    "question_id": "supplemental_054",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "AWS Fargate"
+  },
+  {
+    "question_id": "supplemental_055",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "AWS Fargate"
+  },
+  {
+    "question_id": "supplemental_056",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "AWS Fargate"
+  },
+  {
+    "question_id": "supplemental_057",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon EKS"
+  },
+  {
+    "question_id": "supplemental_058",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon EKS"
+  },
+  {
+    "question_id": "supplemental_059",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon EKS"
+  },
+  {
+    "question_id": "supplemental_060",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon EKS"
+  },
+  {
+    "question_id": "supplemental_061",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon ECS"
+  },
+  {
+    "question_id": "supplemental_062",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon ECS"
+  },
+  {
+    "question_id": "supplemental_063",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon ECS"
+  },
+  {
+    "question_id": "supplemental_064",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon ECS"
+  },
+  {
+    "question_id": "supplemental_065",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS"
+  },
+  {
+    "question_id": "supplemental_066",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS"
+  },
+  {
+    "question_id": "supplemental_067",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS"
+  },
+  {
+    "question_id": "supplemental_068",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS"
+  },
+  {
+    "question_id": "supplemental_069",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SNS"
+  },
+  {
+    "question_id": "supplemental_070",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SNS"
+  },
+  {
+    "question_id": "supplemental_071",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SNS"
+  },
+  {
+    "question_id": "supplemental_072",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SNS"
+  },
+  {
+    "question_id": "supplemental_073",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS FIFO queue"
+  },
+  {
+    "question_id": "supplemental_074",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS FIFO queue"
+  },
+  {
+    "question_id": "supplemental_075",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS FIFO queue"
+  },
+  {
+    "question_id": "supplemental_076",
+    "concept_id": "c6",
+    "cluster_id": "c6_1",
+    "primary_service_tested": "Amazon SQS FIFO queue"
+  },
+  {
+    "question_id": "supplemental_077",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "Amazon EventBridge"
+  },
+  {
+    "question_id": "supplemental_078",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "Amazon EventBridge"
+  },
+  {
+    "question_id": "supplemental_079",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "Amazon EventBridge"
+  },
+  {
+    "question_id": "supplemental_080",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "Amazon EventBridge"
+  },
+  {
+    "question_id": "supplemental_081",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "AWS Step Functions"
+  },
+  {
+    "question_id": "supplemental_082",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "AWS Step Functions"
+  },
+  {
+    "question_id": "supplemental_083",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "AWS Step Functions"
+  },
+  {
+    "question_id": "supplemental_084",
+    "concept_id": "c6",
+    "cluster_id": "c6_2",
+    "primary_service_tested": "AWS Step Functions"
+  },
+  {
+    "question_id": "supplemental_085",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis Data Streams"
+  },
+  {
+    "question_id": "supplemental_086",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis Data Streams"
+  },
+  {
+    "question_id": "supplemental_087",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis Data Streams"
+  },
+  {
+    "question_id": "supplemental_088",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Kinesis Data Streams"
+  },
+  {
+    "question_id": "supplemental_089",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Data Firehose"
+  },
+  {
+    "question_id": "supplemental_090",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Data Firehose"
+  },
+  {
+    "question_id": "supplemental_091",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Data Firehose"
+  },
+  {
+    "question_id": "supplemental_092",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Data Firehose"
+  },
+  {
+    "question_id": "supplemental_093",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "supplemental_094",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "supplemental_095",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "supplemental_096",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "supplemental_097",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "supplemental_098",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM STS AssumeRole"
+  },
+  {
+    "question_id": "supplemental_099",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM role and STS AssumeRole"
+  },
+  {
+    "question_id": "supplemental_100",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "supplemental_101",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "SCPs"
+  },
+  {
+    "question_id": "supplemental_102",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "SCPs"
+  },
+  {
+    "question_id": "supplemental_103",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "SCPs"
+  },
+  {
+    "question_id": "supplemental_104",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "SCPs"
+  },
+  {
+    "question_id": "supplemental_105",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Control Tower"
+  },
+  {
+    "question_id": "supplemental_106",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Control Tower"
+  },
+  {
+    "question_id": "supplemental_107",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Control Tower"
+  },
+  {
+    "question_id": "supplemental_108",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Control Tower"
+  },
+  {
+    "question_id": "supplemental_109",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS KMS"
+  },
+  {
+    "question_id": "supplemental_110",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS KMS"
+  },
+  {
+    "question_id": "supplemental_111",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS KMS"
+  },
+  {
+    "question_id": "supplemental_112",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS KMS"
+  },
+  {
+    "question_id": "supplemental_113",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Secrets Manager"
+  },
+  {
+    "question_id": "supplemental_114",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Secrets Manager"
+  },
+  {
+    "question_id": "supplemental_115",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Secrets Manager"
+  },
+  {
+    "question_id": "supplemental_116",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Secrets Manager"
+  },
+  {
+    "question_id": "supplemental_117",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Systems Manager Parameter Store"
+  },
+  {
+    "question_id": "supplemental_118",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Systems Manager Parameter Store"
+  },
+  {
+    "question_id": "supplemental_119",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Systems Manager Parameter Store"
+  },
+  {
+    "question_id": "supplemental_120",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "AWS Systems Manager Parameter Store"
+  },
+  {
+    "question_id": "supplemental_121",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS WAF"
+  },
+  {
+    "question_id": "supplemental_122",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS WAF"
+  },
+  {
+    "question_id": "supplemental_123",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS WAF"
+  },
+  {
+    "question_id": "supplemental_124",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS WAF"
+  },
+  {
+    "question_id": "supplemental_125",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS Shield Advanced"
+  },
+  {
+    "question_id": "supplemental_126",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS Shield Advanced"
+  },
+  {
+    "question_id": "supplemental_127",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS Shield Advanced"
+  },
+  {
+    "question_id": "supplemental_128",
+    "concept_id": "c1",
+    "cluster_id": "c1_3",
+    "primary_service_tested": "AWS Shield Advanced"
+  },
+  {
+    "question_id": "supplemental_129",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "Amazon GuardDuty"
+  },
+  {
+    "question_id": "supplemental_130",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "GuardDuty"
+  },
+  {
+    "question_id": "supplemental_131",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "GuardDuty"
+  },
+  {
+    "question_id": "supplemental_132",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "GuardDuty"
+  },
+  {
+    "question_id": "supplemental_133",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "Amazon Macie"
+  },
+  {
+    "question_id": "supplemental_134",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "Amazon Macie"
+  },
+  {
+    "question_id": "supplemental_135",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "Amazon Macie"
+  },
+  {
+    "question_id": "supplemental_136",
+    "concept_id": "c1",
+    "cluster_id": "c1_2",
+    "primary_service_tested": "Amazon Macie"
+  },
+  {
+    "question_id": "supplemental_137",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "Amazon Inspector"
+  },
+  {
+    "question_id": "supplemental_138",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "Amazon Inspector"
+  },
+  {
+    "question_id": "supplemental_139",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "Amazon Inspector"
+  },
+  {
+    "question_id": "supplemental_140",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "Amazon Inspector"
+  },
+  {
+    "question_id": "supplemental_141",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS CloudTrail"
+  },
+  {
+    "question_id": "supplemental_142",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS CloudTrail"
+  },
+  {
+    "question_id": "supplemental_143",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS CloudTrail"
+  },
+  {
+    "question_id": "supplemental_144",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS CloudTrail"
+  },
+  {
+    "question_id": "supplemental_145",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "supplemental_146",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "supplemental_147",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "supplemental_148",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch"
+  },
+  {
+    "question_id": "supplemental_149",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "supplemental_150",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "supplemental_151",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "supplemental_152",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "supplemental_153",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS X-Ray"
+  },
+  {
+    "question_id": "supplemental_154",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS X-Ray"
+  },
+  {
+    "question_id": "supplemental_155",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS X-Ray"
+  },
+  {
+    "question_id": "supplemental_156",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS X-Ray"
+  },
+  {
+    "question_id": "supplemental_157",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch Logs Insights"
+  },
+  {
+    "question_id": "supplemental_158",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch Logs Insights"
+  },
+  {
+    "question_id": "supplemental_159",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch Logs Insights"
+  },
+  {
+    "question_id": "supplemental_160",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "CloudWatch Logs Insights"
+  },
+  {
+    "question_id": "supplemental_161",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "supplemental_162",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "supplemental_163",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "supplemental_164",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "supplemental_165",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "supplemental_166",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints (Interface) / PrivateLink"
+  },
+  {
+    "question_id": "supplemental_167",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints (Interface)"
+  },
+  {
+    "question_id": "supplemental_168",
+    "concept_id": "c2",
+    "cluster_id": "c2_2",
+    "primary_service_tested": "VPC Endpoints"
+  },
+  {
+    "question_id": "supplemental_169",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Gateway"
+  },
+  {
+    "question_id": "supplemental_170",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Gateway"
+  },
+  {
+    "question_id": "supplemental_171",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Gateway"
+  },
+  {
+    "question_id": "supplemental_172",
+    "concept_id": "c2",
+    "cluster_id": "c2_1",
+    "primary_service_tested": "NAT Gateway"
+  },
+  {
+    "question_id": "supplemental_173",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Transit Gateway"
+  },
+  {
+    "question_id": "supplemental_174",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Transit Gateway"
+  },
+  {
+    "question_id": "supplemental_175",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Transit Gateway"
+  },
+  {
+    "question_id": "supplemental_176",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Transit Gateway"
+  },
+  {
+    "question_id": "supplemental_177",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPC peering"
+  },
+  {
+    "question_id": "supplemental_178",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPC peering"
+  },
+  {
+    "question_id": "supplemental_179",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPC peering"
+  },
+  {
+    "question_id": "supplemental_180",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "VPC peering"
+  },
+  {
+    "question_id": "supplemental_181",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Direct Connect"
+  },
+  {
+    "question_id": "supplemental_182",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Direct Connect"
+  },
+  {
+    "question_id": "supplemental_183",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Direct Connect"
+  },
+  {
+    "question_id": "supplemental_184",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Direct Connect"
+  },
+  {
+    "question_id": "supplemental_185",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Site-to-Site VPN"
+  },
+  {
+    "question_id": "supplemental_186",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Site-to-Site VPN"
+  },
+  {
+    "question_id": "supplemental_187",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Site-to-Site VPN"
+  },
+  {
+    "question_id": "supplemental_188",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Site-to-Site VPN"
+  },
+  {
+    "question_id": "supplemental_189",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "supplemental_190",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "supplemental_191",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "supplemental_192",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "Direct Connect"
+  },
+  {
+    "question_id": "supplemental_193",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 latency-based routing"
+  },
+  {
+    "question_id": "supplemental_194",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 latency-based routing"
+  },
+  {
+    "question_id": "supplemental_195",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 latency-based routing"
+  },
+  {
+    "question_id": "supplemental_196",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 latency-based routing"
+  },
+  {
+    "question_id": "supplemental_197",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 weighted routing"
+  },
+  {
+    "question_id": "supplemental_198",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 weighted routing"
+  },
+  {
+    "question_id": "supplemental_199",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 weighted routing"
+  },
+  {
+    "question_id": "supplemental_200",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 weighted routing"
+  },
+  {
+    "question_id": "supplemental_201",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 failover routing"
+  },
+  {
+    "question_id": "supplemental_202",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 failover routing"
+  },
+  {
+    "question_id": "supplemental_203",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 failover routing"
+  },
+  {
+    "question_id": "supplemental_204",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53 failover routing"
+  },
+  {
+    "question_id": "supplemental_205",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Global Accelerator"
+  },
+  {
+    "question_id": "supplemental_206",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Global Accelerator"
+  },
+  {
+    "question_id": "supplemental_207",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Global Accelerator"
+  },
+  {
+    "question_id": "supplemental_208",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Global Accelerator"
+  },
+  {
+    "question_id": "supplemental_209",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "supplemental_210",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS Multi-AZ deployment"
+  },
+  {
+    "question_id": "supplemental_211",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS Multi-AZ"
+  },
+  {
+    "question_id": "supplemental_212",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon RDS Multi-AZ deployment"
+  },
+  {
+    "question_id": "supplemental_213",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS read replicas"
+  },
+  {
+    "question_id": "supplemental_214",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS read replicas"
+  },
+  {
+    "question_id": "supplemental_215",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS read replicas"
+  },
+  {
+    "question_id": "supplemental_216",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "RDS read replicas"
+  },
+  {
+    "question_id": "supplemental_217",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon Aurora"
+  },
+  {
+    "question_id": "supplemental_218",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon Aurora"
+  },
+  {
+    "question_id": "supplemental_219",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon Aurora"
+  },
+  {
+    "question_id": "supplemental_220",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "Amazon Aurora"
+  },
+  {
+    "question_id": "supplemental_221",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "supplemental_222",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "supplemental_223",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "supplemental_224",
+    "concept_id": "c5",
+    "cluster_id": "c5_2",
+    "primary_service_tested": "Amazon DynamoDB"
+  },
+  {
+    "question_id": "supplemental_225",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "DAX"
+  },
+  {
+    "question_id": "supplemental_226",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "DAX"
+  },
+  {
+    "question_id": "supplemental_227",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "DAX"
+  },
+  {
+    "question_id": "supplemental_228",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "DAX"
+  },
+  {
+    "question_id": "supplemental_229",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Redis"
+  },
+  {
+    "question_id": "supplemental_230",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Redis"
+  },
+  {
+    "question_id": "supplemental_231",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Redis"
+  },
+  {
+    "question_id": "supplemental_232",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Redis"
+  },
+  {
+    "question_id": "supplemental_233",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Memcached"
+  },
+  {
+    "question_id": "supplemental_234",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Memcached"
+  },
+  {
+    "question_id": "supplemental_235",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Memcached"
+  },
+  {
+    "question_id": "supplemental_236",
+    "concept_id": "c5",
+    "cluster_id": "c5_3",
+    "primary_service_tested": "Amazon ElastiCache for Memcached"
+  },
+  {
+    "question_id": "supplemental_237",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Athena"
+  },
+  {
+    "question_id": "supplemental_238",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Athena"
+  },
+  {
+    "question_id": "supplemental_239",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Athena"
+  },
+  {
+    "question_id": "supplemental_240",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Athena"
+  },
+  {
+    "question_id": "supplemental_241",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "AWS Glue"
+  },
+  {
+    "question_id": "supplemental_242",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "AWS Glue"
+  },
+  {
+    "question_id": "supplemental_243",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "AWS Glue"
+  },
+  {
+    "question_id": "supplemental_244",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "AWS Glue"
+  },
+  {
+    "question_id": "supplemental_245",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Redshift"
+  },
+  {
+    "question_id": "supplemental_246",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Redshift"
+  },
+  {
+    "question_id": "supplemental_247",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Redshift"
+  },
+  {
+    "question_id": "supplemental_248",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon Redshift"
+  },
+  {
+    "question_id": "supplemental_249",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon EMR"
+  },
+  {
+    "question_id": "supplemental_250",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon EMR"
+  },
+  {
+    "question_id": "supplemental_251",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon EMR"
+  },
+  {
+    "question_id": "supplemental_252",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "Amazon EMR"
+  },
+  {
+    "question_id": "supplemental_253",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "AWS DMS"
+  },
+  {
+    "question_id": "supplemental_254",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "AWS Database Migration Service (AWS DMS)"
+  },
+  {
+    "question_id": "supplemental_255",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "AWS Database Migration Service (AWS DMS)"
+  },
+  {
+    "question_id": "supplemental_256",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "AWS DMS"
+  },
+  {
+    "question_id": "supplemental_257",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "AWS Schema Conversion Tool"
+  },
+  {
+    "question_id": "supplemental_258",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "AWS Schema Conversion Tool"
+  },
+  {
+    "question_id": "supplemental_259",
+    "concept_id": "c5",
+    "cluster_id": "c5_5",
+    "primary_service_tested": "AWS Schema Conversion Tool"
+  },
+  {
+    "question_id": "supplemental_260",
+    "concept_id": "c5",
+    "cluster_id": "c5_1",
+    "primary_service_tested": "AWS Schema Conversion Tool"
+  },
+  {
+    "question_id": "supplemental_261",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS DataSync"
+  },
+  {
+    "question_id": "supplemental_262",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS DataSync"
+  },
+  {
+    "question_id": "supplemental_263",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS DataSync"
+  },
+  {
+    "question_id": "supplemental_264",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS DataSync"
+  },
+  {
+    "question_id": "supplemental_265",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Snowball Edge"
+  },
+  {
+    "question_id": "supplemental_266",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Snowball Edge"
+  },
+  {
+    "question_id": "supplemental_267",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Snowball Edge"
+  },
+  {
+    "question_id": "supplemental_268",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Snowball Edge"
+  },
+  {
+    "question_id": "supplemental_269",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "AWS Storage Gateway File Gateway"
+  },
+  {
+    "question_id": "supplemental_270",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "AWS Storage Gateway File Gateway"
+  },
+  {
+    "question_id": "supplemental_271",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "AWS Storage Gateway File Gateway"
+  },
+  {
+    "question_id": "supplemental_272",
+    "concept_id": "c4",
+    "cluster_id": "c4_4",
+    "primary_service_tested": "AWS Storage Gateway File Gateway"
+  },
+  {
+    "question_id": "supplemental_273",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "supplemental_274",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "supplemental_275",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "supplemental_276",
+    "concept_id": "c4",
+    "cluster_id": "c4_3",
+    "primary_service_tested": "AWS Backup"
+  },
+  {
+    "question_id": "supplemental_277",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS CloudFormation"
+  },
+  {
+    "question_id": "supplemental_278",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS CloudFormation"
+  },
+  {
+    "question_id": "supplemental_279",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS CloudFormation"
+  },
+  {
+    "question_id": "supplemental_280",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS CloudFormation"
+  },
+  {
+    "question_id": "supplemental_281",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS Elastic Beanstalk"
+  },
+  {
+    "question_id": "supplemental_282",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "Elastic Beanstalk"
+  },
+  {
+    "question_id": "supplemental_283",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS Elastic Beanstalk"
+  },
+  {
+    "question_id": "supplemental_284",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "AWS Elastic Beanstalk"
+  },
+  {
+    "question_id": "supplemental_285",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Amazon Cognito"
+  },
+  {
+    "question_id": "supplemental_286",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Amazon Cognito"
+  },
+  {
+    "question_id": "supplemental_287",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Amazon Cognito"
+  },
+  {
+    "question_id": "supplemental_288",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Amazon Cognito"
+  },
+  {
+    "question_id": "supplemental_289",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon API Gateway"
+  },
+  {
+    "question_id": "supplemental_290",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon API Gateway"
+  },
+  {
+    "question_id": "supplemental_291",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon API Gateway"
+  },
+  {
+    "question_id": "supplemental_292",
+    "concept_id": "c3",
+    "cluster_id": "c3_4",
+    "primary_service_tested": "Amazon API Gateway"
+  },
+  {
+    "question_id": "supplemental_293",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Compute Savings Plans"
+  },
+  {
+    "question_id": "supplemental_294",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Compute Savings Plans"
+  },
+  {
+    "question_id": "supplemental_295",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Compute Savings Plans"
+  },
+  {
+    "question_id": "supplemental_296",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Compute Savings Plans"
+  },
+  {
+    "question_id": "supplemental_297",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instances"
+  },
+  {
+    "question_id": "supplemental_298",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instances"
+  },
+  {
+    "question_id": "supplemental_299",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instances"
+  },
+  {
+    "question_id": "supplemental_300",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Spot Instances"
+  },
+  {
+    "question_id": "supplemental_301",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 On-Demand Capacity Reservation"
+  },
+  {
+    "question_id": "supplemental_302",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 Capacity Reservations"
+  },
+  {
+    "question_id": "supplemental_303",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "On-Demand Capacity Reservation"
+  },
+  {
+    "question_id": "supplemental_304",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2 On-Demand Capacity Reservation"
+  },
+  {
+    "question_id": "supplemental_305",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "supplemental_306",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "supplemental_307",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "supplemental_308",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "supplemental_309",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Cost Explorer"
+  },
+  {
+    "question_id": "supplemental_310",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Cost Explorer"
+  },
+  {
+    "question_id": "supplemental_311",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Cost Explorer"
+  },
+  {
+    "question_id": "supplemental_312",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Cost Explorer"
+  },
+  {
+    "question_id": "fundamentals_001",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Multi-AZ deployment"
+  },
+  {
+    "question_id": "fundamentals_002",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "fundamentals_003",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Shared Responsibility Model"
+  },
+  {
+    "question_id": "fundamentals_004",
+    "concept_id": "c3",
+    "cluster_id": "c3_3",
+    "primary_service_tested": "Lambda"
+  },
+  {
+    "question_id": "fundamentals_005",
+    "concept_id": "c1",
+    "cluster_id": "c1_4",
+    "primary_service_tested": "AWS Config"
+  },
+  {
+    "question_id": "fundamentals_006",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Reliability"
+  },
+  {
+    "question_id": "fundamentals_007",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Pricing Calculator"
+  },
+  {
+    "question_id": "fundamentals_008",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Local Zone"
+  },
+  {
+    "question_id": "fundamentals_009",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "AWS Organizations"
+  },
+  {
+    "question_id": "fundamentals_010",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM"
+  },
+  {
+    "question_id": "fundamentals_011",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "IAM roles"
+  },
+  {
+    "question_id": "fundamentals_012",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "Route 53"
+  },
+  {
+    "question_id": "fundamentals_013",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Design for Failure"
+  },
+  {
+    "question_id": "fundamentals_014",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "CloudFront"
+  },
+  {
+    "question_id": "fundamentals_015",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Budgets"
+  },
+  {
+    "question_id": "fundamentals_016",
+    "concept_id": "c3",
+    "cluster_id": "c3_1",
+    "primary_service_tested": "EC2"
+  },
+  {
+    "question_id": "fundamentals_017",
+    "concept_id": "c2",
+    "cluster_id": "c2_3",
+    "primary_service_tested": "AWS Wavelength"
+  },
+  {
+    "question_id": "fundamentals_018",
+    "concept_id": "c3",
+    "cluster_id": "c3_2",
+    "primary_service_tested": "Auto Scaling Groups (ASG)"
+  },
+  {
+    "question_id": "fundamentals_019",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Organizations"
+  },
+  {
+    "question_id": "fundamentals_020",
+    "concept_id": "c6",
+    "cluster_id": "c6_3",
+    "primary_service_tested": "Availability Zones"
+  },
+  {
+    "question_id": "fundamentals_021",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Organizations"
+  },
+  {
+    "question_id": "fundamentals_022",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "SCP"
+  },
+  {
+    "question_id": "fundamentals_023",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Organizations SCPs"
+  },
+  {
+    "question_id": "fundamentals_024",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "AWS Control Tower"
+  },
+  {
+    "question_id": "fundamentals_025",
+    "concept_id": "c2",
+    "cluster_id": "c2_4",
+    "primary_service_tested": "AWS Resource Access Manager (RAM)"
+  },
+  {
+    "question_id": "fundamentals_026",
+    "concept_id": "c6",
+    "cluster_id": "c6_4",
+    "primary_service_tested": "Consolidated billing"
+  },
+  {
+    "question_id": "fundamentals_027",
+    "concept_id": "c1",
+    "cluster_id": "c1_1",
+    "primary_service_tested": "Organizations SCPs"
+  }
+]

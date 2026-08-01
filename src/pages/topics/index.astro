@@ -1,0 +1,52 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { clusterMeta, conceptStyles, summaryFor, topicById } from "../../lib/data";
+
+const clusters = clusterMeta();
+const byConcept = new Map<string, typeof clusters>();
+for (const cluster of clusters) {
+  const bucket = byConcept.get(cluster.conceptId) ?? [];
+  bucket.push(cluster);
+  byConcept.set(cluster.conceptId, bucket);
+}
+---
+
+<BaseLayout title="Topics">
+  <div class="page-head">
+    <span class="eyebrow">Reference</span>
+    <h1>Topics</h1>
+    <p>
+      Open one to read the topic, then work the questions at the bottom of the page.
+    </p>
+  </div>
+
+  <div class="stack-lg">
+    {
+      [...byConcept.entries()].map(([conceptId, group]) => (
+        <section>
+          <div class="block-head">
+            <h2>{conceptStyles[conceptId]?.label ?? conceptId}</h2>
+            <span class="small muted">
+              {group.reduce((sum, cluster) => sum + cluster.count, 0)} questions
+            </span>
+          </div>
+          <div class="stack">
+            {group.map((cluster) => (
+              <a
+                class="topic-link"
+                href={`/topics/${cluster.id}/`}
+                style={`--accent: ${cluster.color}`}
+              >
+                <span>
+                  <b>{cluster.title}</b>
+                  <p>{(() => { const topic = topicById.get(cluster.id); return topic && summaryFor(topic); })()}</p>
+                </span>
+                <span class="chip">{cluster.count}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

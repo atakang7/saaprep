@@ -1,0 +1,329 @@
+---
+import { ArrowLeft } from "lucide-astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  accentFor,
+  conceptStyles,
+  contentFor,
+  explanationFor,
+  getQuestionsForTopic,
+  inlineMarkdown,
+  summaryFor,
+  topics,
+} from "../../lib/data";
+
+export function getStaticPaths() {
+  return topics.map((topic) => ({
+    params: { cluster_id: topic.cluster_id },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+const accent = accentFor(topic.concept_id);
+const concept = conceptStyles[topic.concept_id] ?? conceptStyles.c1;
+const practice = getQuestionsForTopic(topic);
+const content = contentFor(topic.cluster_id);
+---
+
+<BaseLayout title={topic.cluster_title}>
+  <article class="doc-container" style={`--accent: ${accent};`}>
+    <div class="doc-content">
+      <a href={`/concepts/${topic.concept_id}/`} class="back-link">
+        <ArrowLeft size={14} /> Back to {concept.label}
+      </a>
+      <header class="doc-header">
+        <span class="concept-tag">{concept.label}</span>
+        <h1 class="doc-title">{topic.cluster_title}</h1>
+        <p class="doc-lead">{summaryFor(topic)}</p>
+      </header>
+
+      {content ? (
+        <div class="markdown-body">
+          <h2 id="core-concept">1. Core Concept</h2>
+          <ul>
+            {content.core_concept.map((paragraph) => (
+              <li><span set:html={inlineMarkdown(paragraph)} /></li>
+            ))}
+          </ul>
+
+          <h2 id="key-services">2. Key Services & Features</h2>
+          <ul>
+            {content.hard_facts.map((item) => (
+              <li>
+                <strong>{item.name}:</strong>
+                <ul>
+                  {item.facts.map((point) => (
+                    <li set:html={inlineMarkdown(point)} />
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+
+          <h2 id="architecture-rules">3. Architecture Rules</h2>
+          <ul>
+            {content.architecture_rules.map((rule) => (
+              <li set:html={inlineMarkdown(rule)} />
+            ))}
+          </ul>
+
+          <h2 id="scenarios">4. Scenarios & Use Cases</h2>
+          <ul>
+            {content.when_to_choose.map((item) => (
+              <li>
+                <strong>{item.scenario}</strong>
+                <ul>
+                  <li><strong>Choose:</strong> <code class="highlight">{item.choice}</code></li>
+                  <li><strong>Why:</strong> <span class="muted">{item.why}</span></li>
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <div class="markdown-body">
+          <h2>Legacy Content Mode</h2>
+          <p>This page has not been migrated to the new schema yet.</p>
+        </div>
+      )}
+
+      <hr class="doc-divider" />
+
+      <section id="practice" class="markdown-body">
+        <h2>5. Practice Questions ({practice.length})</h2>
+        <p>Test your knowledge with these exam-style questions.</p>
+        
+        <div class="stack">
+          {practice.map((question, position) => {
+            const explanation = explanationFor(question);
+            const correct = new Set(question.answer?.labels ?? []);
+            return (
+              <details class="qa-block">
+                <summary class="qa-summary">
+                  <span class="qa-num">Q{position + 1}</span>
+                  <span class="qa-text">{question.question}</span>
+                </summary>
+                <div class="qa-details">
+                  <ul class="qa-options">
+                    {question.options.map((option) => (
+                      <li class={correct.has(option.label) ? "is-correct" : ""}>
+                        <strong>{option.label}</strong> {option.text}
+                      </li>
+                    ))}
+                  </ul>
+                  <div class="qa-answer">
+                    <strong>Answer: {question.answer?.labels.join(", ")}</strong>
+                    {explanation && <p class="qa-explain">{explanation}</p>}
+                  </div>
+                  <a class="qa-link" href={`/questions/${question.id}/`}>Open isolated question ↗</a>
+                </div>
+              </details>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  </article>
+
+  <style>
+    .doc-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 2rem;
+      transition: color 0.2s;
+    }
+    .back-link:hover {
+      color: var(--accent);
+    }
+
+    /* Main Content Area */
+    .doc-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Header */
+    .doc-header {
+      margin-bottom: 3rem;
+    }
+    .concept-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .doc-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--ink);
+      margin: 0 0 1rem 0;
+    }
+    .doc-lead {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Markdown-style content */
+    .markdown-body {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: var(--ink);
+    }
+    .markdown-body h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+    }
+    .markdown-body h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem 0;
+    }
+    .markdown-body ul {
+      padding-left: 1.25rem;
+      margin: 0 0 1.5rem 0;
+    }
+    .markdown-body li {
+      margin-bottom: 0.5rem;
+    }
+    .markdown-body li > ul {
+      margin-top: 0.5rem;
+      margin-bottom: 0;
+    }
+    .markdown-body strong {
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .markdown-body .muted {
+      color: var(--muted);
+    }
+    .highlight {
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      color: var(--accent);
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+      font-weight: 600;
+    }
+
+    .doc-divider {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 3rem 0;
+    }
+
+    /* Q&A section styling for notes format */
+    .qa-block {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .qa-summary {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      cursor: pointer;
+      font-weight: 500;
+      background: var(--surface-soft);
+      transition: background 0.2s;
+    }
+    .qa-summary:hover {
+      background: color-mix(in srgb, var(--accent) 5%, var(--surface-soft));
+    }
+    .qa-summary::marker {
+      display: none;
+    }
+    .qa-summary::-webkit-details-marker {
+      display: none;
+    }
+    .qa-num {
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .qa-text {
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .qa-details {
+      padding: 1rem;
+      border-top: 1px solid var(--line);
+    }
+    .qa-options {
+      list-style: none !important;
+      padding: 0 !important;
+      margin: 0 0 1.5rem 0 !important;
+    }
+    .qa-options li {
+      padding: 0.5rem 0;
+      border-bottom: 1px dashed var(--line);
+    }
+    .qa-options li:last-child {
+      border-bottom: none;
+    }
+    .qa-options li.is-correct {
+      color: var(--ok);
+      font-weight: 500;
+    }
+    .qa-answer {
+      background: var(--ok-soft);
+      border-left: 4px solid var(--ok);
+      padding: 1rem;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 1rem;
+    }
+    .qa-explain {
+      margin: 0.5rem 0 0 0;
+      font-size: 0.95rem;
+      color: var(--ink);
+    }
+    .qa-link {
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .qa-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 900px) {
+      .doc-container {
+        flex-direction: column;
+      }
+      .doc-nav {
+        width: 100%;
+        position: static;
+        border-left: none;
+        border-bottom: 1px solid var(--line);
+        padding-left: 0;
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+    }
+  </style>
+</BaseLayout>

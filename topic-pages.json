@@ -1,0 +1,3505 @@
+[
+  {
+    "cluster_id": "c1_1",
+    "cluster_title": "Identity and permissions",
+    "concept_id": "c1",
+    "concept_name": "Guard (Access and Data)",
+    "exam_domains": [
+      "Security",
+      "Resilience",
+      "Performance",
+      "Cost"
+    ],
+    "what_this_tests": [
+      "Ability to choose the right identity mechanism (IAM user, role, federation, or Cognito) for access control without exposing long-term credentials.",
+      "Understanding of permission boundaries, including SCPs for account-wide guardrails and IAM policies for fine-grained access.",
+      "Knowledge of temporary credential patterns (STS, roles, web identity federation) to secure AWS API calls.",
+      "Recognition of when to use resource-based policies vs. identity-based policies for cross-account or public access."
+    ],
+    "signal_words": [
+      {
+        "phrase": "without exposing API credentials",
+        "points_to": "IAM roles (instance profile) or STS temporary credentials"
+      },
+      {
+        "phrase": "prevent large instances in all accounts",
+        "points_to": "Service Control Policies (SCPs) in AWS Organizations"
+      },
+      {
+        "phrase": "federation with on-premises identity provider",
+        "points_to": "IAM federation with SAML 2.0 or OIDC"
+      },
+      {
+        "phrase": "serverless authentication and authorization",
+        "points_to": "Amazon Cognito + Lambda@Edge"
+      },
+      {
+        "phrase": "anonymous access to S3",
+        "points_to": "Bucket policy with Principal: *"
+      },
+      {
+        "phrase": "cross-account admin access",
+        "points_to": "Cross-account IAM roles"
+      },
+      {
+        "phrase": "fine-grained access to DynamoDB without middle tier",
+        "points_to": "DynamoDB Fine-Grained Access Control (FGAC) with IAM conditions"
+      },
+      {
+        "phrase": "OpenID Connect identity provider",
+        "points_to": "Web Identity Federation (Cognito or direct STS AssumeRoleWithWebIdentity)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "IAM",
+        "job": "Manages users, groups, roles, and policies to control access to AWS resources.",
+        "choose_when": "You need to define granular permissions for AWS users or services within a single account.",
+        "avoid_when": "You need to enforce permissions across multiple accounts in an organization (use SCPs) or need external identity federation (use IAM Identity Center or Cognito).",
+        "trap_words": "long-term access keys, root user, inline policy vs. managed policy"
+      },
+      {
+        "name": "IAM Identity Center",
+        "job": "Centralizes workforce identity and access management across AWS accounts and applications.",
+        "choose_when": "You have multiple AWS accounts and want single sign-on (SSO) for employees using an existing identity provider.",
+        "avoid_when": "You only need simple IAM users for a single account or need customer-facing authentication (use Cognito).",
+        "trap_words": "SSO, permission sets, multi-account, ABAC"
+      },
+      {
+        "name": "Organizations SCPs",
+        "job": "Sets permission guardrails for all accounts in an AWS Organization, restricting maximum allowed actions.",
+        "choose_when": "You need to enforce baseline restrictions (e.g., deny launching large EC2 instances) across all accounts with minimal overhead.",
+        "avoid_when": "You need to grant permissions (SCPs only deny, not grant) or need per-resource fine-grained control (use IAM policies).",
+        "trap_words": "default policy, FullAWSAccess, deny list, allow list"
+      },
+      {
+        "name": "Amazon Cognito",
+        "job": "Provides authentication, authorization, and user management for web and mobile applications.",
+        "choose_when": "You need customer-facing sign-up/sign-in with social or enterprise identity providers, and want to integrate with API Gateway or AppSync.",
+        "avoid_when": "You need workforce SSO for AWS console access (use IAM Identity Center) or simple IAM users.",
+        "trap_words": "user pool, identity pool, OAuth 2.0, Lambda triggers, low login latency"
+      }
+    ],
+    "comparisons": [
+      "IAM user vs IAM role: Choose IAM user for long-term human access with keys; choose IAM role for temporary credentials for AWS services or federated users.",
+      "SCP vs IAM policy: SCPs set maximum permissions at the account level (cannot grant); IAM policies grant or deny specific actions within those boundaries.",
+      "Cognito User Pools vs Identity Pools: User Pools authenticate users; Identity Pools provide temporary AWS credentials for authenticated (or unauthenticated) users.",
+      "Resource-based policy vs identity-based policy: Resource-based policies (e.g., S3 bucket policy) grant access to the resource directly; identity-based policies attach to a user/role and specify what they can do.",
+      "IAM federation with SAML vs Web Identity Federation: SAML is for enterprise identity providers (e.g., Active Directory); Web Identity Federation is for social or OIDC providers (e.g., Google, Amazon)."
+    ],
+    "exam_moves": [
+      "If a question mentions 'prevent large EC2 instances in all accounts' and 'least operational overhead', immediately think SCPs in AWS Organizations.",
+      "When you see 'temporary credentials' or 'without exposing long-term keys', the answer is almost always an IAM role (instance profile for EC2, cross-account role, or STS).",
+      "For 'serverless authentication and authorization' with 'global content delivery', combine Cognito (auth) + Lambda@Edge (authz) + CloudFront (global).",
+      "If the question involves 'federation with on-premises SAML 2.0', the correct answer is IAM federation (not Cognito) for console access.",
+      "Remember: SCPs cannot grant permissions; they only deny or allow within the boundaries of IAM policies. A common trap is to think SCPs can grant access.",
+      "For 'anonymous access to S3', the bucket policy must have Principal: '*'. A common distractor is using an IAM user with public keys.",
+      "When DynamoDB FGAC is mentioned, the key is that the end user accesses the table directly without a middle-tier service, using IAM conditions like LeadingKeys."
+    ],
+    "practice_links": [
+      "ditectrev_011",
+      "ditectrev_033",
+      "ditectrev_060",
+      "ditectrev_075",
+      "ditectrev_097",
+      "ditectrev_108",
+      "ditectrev_110",
+      "ditectrev_114",
+      "ditectrev_115",
+      "ditectrev_128",
+      "ditectrev_129",
+      "ditectrev_136",
+      "ditectrev_148",
+      "ditectrev_150",
+      "ditectrev_155",
+      "ditectrev_156",
+      "ditectrev_159",
+      "ditectrev_161",
+      "ditectrev_172",
+      "ditectrev_175",
+      "ditectrev_187",
+      "ditectrev_192",
+      "ditectrev_200",
+      "ditectrev_203",
+      "ditectrev_213",
+      "ditectrev_215",
+      "ditectrev_216",
+      "ditectrev_226",
+      "ditectrev_227",
+      "ditectrev_248",
+      "ditectrev_251",
+      "ditectrev_253",
+      "ditectrev_264",
+      "ditectrev_277",
+      "ditectrev_279",
+      "ditectrev_300",
+      "ditectrev_306",
+      "ditectrev_314",
+      "ditectrev_319",
+      "ditectrev_325",
+      "ditectrev_337",
+      "ditectrev_356",
+      "ditectrev_363",
+      "ditectrev_369",
+      "ditectrev_371",
+      "ditectrev_378",
+      "ditectrev_383",
+      "ditectrev_391",
+      "ditectrev_400",
+      "ditectrev_410",
+      "ditectrev_414",
+      "ditectrev_429",
+      "ditectrev_446",
+      "ditectrev_464",
+      "ditectrev_478",
+      "ditectrev_493",
+      "ditectrev_500",
+      "ditectrev_501",
+      "ditectrev_511",
+      "ditectrev_516",
+      "ditectrev_517",
+      "ditectrev_525",
+      "ditectrev_528",
+      "ditectrev_534",
+      "ditectrev_535",
+      "ditectrev_536",
+      "ditectrev_543",
+      "ditectrev_550",
+      "ditectrev_554",
+      "ditectrev_556",
+      "ditectrev_599",
+      "ditectrev_609",
+      "ditectrev_611",
+      "ditectrev_630",
+      "ditectrev_649",
+      "ditectrev_651",
+      "ditectrev_666",
+      "ditectrev_667",
+      "ditectrev_668",
+      "ditectrev_691",
+      "ditectrev_692",
+      "ditectrev_699",
+      "supplemental_093",
+      "supplemental_094",
+      "supplemental_095",
+      "supplemental_096",
+      "supplemental_097",
+      "supplemental_098",
+      "supplemental_099",
+      "supplemental_100",
+      "supplemental_101",
+      "supplemental_102",
+      "supplemental_103",
+      "supplemental_104",
+      "supplemental_285",
+      "supplemental_286",
+      "supplemental_287",
+      "supplemental_288",
+      "fundamentals_009",
+      "fundamentals_010",
+      "fundamentals_011",
+      "fundamentals_022",
+      "fundamentals_023",
+      "fundamentals_027"
+    ]
+  },
+  {
+    "cluster_id": "c1_2",
+    "cluster_title": "Encryption and secrets",
+    "concept_id": "c1",
+    "concept_name": "Guard (Access and Data)",
+    "exam_domains": [
+      "Security",
+      "Resilience",
+      "Performance",
+      "Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the right encryption service (KMS vs CloudHSM vs SSE) based on control, compliance, and operational overhead.",
+      "Selecting the correct secrets management service (Secrets Manager vs Parameter Store) for rotation, cost, and feature needs.",
+      "Understanding encryption at rest and in transit for key AWS services (S3, EBS, RDS, Glacier).",
+      "Identifying data discovery and classification tools (Macie) for sensitive data like PII."
+    ],
+    "signal_words": [
+      {
+        "phrase": "least operational overhead",
+        "points_to": "AWS managed services (KMS, Secrets Manager, Parameter Store, Macie)"
+      },
+      {
+        "phrase": "customer-controlled keys",
+        "points_to": "AWS KMS (CMK) or CloudHSM"
+      },
+      {
+        "phrase": "password rotation",
+        "points_to": "AWS Secrets Manager (automatic rotation)"
+      },
+      {
+        "phrase": "non-secret configuration values",
+        "points_to": "AWS Systems Manager Parameter Store (Standard tier)"
+      },
+      {
+        "phrase": "discover sensitive data / PII",
+        "points_to": "Amazon Macie"
+      },
+      {
+        "phrase": "encrypt data at rest",
+        "points_to": "S3 SSE, EBS encryption, Glacier encryption, KMS"
+      },
+      {
+        "phrase": "encrypt data in transit",
+        "points_to": "TLS/SSL, HTTPS, ACM"
+      },
+      {
+        "phrase": "dedicated hardware security module",
+        "points_to": "AWS CloudHSM (for regulatory/compliance requirements)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS KMS",
+        "job": "Managed service to create and control encryption keys used to encrypt data across AWS services.",
+        "choose_when": "Need customer-managed keys with low operational overhead, key rotation, and integration with most AWS services.",
+        "avoid_when": "Require FIPS 140-2 Level 3 validated HSM or full control over the HSM appliance.",
+        "trap_words": "customer-managed keys, automatic key rotation, envelope encryption"
+      },
+      {
+        "name": "AWS CloudHSM",
+        "job": "Dedicated hardware security module (HSM) for secure key storage and cryptographic operations.",
+        "choose_when": "Need FIPS 140-2 Level 3 compliance, full control over HSM, or run custom cryptographic operations.",
+        "avoid_when": "Want minimal operational overhead or only need standard key management integrated with AWS services.",
+        "trap_words": "dedicated HSM, FIPS 140-2 Level 3, security group with SSH/RDP ports"
+      },
+      {
+        "name": "AWS Secrets Manager",
+        "job": "Securely store, rotate, and manage secrets like database credentials and API keys.",
+        "choose_when": "Need automatic rotation of secrets (e.g., RDS passwords) with minimal effort.",
+        "avoid_when": "Only need to store non-secret configuration data or want to minimize cost.",
+        "trap_words": "automatic rotation, secret rotation, database credentials"
+      },
+      {
+        "name": "AWS Systems Manager Parameter Store",
+        "job": "Hierarchical store for configuration data and secrets (free tier available).",
+        "choose_when": "Need low-cost storage for non-secret configuration values or simple secrets without rotation.",
+        "avoid_when": "Require automatic secret rotation or advanced access control policies.",
+        "trap_words": "configuration values, hierarchical, low cost, non-secret"
+      },
+      {
+        "name": "Amazon Macie",
+        "job": "Fully managed data security service that uses ML to discover and protect sensitive data in S3.",
+        "choose_when": "Need to automatically discover PII, PHI, or financial data in S3 buckets.",
+        "avoid_when": "Only need encryption or key management; Macie is for discovery, not encryption.",
+        "trap_words": "discover sensitive data, PII, data classification, S3"
+      },
+      {
+        "name": "S3 Server-Side Encryption (SSE)",
+        "job": "Encrypts data at rest in S3 using S3-managed keys (SSE-S3), KMS keys (SSE-KMS), or customer-provided keys (SSE-C).",
+        "choose_when": "Need to encrypt S3 objects at rest with minimal effort (SSE-S3) or with KMS integration (SSE-KMS).",
+        "avoid_when": "Need client-side encryption or have regulatory requirements for on-premises key management.",
+        "trap_words": "server-side encryption, SSE-S3, SSE-KMS, SSE-C, AES-256"
+      }
+    ],
+    "comparisons": [
+      "KMS vs CloudHSM: Choose KMS for low operational overhead and broad AWS integration; choose CloudHSM for FIPS 140-2 Level 3 compliance and full HSM control.",
+      "Secrets Manager vs Parameter Store: Choose Secrets Manager for automatic rotation of secrets; choose Parameter Store for low-cost storage of non-secret configuration data.",
+      "SSE-S3 vs SSE-KMS vs SSE-C: SSE-S3 is simplest (AES-256); SSE-KMS provides separate permissions and audit trail; SSE-C requires you to manage keys outside AWS.",
+      "Macie vs Config: Macie discovers sensitive data (PII) in S3; AWS Config tracks resource configuration changes, not data content.",
+      "Glacier encryption vs S3 encryption: Both use AES-256 automatically at rest; Glacier encryption is transparent and identical to S3."
+    ],
+    "exam_moves": [
+      "If a question asks for 'least operational overhead' for encryption, prefer AWS KMS over CloudHSM unless compliance demands dedicated HSM.",
+      "For password rotation, always lean toward Secrets Manager; Parameter Store does not natively rotate secrets.",
+      "When encrypting EBS volumes, you can encrypt the root volume at launch or create an encrypted volume and migrate data; you cannot encrypt an existing unencrypted volume in place.",
+      "S3 SSE-KMS provides an additional layer of control (KMS key policies) and audit (CloudTrail) compared to SSE-S3.",
+      "Macie is specifically for discovering sensitive data in S3; it does not encrypt data or manage keys.",
+      "CloudHSM requires you to manage security groups with SSH/RDP ports open to your network for administration.",
+      "For data in transit, always use HTTPS (SSL/TLS); ACM helps manage SSL/TLS certificates for load balancers and CloudFront."
+    ],
+    "practice_links": [
+      "ditectrev_018",
+      "ditectrev_054",
+      "ditectrev_145",
+      "ditectrev_146",
+      "ditectrev_207",
+      "ditectrev_225",
+      "ditectrev_232",
+      "ditectrev_384",
+      "ditectrev_407",
+      "ditectrev_436",
+      "ditectrev_522",
+      "ditectrev_544",
+      "ditectrev_563",
+      "ditectrev_578",
+      "ditectrev_620",
+      "ditectrev_650",
+      "ditectrev_657",
+      "ditectrev_698",
+      "ditectrev_702",
+      "ditectrev_709",
+      "supplemental_109",
+      "supplemental_110",
+      "supplemental_111",
+      "supplemental_112",
+      "supplemental_113",
+      "supplemental_114",
+      "supplemental_115",
+      "supplemental_116",
+      "supplemental_117",
+      "supplemental_118",
+      "supplemental_119",
+      "supplemental_120",
+      "supplemental_133",
+      "supplemental_134",
+      "supplemental_135",
+      "supplemental_136"
+    ]
+  },
+  {
+    "cluster_id": "c1_3",
+    "cluster_title": "Network/application protection",
+    "concept_id": "c1",
+    "concept_name": "Guard (Access and Data)",
+    "exam_domains": [
+      "Security",
+      "Resilience",
+      "Performance",
+      "Cost"
+    ],
+    "what_this_tests": [
+      "Ability to differentiate between stateful (Security Groups) and stateless (NACLs) filtering and their appropriate use cases.",
+      "Understanding of AWS-managed DDoS protection (Shield Standard vs Advanced) and application-layer filtering (WAF).",
+      "Knowledge of layered security: combining Security Groups, NACLs, WAF, and Shield for defense in depth.",
+      "Recognition of when to use Network Firewall for centralized inspection vs host-based IDS/IPS."
+    ],
+    "signal_words": [
+      {
+        "phrase": "firewall at the instance level",
+        "points_to": "Security Groups"
+      },
+      {
+        "phrase": "firewall at the subnet level",
+        "points_to": "Network ACLs"
+      },
+      {
+        "phrase": "SQL injection or cross-site scripting",
+        "points_to": "AWS WAF"
+      },
+      {
+        "phrase": "DDoS protection with cost protection",
+        "points_to": "AWS Shield Advanced"
+      },
+      {
+        "phrase": "intrusion detection/prevention",
+        "points_to": "IDS/IPS (host-based or Network Firewall)"
+      },
+      {
+        "phrase": "least operational overhead for web app protection",
+        "points_to": "AWS WAF (managed rules)"
+      },
+      {
+        "phrase": "enhanced DDoS protection for critical resources",
+        "points_to": "AWS Shield Advanced"
+      },
+      {
+        "phrase": "centralized network inspection",
+        "points_to": "AWS Network Firewall"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Security Groups",
+        "job": "Stateful virtual firewall that controls inbound and outbound traffic at the instance (ENI) level.",
+        "choose_when": "You need instance-level, stateful filtering with allow rules only; default deny all inbound.",
+        "avoid_when": "You need stateless filtering or explicit deny rules (use NACLs instead).",
+        "trap_words": "stateless, deny rules, subnet-level"
+      },
+      {
+        "name": "Network ACLs (NACLs)",
+        "job": "Stateless firewall that controls traffic at the subnet level with numbered allow/deny rules.",
+        "choose_when": "You need subnet-level stateless filtering or explicit deny rules (e.g., block a specific IP).",
+        "avoid_when": "You need stateful tracking of connection state (use Security Groups).",
+        "trap_words": "stateful, instance-level, automatic connection tracking"
+      },
+      {
+        "name": "AWS WAF",
+        "job": "Managed web application firewall that protects against common web exploits like SQL injection and XSS.",
+        "choose_when": "You need to filter HTTP/HTTPS requests to CloudFront, ALB, or API Gateway.",
+        "avoid_when": "You need DDoS protection at the network/transport layer (use Shield).",
+        "trap_words": "DDoS protection, network layer, instance-level"
+      },
+      {
+        "name": "AWS Shield Advanced",
+        "job": "Enhanced DDoS protection with 24/7 support, cost protection, and visibility for critical resources.",
+        "choose_when": "You need advanced DDoS mitigation, cost protection against scaling, or DDoS response team access.",
+        "avoid_when": "You only need basic DDoS protection (Shield Standard is free and automatic).",
+        "trap_words": "free, automatic, basic protection"
+      },
+      {
+        "name": "AWS Network Firewall",
+        "job": "Managed firewall service that provides centralized network traffic inspection and filtering across VPCs.",
+        "choose_when": "You need stateful inspection, intrusion prevention, or domain filtering at the VPC level.",
+        "avoid_when": "You only need simple instance-level or subnet-level rules (use Security Groups/NACLs).",
+        "trap_words": "instance-level, application-layer filtering"
+      }
+    ],
+    "comparisons": [
+      "Security Groups vs NACLs: Choose Security Groups for stateful, instance-level allow rules; choose NACLs for stateless, subnet-level allow/deny rules.",
+      "WAF vs Shield: Choose WAF for application-layer (Layer 7) attack mitigation (SQLi, XSS); choose Shield for network/transport-layer (Layer 3/4) DDoS protection.",
+      "Shield Standard vs Shield Advanced: Shield Standard is free and automatic for all AWS customers; Shield Advanced provides enhanced detection, cost protection, and 24/7 support for a fee.",
+      "Network Firewall vs Security Groups: Network Firewall provides centralized, stateful inspection across VPCs with intrusion prevention; Security Groups are simpler, instance-level stateful filters.",
+      "Host-based IDS/IPS vs Network Firewall: Host-based IDS/IPS (e.g., on EC2) is flexible but adds overhead; Network Firewall is managed and scales better for VPC-wide inspection."
+    ],
+    "exam_moves": [
+      "Security Groups are stateful: if you allow inbound, outbound response is automatically allowed regardless of outbound rules.",
+      "NACLs are stateless: you must explicitly allow both inbound and outbound traffic for responses.",
+      "WAF can be associated with CloudFront, ALB, or API Gateway—not directly with EC2 instances.",
+      "Shield Advanced requires a 1-year commitment and provides cost protection against DDoS-related scaling.",
+      "Network Firewall supports stateful inspection, intrusion prevention (Suricata-compatible), and domain filtering.",
+      "When a question mentions 'least operational overhead' for web app protection, WAF with managed rules is usually the answer.",
+      "For IDS/IPS in a VPC, consider host-based agents or Network Firewall; avoid suggesting a single EC2 instance as a bottleneck."
+    ],
+    "practice_links": [
+      "ditectrev_005",
+      "ditectrev_021",
+      "ditectrev_032",
+      "ditectrev_051",
+      "ditectrev_055",
+      "ditectrev_057",
+      "ditectrev_072",
+      "ditectrev_086",
+      "ditectrev_103",
+      "ditectrev_104",
+      "ditectrev_132",
+      "ditectrev_152",
+      "ditectrev_165",
+      "ditectrev_168",
+      "ditectrev_198",
+      "ditectrev_205",
+      "ditectrev_208",
+      "ditectrev_217",
+      "ditectrev_224",
+      "ditectrev_237",
+      "ditectrev_256",
+      "ditectrev_269",
+      "ditectrev_280",
+      "ditectrev_290",
+      "ditectrev_297",
+      "ditectrev_320",
+      "ditectrev_333",
+      "ditectrev_343",
+      "ditectrev_350",
+      "ditectrev_426",
+      "ditectrev_427",
+      "ditectrev_437",
+      "ditectrev_450",
+      "ditectrev_456",
+      "ditectrev_469",
+      "ditectrev_475",
+      "ditectrev_509",
+      "ditectrev_530",
+      "ditectrev_562",
+      "ditectrev_590",
+      "ditectrev_606",
+      "ditectrev_610",
+      "ditectrev_633",
+      "ditectrev_638",
+      "ditectrev_697",
+      "ditectrev_706",
+      "supplemental_121",
+      "supplemental_122",
+      "supplemental_123",
+      "supplemental_124",
+      "supplemental_125",
+      "supplemental_126",
+      "supplemental_127",
+      "supplemental_128"
+    ]
+  },
+  {
+    "cluster_id": "c1_4",
+    "cluster_title": "Audit, detection, compliance",
+    "concept_id": "c1",
+    "concept_name": "Guard (Access and Data)",
+    "exam_domains": [
+      "Security",
+      "Resilience",
+      "Performance",
+      "Cost"
+    ],
+    "what_this_tests": [
+      "Ability to select the correct AWS service for auditing API calls, detecting threats, assessing vulnerabilities, and ensuring compliance.",
+      "Understanding of how to automate responses to security findings using event-driven architectures.",
+      "Knowledge of logging granularity, retention, and integration between CloudTrail, GuardDuty, Inspector, and Config.",
+      "Recognition of operational overhead trade-offs between managed services and custom solutions."
+    ],
+    "signal_words": [
+      {
+        "phrase": "record API calls",
+        "points_to": "AWS CloudTrail"
+      },
+      {
+        "phrase": "detect suspicious behavior",
+        "points_to": "Amazon GuardDuty"
+      },
+      {
+        "phrase": "vulnerability assessment",
+        "points_to": "Amazon Inspector"
+      },
+      {
+        "phrase": "compliance rules / resource configuration",
+        "points_to": "AWS Config"
+      },
+      {
+        "phrase": "trace requests across microservices",
+        "points_to": "AWS X-Ray"
+      },
+      {
+        "phrase": "interactive log query",
+        "points_to": "CloudWatch Logs Insights"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "Managed service (e.g., CloudTrail, GuardDuty)"
+      },
+      {
+        "phrase": "automated response to findings",
+        "points_to": "Amazon EventBridge + Lambda"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS CloudTrail",
+        "job": "Records all API calls made within your AWS account for auditing and governance.",
+        "choose_when": "You need to track user activity, API usage, or changes to resources for compliance or forensic investigation.",
+        "avoid_when": "You need real-time threat detection or vulnerability scanning; use GuardDuty or Inspector instead.",
+        "trap_words": "real-time, threat detection, vulnerability"
+      },
+      {
+        "name": "Amazon GuardDuty",
+        "job": "Provides intelligent threat detection by analyzing logs (CloudTrail, VPC Flow Logs, DNS) for malicious activity.",
+        "choose_when": "You need automated, continuous threat detection with minimal configuration.",
+        "avoid_when": "You only need to audit API calls without threat analysis; CloudTrail is sufficient.",
+        "trap_words": "manual, custom threat rules, vulnerability scanning"
+      },
+      {
+        "name": "Amazon Inspector",
+        "job": "Automatically assesses EC2 instances and container images for software vulnerabilities and unintended network exposure.",
+        "choose_when": "You need to identify common vulnerabilities and exposures (CVEs) or network reachability issues.",
+        "avoid_when": "You need to detect active threats or anomalous behavior; use GuardDuty.",
+        "trap_words": "real-time threat, API auditing"
+      },
+      {
+        "name": "AWS Config",
+        "job": "Evaluates your resource configurations against desired policies and records configuration changes over time.",
+        "choose_when": "You need to track resource compliance, configuration history, or trigger remediation on non-compliant changes.",
+        "avoid_when": "You need to analyze API calls or detect threats; use CloudTrail or GuardDuty.",
+        "trap_words": "API calls, threat detection"
+      },
+      {
+        "name": "AWS X-Ray",
+        "job": "Traces and analyzes requests as they travel through distributed applications to identify performance bottlenecks and errors.",
+        "choose_when": "You need end-to-end visibility into microservices or serverless applications for debugging latency.",
+        "avoid_when": "You need to audit API calls or detect security threats; use CloudTrail or GuardDuty.",
+        "trap_words": "security, compliance, API auditing"
+      },
+      {
+        "name": "CloudWatch Logs Insights",
+        "job": "Enables interactive querying and analysis of log data stored in CloudWatch Logs.",
+        "choose_when": "You need to search, filter, and analyze logs from multiple sources with minimal setup.",
+        "avoid_when": "You need to trace requests across services (use X-Ray) or detect threats (use GuardDuty).",
+        "trap_words": "real-time tracing, threat detection"
+      }
+    ],
+    "comparisons": [
+      "CloudTrail vs GuardDuty: Choose CloudTrail for auditing API calls; choose GuardDuty for threat detection using those logs.",
+      "Inspector vs GuardDuty: Choose Inspector for vulnerability scanning of EC2/containers; choose GuardDuty for behavioral threat detection.",
+      "Config vs CloudTrail: Choose Config for tracking configuration changes and compliance; choose CloudTrail for tracking who made API calls.",
+      "X-Ray vs CloudWatch Logs Insights: Choose X-Ray for tracing requests across services; choose CloudWatch Logs Insights for ad-hoc log queries.",
+      "Managed service vs custom solution: Always prefer managed services (e.g., GuardDuty, Inspector) for lower operational overhead unless specific custom logic is required."
+    ],
+    "exam_moves": [
+      "If a question mentions 'least operational overhead' for logging or detection, pick the fully managed service (CloudTrail, GuardDuty, Inspector) over custom scripts or third-party tools.",
+      "GuardDuty findings can be sent to EventBridge to trigger automated remediation (e.g., Lambda to update WAF rules).",
+      "CloudTrail is enabled by default for the last 90 days of management events; for longer retention, create a trail and store logs in S3.",
+      "Inspector now supports both EC2 and container images (ECR); it does not cover RDS or Lambda.",
+      "AWS Config rules can auto-remediate non-compliant resources using Systems Manager Automation or Lambda.",
+      "Penetration testing on EC2 is allowed without prior approval for common scenarios, but always check the current AWS policy.",
+      "Data destruction on AWS follows NIST 800-88 or DoD 5220.22-M standards; do not confuse with simple deletion."
+    ],
+    "practice_links": [
+      "ditectrev_002",
+      "ditectrev_037",
+      "ditectrev_094",
+      "ditectrev_100",
+      "ditectrev_105",
+      "ditectrev_143",
+      "ditectrev_179",
+      "ditectrev_189",
+      "ditectrev_195",
+      "ditectrev_199",
+      "ditectrev_218",
+      "ditectrev_239",
+      "ditectrev_245",
+      "ditectrev_362",
+      "ditectrev_393",
+      "ditectrev_420",
+      "ditectrev_424",
+      "ditectrev_449",
+      "ditectrev_506",
+      "ditectrev_567",
+      "ditectrev_584",
+      "ditectrev_616",
+      "ditectrev_635",
+      "ditectrev_639",
+      "ditectrev_640",
+      "ditectrev_648",
+      "ditectrev_669",
+      "ditectrev_690",
+      "ditectrev_695",
+      "supplemental_129",
+      "supplemental_130",
+      "supplemental_131",
+      "supplemental_132",
+      "supplemental_137",
+      "supplemental_138",
+      "supplemental_139",
+      "supplemental_140",
+      "supplemental_141",
+      "supplemental_142",
+      "supplemental_143",
+      "supplemental_144",
+      "supplemental_145",
+      "supplemental_146",
+      "supplemental_147",
+      "supplemental_148",
+      "supplemental_149",
+      "supplemental_150",
+      "supplemental_151",
+      "supplemental_152",
+      "supplemental_153",
+      "supplemental_154",
+      "supplemental_155",
+      "supplemental_156",
+      "supplemental_157",
+      "supplemental_158",
+      "supplemental_159",
+      "supplemental_160",
+      "fundamentals_003",
+      "fundamentals_005"
+    ]
+  },
+  {
+    "cluster_id": "c2_1",
+    "cluster_title": "VPC foundations",
+    "concept_id": "c2",
+    "concept_name": "Connect (Traffic)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Understanding of VPC components: subnets, route tables, IGW, NAT Gateway/Instance, and how they enable or restrict internet connectivity.",
+      "Ability to troubleshoot common connectivity issues: missing public IP, missing route, source/destination check on NAT instances.",
+      "Knowledge of private vs public IP addressing and DNS naming within EC2.",
+      "Design of high-availability outbound internet access for private subnets using NAT devices."
+    ],
+    "signal_words": [
+      {
+        "phrase": "cannot access the internet",
+        "points_to": "Missing public IP (Elastic IP) or missing route to IGW"
+      },
+      {
+        "phrase": "only be reached from within the Amazon EC2 network",
+        "points_to": "Private IP address"
+      },
+      {
+        "phrase": "whitelisting of all public IP addresses",
+        "points_to": "NAT Gateway/Instance with Elastic IP"
+      },
+      {
+        "phrase": "modify your route tables to have the NAT device be the target",
+        "points_to": "Route table update for private subnet to NAT"
+      },
+      {
+        "phrase": "Source/Destination Check attribute",
+        "points_to": "Must disable on NAT instance"
+      },
+      {
+        "phrase": "DB Subnet Group",
+        "points_to": "Collection of private subnets for RDS"
+      },
+      {
+        "phrase": "internal DNS name",
+        "points_to": "Resolvable only within EC2 (private DNS)"
+      },
+      {
+        "phrase": "public VPN will be in place",
+        "points_to": "Route to IGW still needed for internet access"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Internet Gateway (IGW)",
+        "job": "Provides a target in route tables for internet-bound traffic from public subnets.",
+        "choose_when": "Instances need direct inbound/outbound internet access with public IPs.",
+        "avoid_when": "Instances must remain private and only initiate outbound traffic.",
+        "trap_words": "attached to VPC but no route; instance has no public IP"
+      },
+      {
+        "name": "NAT Gateway",
+        "job": "Allows instances in private subnets to initiate outbound internet traffic while preventing inbound internet connections.",
+        "choose_when": "High availability and managed service needed for outbound-only internet access from private subnets.",
+        "avoid_when": "Low cost is critical (use NAT instance instead) or need inbound access (use IGW).",
+        "trap_words": "NAT Gateway is in a public subnet; must have Elastic IP; automatically scales"
+      },
+      {
+        "name": "NAT Instance",
+        "job": "An EC2 instance configured to forward traffic from private subnets to the internet.",
+        "choose_when": "Need full control over NAT configuration or lower cost for predictable low traffic.",
+        "avoid_when": "High availability or managed service required; single point of failure risk.",
+        "trap_words": "must disable Source/Destination Check; must be in public subnet; requires Elastic IP"
+      },
+      {
+        "name": "Elastic IP (EIP)",
+        "job": "Static public IPv4 address that can be attached to an instance or NAT Gateway.",
+        "choose_when": "Instance or NAT device needs a fixed public IP for whitelisting or consistent access.",
+        "avoid_when": "Only private communication needed; cost or IPv4 scarcity is a concern.",
+        "trap_words": "not automatically assigned; must be explicitly allocated and associated"
+      },
+      {
+        "name": "Route Table",
+        "job": "Defines rules (routes) that determine where network traffic is directed.",
+        "choose_when": "Need to control traffic flow between subnets, IGW, NAT, or VPN.",
+        "avoid_when": "Simple default VPC configuration suffices.",
+        "trap_words": "missing default route (0.0.0.0/0) to IGW or NAT; main route table vs custom"
+      }
+    ],
+    "comparisons": [
+      "NAT Gateway vs NAT Instance: Choose NAT Gateway for managed, HA, auto-scaling; choose NAT Instance for lower cost, full control, or custom configurations.",
+      "Public IP vs Elastic IP: Public IP is auto-assigned at launch and changes on stop/start; Elastic IP is static and can be reassigned.",
+      "IGW vs NAT Gateway: IGW allows bidirectional internet access (inbound and outbound); NAT Gateway allows only outbound from private subnets.",
+      "Private IP vs Public IP: Private IP is used for internal VPC communication and is not reachable from internet; Public IP is internet-routable.",
+      "DB Subnet Group vs regular subnet group: DB Subnet Group is specifically for RDS and must include subnets in at least two AZs for HA."
+    ],
+    "exam_moves": [
+      "If an instance in a public subnet cannot reach the internet, check: (1) Does it have a public IP (EIP or auto-assigned)? (2) Is there a route 0.0.0.0/0 to IGW? (3) Is the security group allowing outbound traffic?",
+      "For private subnet internet access, always use a NAT device (Gateway or Instance) in a public subnet, and add a route 0.0.0.0/0 to that NAT device in the private subnet's route table.",
+      "When using a NAT instance, you must disable the Source/Destination Check on that instance; otherwise, traffic will be dropped.",
+      "For high availability with NAT, deploy NAT Gateways in multiple AZs (one per AZ) or use an Auto Scaling group of NAT instances.",
+      "Elastic IPs are charged when not associated with a running instance; avoid leaving them idle.",
+      "Internal DNS names (e.g., ip-10-0-0-5.ec2.internal) resolve only within EC2; use them for private communication.",
+      "When whitelisting public IPs for outbound traffic from private subnets, use NAT devices with Elastic IPs to provide a fixed source IP."
+    ],
+    "practice_links": [
+      "ditectrev_015",
+      "ditectrev_016",
+      "ditectrev_039",
+      "ditectrev_050",
+      "ditectrev_063",
+      "ditectrev_067",
+      "ditectrev_087",
+      "ditectrev_120",
+      "ditectrev_134",
+      "ditectrev_135",
+      "ditectrev_144",
+      "ditectrev_153",
+      "ditectrev_160",
+      "ditectrev_234",
+      "ditectrev_250",
+      "ditectrev_292",
+      "ditectrev_301",
+      "ditectrev_302",
+      "ditectrev_307",
+      "ditectrev_313",
+      "ditectrev_346",
+      "ditectrev_375",
+      "ditectrev_398",
+      "ditectrev_417",
+      "ditectrev_453",
+      "ditectrev_460",
+      "ditectrev_465",
+      "ditectrev_476",
+      "ditectrev_481",
+      "ditectrev_505",
+      "ditectrev_507",
+      "ditectrev_519",
+      "ditectrev_520",
+      "ditectrev_538",
+      "ditectrev_577",
+      "ditectrev_589",
+      "ditectrev_600",
+      "ditectrev_622",
+      "supplemental_169",
+      "supplemental_170",
+      "supplemental_171",
+      "supplemental_172"
+    ]
+  },
+  {
+    "cluster_id": "c2_2",
+    "cluster_title": "Private AWS access",
+    "concept_id": "c2",
+    "concept_name": "Connect (Traffic)",
+    "exam_domains": [
+      "Security",
+      "Cost",
+      "Performance"
+    ],
+    "what_this_tests": [
+      "Ability to choose between Gateway and Interface VPC Endpoints for private AWS service access.",
+      "Understanding of cost implications: Gateway endpoints are free, Interface endpoints incur hourly + data processing charges.",
+      "Knowledge of routing: Gateway endpoints use route table entries; Interface endpoints use private IPs and DNS.",
+      "Recognition of when to avoid NAT gateways or public internet for compliance or cost savings."
+    ],
+    "signal_words": [
+      {
+        "phrase": "private connectivity to S3 without using a NAT gateway",
+        "points_to": "S3 Gateway VPC Endpoint"
+      },
+      {
+        "phrase": "privately access an AWS service through private IP addresses",
+        "points_to": "Interface VPC Endpoint (PrivateLink)"
+      },
+      {
+        "phrase": "data must not travel across the public internet",
+        "points_to": "VPC Endpoint (Gateway or Interface)"
+      },
+      {
+        "phrase": "most cost-effectively",
+        "points_to": "Gateway VPC Endpoint (free)"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "Gateway VPC Endpoint (no DNS changes needed)"
+      },
+      {
+        "phrase": "most appropriate managed way",
+        "points_to": "Interface VPC Endpoint (fully managed by AWS)"
+      },
+      {
+        "phrase": "frequently access large files from S3",
+        "points_to": "Gateway VPC Endpoint (no data processing fees)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Gateway VPC Endpoint",
+        "job": "Provides private connectivity to S3 and DynamoDB using route table entries, with no additional cost.",
+        "choose_when": "Accessing S3 or DynamoDB privately, cost is a priority, and you want to avoid NAT gateway or internet gateway charges.",
+        "avoid_when": "Accessing any AWS service other than S3 or DynamoDB, or when you need private IP-based access for on-premises or cross-VPC.",
+        "trap_words": "interface, PrivateLink, private IP address, DNS resolution"
+      },
+      {
+        "name": "Interface VPC Endpoint (AWS PrivateLink)",
+        "job": "Provides private connectivity to many AWS services and your own applications using elastic network interfaces with private IPs.",
+        "choose_when": "Accessing AWS services other than S3/DynamoDB (e.g., SQS, SNS, KMS, API Gateway) or third-party services, and you need private IP-based access.",
+        "avoid_when": "Accessing S3 or DynamoDB (use Gateway endpoint for cost), or when you want to minimize costs (Gateway endpoint is free).",
+        "trap_words": "gateway, route table, free, S3, DynamoDB"
+      }
+    ],
+    "comparisons": [
+      "Gateway VPC Endpoint vs Interface VPC Endpoint: Choose Gateway for S3/DynamoDB (free, route-based); choose Interface for other AWS services (paid, IP-based).",
+      "VPC Endpoint vs NAT Gateway: VPC Endpoint provides direct private access to AWS services without internet; NAT Gateway enables outbound internet access for private subnets.",
+      "Gateway Endpoint vs VPC Peering: Gateway Endpoint is for accessing AWS services privately; VPC Peering connects two VPCs privately.",
+      "Interface Endpoint vs Direct Connect: Interface Endpoint is for private access to AWS services within a VPC; Direct Connect is for dedicated on-premises to AWS connectivity."
+    ],
+    "exam_moves": [
+      "If the question mentions 'S3' and 'private' without specifying a service, always consider Gateway VPC Endpoint first.",
+      "If the question says 'private IP addresses' or 'PrivateLink', it's an Interface Endpoint, not Gateway.",
+      "Gateway Endpoints do not use DNS or private IPs; they work via route table entries. Interface Endpoints use DNS and private IPs.",
+      "Interface Endpoints incur hourly charges and data processing fees; Gateway Endpoints are free.",
+      "When the question says 'most cost-effective' for S3 access, the answer is Gateway VPC Endpoint.",
+      "If the question says 'least operational overhead' for S3, Gateway Endpoint is simpler (no DNS changes).",
+      "For services like SQS, SNS, KMS, or API Gateway, you must use Interface Endpoints (PrivateLink)."
+    ],
+    "practice_links": [
+      "ditectrev_655",
+      "ditectrev_662",
+      "ditectrev_671",
+      "supplemental_161",
+      "supplemental_162",
+      "supplemental_163",
+      "supplemental_164",
+      "supplemental_165",
+      "supplemental_166",
+      "supplemental_167",
+      "supplemental_168"
+    ]
+  },
+  {
+    "cluster_id": "c2_3",
+    "cluster_title": "Load balancing, DNS, edge",
+    "concept_id": "c2",
+    "concept_name": "Connect (Traffic)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the correct load balancer type (ALB, NLB, GLB) based on protocol, traffic pattern, and integration needs.",
+      "Configuring Route 53 routing policies (latency, weighted, failover) for DNS-level traffic management and disaster recovery.",
+      "Using CloudFront and Global Accelerator for edge caching, low-latency delivery, and global traffic optimization.",
+      "Understanding health checks, connection draining, and sticky sessions for high availability and graceful instance de-registration."
+    ],
+    "signal_words": [
+      {
+        "phrase": "lowest latency / UDP / TCP",
+        "points_to": "Network Load Balancer (NLB) or Global Accelerator"
+      },
+      {
+        "phrase": "URL path / host-based routing / HTTP",
+        "points_to": "Application Load Balancer (ALB)"
+      },
+      {
+        "phrase": "third-party firewall / security appliance / packet inspection",
+        "points_to": "Gateway Load Balancer (GLB)"
+      },
+      {
+        "phrase": "failover / health check / automatic DNS routing",
+        "points_to": "Route 53 failover routing with health checks"
+      },
+      {
+        "phrase": "weighted / distribute traffic proportionally",
+        "points_to": "Route 53 weighted routing"
+      },
+      {
+        "phrase": "spiky usage / millions of views / static content",
+        "points_to": "CloudFront with S3 origin"
+      },
+      {
+        "phrase": "connection draining / in-flight requests",
+        "points_to": "ELB connection draining (set timeout appropriately)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Application Load Balancer (ALB)",
+        "job": "Routes HTTP/HTTPS traffic based on content (path, host, headers).",
+        "choose_when": "You need layer 7 routing, microservices, or container-based apps.",
+        "avoid_when": "You need static IP or UDP/TCP traffic.",
+        "trap_words": "static IP, UDP, TCP, low latency"
+      },
+      {
+        "name": "Network Load Balancer (NLB)",
+        "job": "Handles TCP/UDP traffic at layer 4 with ultra-low latency and static IP support.",
+        "choose_when": "You need high performance, static IP, or UDP traffic.",
+        "avoid_when": "You need content-based routing or HTTP features.",
+        "trap_words": "HTTP, path-based, sticky sessions (NLB supports but limited)"
+      },
+      {
+        "name": "Gateway Load Balancer (GLB)",
+        "job": "Distributes traffic to third-party virtual appliances (firewalls, IDS/IPS).",
+        "choose_when": "You need to insert a security appliance inline with traffic.",
+        "avoid_when": "You need standard load balancing for apps.",
+        "trap_words": "HTTP, TCP, UDP (GLB works at layer 3/4 but for appliances)"
+      },
+      {
+        "name": "Route 53",
+        "job": "DNS service with routing policies for traffic management and failover.",
+        "choose_when": "You need DNS-level routing, health checks, or global failover.",
+        "avoid_when": "You need low-latency edge caching or static IP for UDP.",
+        "trap_words": "alias record (free, maps to AWS resources), CNAME (extra cost, not for apex)"
+      },
+      {
+        "name": "CloudFront",
+        "job": "CDN that caches content at edge locations for low latency and high transfer speeds.",
+        "choose_when": "You need global content delivery, DDoS protection, or static asset caching.",
+        "avoid_when": "You need real-time dynamic content without caching or static IP.",
+        "trap_words": "origin access identity (OAI) for S3, signed URLs for private content"
+      },
+      {
+        "name": "Global Accelerator",
+        "job": "Uses AWS edge to route traffic to optimal endpoint via Anycast IP, improving latency and failover.",
+        "choose_when": "You need static IP, low latency for TCP/UDP, or fast regional failover.",
+        "avoid_when": "You need content caching or HTTP-level routing.",
+        "trap_words": "caching, HTTP, path-based"
+      }
+    ],
+    "comparisons": [
+      "ALB vs NLB: Choose ALB for HTTP/HTTPS content-based routing; choose NLB for TCP/UDP, static IP, or extreme performance.",
+      "CloudFront vs Global Accelerator: CloudFront caches content at edge for static/dynamic web; Global Accelerator optimizes TCP/UDP traffic without caching, providing static IP and fast failover.",
+      "Route 53 latency routing vs Global Accelerator: Latency routing uses DNS to direct to lowest-latency region but can be slow to update; Global Accelerator uses Anycast IP for real-time traffic steering and faster failover.",
+      "Route 53 failover vs weighted routing: Failover is for active-passive DR; weighted is for gradual traffic shifting or A/B testing.",
+      "ELB connection draining vs sticky sessions: Connection draining allows in-flight requests to complete during deregistration; sticky sessions bind a user to a specific instance (use with caution for uneven load)."
+    ],
+    "exam_moves": [
+      "If a question mentions 'lowest latency' and 'UDP', immediately think NLB or Global Accelerator, not ALB.",
+      "For 'failover' with Route 53, always enable 'Evaluate target health' on the alias record and associate health checks with the endpoint, not the record set.",
+      "When using CloudFront with S3, always use Origin Access Identity (OAI) to restrict direct S3 access.",
+      "Connection draining timeout must be less than the application session timeout to avoid errors; set it to handle longest in-flight request.",
+      "Gateway Load Balancer endpoints are used to send traffic to third-party appliances in a separate VPC (inspection VPC).",
+      "Route 53 alias records are free and can map to AWS resources (ELB, CloudFront, S3); CNAME records cost extra and cannot be used at zone apex.",
+      "For weighted routing with multiple instance types, use separate ELBs per type and Route 53 weighted records to distribute load proportionally."
+    ],
+    "practice_links": [
+      "ditectrev_007",
+      "ditectrev_013",
+      "ditectrev_019",
+      "ditectrev_022",
+      "ditectrev_024",
+      "ditectrev_043",
+      "ditectrev_053",
+      "ditectrev_061",
+      "ditectrev_065",
+      "ditectrev_066",
+      "ditectrev_079",
+      "ditectrev_084",
+      "ditectrev_133",
+      "ditectrev_169",
+      "ditectrev_180",
+      "ditectrev_183",
+      "ditectrev_196",
+      "ditectrev_206",
+      "ditectrev_241",
+      "ditectrev_254",
+      "ditectrev_259",
+      "ditectrev_262",
+      "ditectrev_266",
+      "ditectrev_283",
+      "ditectrev_316",
+      "ditectrev_335",
+      "ditectrev_340",
+      "ditectrev_360",
+      "ditectrev_365",
+      "ditectrev_368",
+      "ditectrev_379",
+      "ditectrev_406",
+      "ditectrev_415",
+      "ditectrev_433",
+      "ditectrev_440",
+      "ditectrev_443",
+      "ditectrev_445",
+      "ditectrev_455",
+      "ditectrev_457",
+      "ditectrev_488",
+      "ditectrev_503",
+      "ditectrev_504",
+      "ditectrev_532",
+      "ditectrev_537",
+      "ditectrev_546",
+      "ditectrev_552",
+      "ditectrev_575",
+      "ditectrev_615",
+      "ditectrev_634",
+      "ditectrev_636",
+      "ditectrev_672",
+      "ditectrev_677",
+      "ditectrev_683",
+      "ditectrev_693",
+      "supplemental_001",
+      "supplemental_002",
+      "supplemental_003",
+      "supplemental_004",
+      "supplemental_029",
+      "supplemental_030",
+      "supplemental_031",
+      "supplemental_032",
+      "supplemental_033",
+      "supplemental_034",
+      "supplemental_035",
+      "supplemental_036",
+      "supplemental_037",
+      "supplemental_038",
+      "supplemental_039",
+      "supplemental_040",
+      "supplemental_193",
+      "supplemental_194",
+      "supplemental_195",
+      "supplemental_196",
+      "supplemental_197",
+      "supplemental_198",
+      "supplemental_199",
+      "supplemental_200",
+      "supplemental_201",
+      "supplemental_202",
+      "supplemental_203",
+      "supplemental_204",
+      "supplemental_205",
+      "supplemental_206",
+      "supplemental_207",
+      "supplemental_208",
+      "fundamentals_002",
+      "fundamentals_008",
+      "fundamentals_012",
+      "fundamentals_014",
+      "fundamentals_017"
+    ]
+  },
+  {
+    "cluster_id": "c2_4",
+    "cluster_title": "Hybrid and multi-VPC networking",
+    "concept_id": "c2",
+    "concept_name": "Connect (Traffic)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the right hybrid connectivity method (Direct Connect, Site-to-Site VPN, Transit Gateway) based on bandwidth, latency, encryption, and cost requirements.",
+      "Understanding VPC peering limitations (no transitive routing, no overlapping CIDRs) and when to use Transit Gateway for hub-and-spoke topologies.",
+      "Recognizing VPN CloudHub as a low-cost hub-and-spoke model for multiple branch offices using existing VPN connections.",
+      "Identifying when to use AWS Resource Access Manager (RAM) to share VPC subnets across accounts without duplicating infrastructure."
+    ],
+    "signal_words": [
+      {
+        "phrase": "dedicated private connection",
+        "points_to": "AWS Direct Connect"
+      },
+      {
+        "phrase": "encrypted over the internet",
+        "points_to": "AWS Site-to-Site VPN"
+      },
+      {
+        "phrase": "central hub for many VPCs and on-premises",
+        "points_to": "AWS Transit Gateway"
+      },
+      {
+        "phrase": "low-cost hub-and-spoke for remote offices",
+        "points_to": "AWS VPN CloudHub"
+      },
+      {
+        "phrase": "connect two VPCs privately without transitive routing",
+        "points_to": "VPC peering"
+      },
+      {
+        "phrase": "share subnets across accounts",
+        "points_to": "AWS Resource Access Manager (RAM)"
+      },
+      {
+        "phrase": "IPsec tunnels over the internet",
+        "points_to": "AWS Site-to-Site VPN"
+      },
+      {
+        "phrase": "BGP ASN for multiple VPN connections",
+        "points_to": "VPN CloudHub"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS Direct Connect",
+        "job": "Provides a dedicated, private, high-bandwidth network connection from on-premises to AWS, bypassing the internet.",
+        "choose_when": "You need consistent, low-latency, high-throughput connectivity, or have large data transfer volumes, or require a private connection for compliance.",
+        "avoid_when": "You only need occasional or low-bandwidth connectivity, or the cost of dedicated lines is not justified.",
+        "trap_words": "internet-based, encrypted by default (Direct Connect does not encrypt; use VPN or MACsec), low cost"
+      },
+      {
+        "name": "AWS Site-to-Site VPN",
+        "job": "Creates encrypted IPsec tunnels between on-premises and a VPC over the internet.",
+        "choose_when": "You need quick, encrypted connectivity over the internet with minimal setup, or as a backup to Direct Connect.",
+        "avoid_when": "You require consistent low latency, high bandwidth, or a private connection not subject to internet variability.",
+        "trap_words": "dedicated, private, high throughput, low latency"
+      },
+      {
+        "name": "AWS Transit Gateway",
+        "job": "Acts as a central hub to interconnect VPCs and on-premises networks, supporting transitive routing.",
+        "choose_when": "You need to connect many VPCs and on-premises networks in a hub-and-spoke topology with transitive routing and centralized management.",
+        "avoid_when": "You only need to connect two VPCs (use VPC peering) or require no transitive routing.",
+        "trap_words": "simple two-VPC connection, no transitive routing needed"
+      },
+      {
+        "name": "VPC peering",
+        "job": "Connects two VPCs privately using AWS infrastructure, with no transitive routing.",
+        "choose_when": "You need a simple, private connection between exactly two VPCs, and transitive routing is not required.",
+        "avoid_when": "You need to connect more than two VPCs or require transitive routing (use Transit Gateway).",
+        "trap_words": "transitive routing, overlapping CIDRs, more than two VPCs"
+      },
+      {
+        "name": "AWS VPN CloudHub",
+        "job": "Provides a low-cost hub-and-spoke model for connecting multiple branch offices using existing VPN connections to a virtual private gateway.",
+        "choose_when": "You have multiple VPN connections and need secure communication between remote sites with minimal cost.",
+        "avoid_when": "You need high bandwidth or dedicated private connectivity (use Direct Connect or Transit Gateway).",
+        "trap_words": "high performance, dedicated, single VPN connection"
+      },
+      {
+        "name": "AWS Resource Access Manager (RAM)",
+        "job": "Enables sharing of VPC subnets across AWS accounts without duplicating VPC infrastructure.",
+        "choose_when": "You need to share subnets from a central networking account with multiple application accounts.",
+        "avoid_when": "You need to connect VPCs (use VPC peering or Transit Gateway) or share resources other than subnets.",
+        "trap_words": "VPC peering, Transit Gateway, cross-account VPC connection"
+      }
+    ],
+    "comparisons": [
+      "Direct Connect vs Site-to-Site VPN: Choose Direct Connect for dedicated, low-latency, high-throughput private connectivity; choose Site-to-Site VPN for quick, encrypted, internet-based connectivity or as a backup.",
+      "Transit Gateway vs VPC peering: Choose Transit Gateway for hub-and-spoke topologies with many VPCs and transitive routing; choose VPC peering for simple, direct connections between two VPCs without transitive routing.",
+      "VPN CloudHub vs Transit Gateway: VPN CloudHub is a low-cost option for connecting multiple branch offices using existing VPN connections; Transit Gateway offers higher performance, scalability, and integration with Direct Connect and VPN.",
+      "VPC peering vs Resource Access Manager (RAM): VPC peering connects entire VPCs privately; RAM shares subnets across accounts, allowing resources in different accounts to use the same VPC without peering."
+    ],
+    "exam_moves": [
+      "If a question mentions 'dedicated private connection' and 'bypass the internet', the answer is Direct Connect, not VPN.",
+      "If a question says 'encrypted over the internet' or 'IPsec tunnels', the answer is Site-to-Site VPN, not Direct Connect.",
+      "If a question involves connecting many VPCs and on-premises networks with transitive routing, choose Transit Gateway over VPC peering.",
+      "If a question asks for a low-cost hub-and-spoke for multiple branch offices using VPN, choose VPN CloudHub.",
+      "If a question mentions sharing subnets across accounts without duplicating VPCs, choose AWS Resource Access Manager (RAM).",
+      "Remember: VPC peering does not support transitive routing; you cannot route through a peered VPC to another VPC.",
+      "Direct Connect does not encrypt data by default; you must add a VPN or MACsec for encryption."
+    ],
+    "practice_links": [
+      "ditectrev_088",
+      "ditectrev_118",
+      "ditectrev_188",
+      "ditectrev_288",
+      "ditectrev_291",
+      "ditectrev_305",
+      "ditectrev_334",
+      "ditectrev_358",
+      "ditectrev_452",
+      "ditectrev_484",
+      "ditectrev_518",
+      "ditectrev_555",
+      "ditectrev_561",
+      "ditectrev_612",
+      "ditectrev_653",
+      "supplemental_173",
+      "supplemental_174",
+      "supplemental_175",
+      "supplemental_176",
+      "supplemental_177",
+      "supplemental_178",
+      "supplemental_179",
+      "supplemental_180",
+      "supplemental_181",
+      "supplemental_182",
+      "supplemental_183",
+      "supplemental_184",
+      "supplemental_185",
+      "supplemental_186",
+      "supplemental_187",
+      "supplemental_188",
+      "supplemental_189",
+      "supplemental_190",
+      "supplemental_191",
+      "supplemental_192",
+      "fundamentals_025"
+    ]
+  },
+  {
+    "cluster_id": "c3_1",
+    "cluster_title": "Compute choice",
+    "concept_id": "c3",
+    "concept_name": "Run (Compute)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the right compute service (EC2 vs Elastic Beanstalk) based on operational overhead and control needs.",
+      "Understanding EC2 instance lifecycle, billing states, and termination reasons.",
+      "Applying cost optimization strategies using Spot Instances, Reserved Instances, and placement groups.",
+      "Using AWS CloudFormation and Elastic Beanstalk for automated deployment and infrastructure as code."
+    ],
+    "signal_words": [
+      {
+        "phrase": "least operational overhead",
+        "points_to": "Elastic Beanstalk"
+      },
+      {
+        "phrase": "cost-effective / most cost-effective",
+        "points_to": "EC2 Spot Instances"
+      },
+      {
+        "phrase": "recover gracefully from instance failures",
+        "points_to": "EC2 Spot Instances"
+      },
+      {
+        "phrase": "deploy, replicate, control, track changes",
+        "points_to": "AWS CloudFormation"
+      },
+      {
+        "phrase": "instance got terminated as soon as it was launched",
+        "points_to": "EC2 instance limit, EBS snapshot corruption, AMI issues"
+      },
+      {
+        "phrase": "move a Reserved Instance",
+        "points_to": "Reserved Instance scope (AZ vs Region)"
+      },
+      {
+        "phrase": "placement group",
+        "points_to": "EC2 Placement Groups (same AZ required)"
+      },
+      {
+        "phrase": "categorize EC2 resources",
+        "points_to": "EC2 tags"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "EC2",
+        "job": "Provides resizable virtual servers in the cloud with full control over the OS, networking, and security.",
+        "choose_when": "You need granular control over the instance, custom AMIs, or specific placement groups.",
+        "avoid_when": "You want to minimize operational overhead and don't need full control.",
+        "trap_words": "fully managed, serverless, zero administration"
+      },
+      {
+        "name": "Elastic Beanstalk",
+        "job": "Automates deployment, capacity provisioning, load balancing, and health monitoring for web applications.",
+        "choose_when": "You want to quickly deploy a web app with minimal operational overhead and AWS manages the underlying infrastructure.",
+        "avoid_when": "You need full control over EC2 instances, custom networking, or non-web workloads.",
+        "trap_words": "full control, custom AMI, complex networking"
+      },
+      {
+        "name": "EC2 Spot Instances",
+        "job": "Offers unused EC2 capacity at steep discounts, suitable for fault-tolerant and flexible workloads.",
+        "choose_when": "Workloads are stateless, fault-tolerant, or can handle interruptions (e.g., batch processing, big data).",
+        "avoid_when": "Workloads are stateful, require persistent uptime, or cannot tolerate interruptions.",
+        "trap_words": "persistent, always on, critical production"
+      },
+      {
+        "name": "EC2 Reserved Instances",
+        "job": "Provides a significant discount in exchange for a one- or three-year commitment to a specific instance family in a region.",
+        "choose_when": "You have predictable, steady-state workloads and want to reduce costs.",
+        "avoid_when": "Workloads are variable, short-lived, or you need flexibility to change instance types.",
+        "trap_words": "short-term, variable, change instance type frequently"
+      },
+      {
+        "name": "EC2 Placement Groups",
+        "job": "Controls the placement of instances to influence network performance or fault tolerance.",
+        "choose_when": "You need low-latency network performance (cluster placement group) or want to spread instances across hardware (spread placement group).",
+        "avoid_when": "You don't have specific placement requirements or need instances in multiple AZs (for cluster placement group).",
+        "trap_words": "multiple Availability Zones, high availability across AZs"
+      },
+      {
+        "name": "AWS CloudFormation",
+        "job": "Enables you to model and provision AWS resources using infrastructure as code (templates).",
+        "choose_when": "You need to deploy, replicate, control, and track changes to complex infrastructure.",
+        "avoid_when": "You need a quick, simple deployment without writing templates (use Elastic Beanstalk instead).",
+        "trap_words": "manual deployment, one-time setup, no version control"
+      }
+    ],
+    "comparisons": [
+      "EC2 vs Elastic Beanstalk: Choose EC2 when you need full control over the compute environment; choose Elastic Beanstalk when you want AWS to manage the deployment and scaling with minimal effort.",
+      "EC2 On-Demand vs Spot Instances: Choose On-Demand for steady-state, critical workloads; choose Spot for fault-tolerant, flexible workloads to save up to 90%.",
+      "EC2 Reserved Instances vs On-Demand: Choose Reserved Instances for predictable, long-term workloads to reduce costs; choose On-Demand for short-term, variable, or unknown workloads.",
+      "EC2 Placement Groups (Cluster vs Spread): Choose Cluster for low-latency, high-throughput within a single AZ; choose Spread for fault tolerance across distinct hardware (up to 7 instances per AZ).",
+      "Elastic Beanstalk vs CloudFormation: Choose Elastic Beanstalk for quick web app deployment with managed services; choose CloudFormation for full infrastructure as code across multiple services and complex architectures."
+    ],
+    "exam_moves": [
+      "If a question mentions 'instance terminated immediately after launch', the cause is NOT reaching the EC2 instance limit (that gives an error, not termination).",
+      "For cost optimization with fault-tolerant workloads, always consider Spot Instances first.",
+      "Reserved Instances can be moved between AZs within the same region, but not across regions.",
+      "Placement groups require all instances to be in the same Availability Zone for cluster placement groups.",
+      "Elastic Beanstalk automatically handles capacity, load balancing, and health monitoring—do not manually configure these.",
+      "Tags can be applied to most EC2 resources, including instances, volumes, and placement groups.",
+      "Elastic IP addresses have a default limit of 5 per region; you can request an increase."
+    ],
+    "practice_links": [
+      "ditectrev_003",
+      "ditectrev_020",
+      "ditectrev_029",
+      "ditectrev_035",
+      "ditectrev_045",
+      "ditectrev_046",
+      "ditectrev_047",
+      "ditectrev_059",
+      "ditectrev_064",
+      "ditectrev_074",
+      "ditectrev_078",
+      "ditectrev_090",
+      "ditectrev_096",
+      "ditectrev_112",
+      "ditectrev_117",
+      "ditectrev_119",
+      "ditectrev_121",
+      "ditectrev_124",
+      "ditectrev_125",
+      "ditectrev_130",
+      "ditectrev_131",
+      "ditectrev_141",
+      "ditectrev_147",
+      "ditectrev_163",
+      "ditectrev_173",
+      "ditectrev_201",
+      "ditectrev_212",
+      "ditectrev_219",
+      "ditectrev_228",
+      "ditectrev_230",
+      "ditectrev_243",
+      "ditectrev_247",
+      "ditectrev_270",
+      "ditectrev_271",
+      "ditectrev_272",
+      "ditectrev_274",
+      "ditectrev_275",
+      "ditectrev_293",
+      "ditectrev_298",
+      "ditectrev_299",
+      "ditectrev_309",
+      "ditectrev_317",
+      "ditectrev_318",
+      "ditectrev_331",
+      "ditectrev_344",
+      "ditectrev_348",
+      "ditectrev_349",
+      "ditectrev_372",
+      "ditectrev_377",
+      "ditectrev_381",
+      "ditectrev_388",
+      "ditectrev_394",
+      "ditectrev_408",
+      "ditectrev_409",
+      "ditectrev_411",
+      "ditectrev_416",
+      "ditectrev_419",
+      "ditectrev_422",
+      "ditectrev_428",
+      "ditectrev_430",
+      "ditectrev_447",
+      "ditectrev_448",
+      "ditectrev_454",
+      "ditectrev_458",
+      "ditectrev_462",
+      "ditectrev_468",
+      "ditectrev_471",
+      "ditectrev_482",
+      "ditectrev_490",
+      "ditectrev_502",
+      "ditectrev_508",
+      "ditectrev_512",
+      "ditectrev_526",
+      "ditectrev_527",
+      "ditectrev_531",
+      "ditectrev_540",
+      "ditectrev_549",
+      "ditectrev_557",
+      "ditectrev_565",
+      "ditectrev_571",
+      "ditectrev_574",
+      "ditectrev_582",
+      "ditectrev_586",
+      "ditectrev_594",
+      "ditectrev_598",
+      "ditectrev_602",
+      "ditectrev_619",
+      "ditectrev_621",
+      "ditectrev_624",
+      "ditectrev_626",
+      "ditectrev_628",
+      "ditectrev_629",
+      "ditectrev_631",
+      "ditectrev_637",
+      "ditectrev_644",
+      "ditectrev_652",
+      "ditectrev_701",
+      "supplemental_277",
+      "supplemental_278",
+      "supplemental_279",
+      "supplemental_280",
+      "supplemental_281",
+      "supplemental_282",
+      "supplemental_283",
+      "supplemental_284",
+      "supplemental_297",
+      "supplemental_298",
+      "supplemental_299",
+      "supplemental_300",
+      "supplemental_301",
+      "supplemental_302",
+      "supplemental_303",
+      "supplemental_304",
+      "fundamentals_016"
+    ]
+  },
+  {
+    "cluster_id": "c3_2",
+    "cluster_title": "Scaling",
+    "concept_id": "c3",
+    "concept_name": "Run (Compute)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Understanding of Auto Scaling Groups (ASG) lifecycle, including launch configurations/templates, scaling policies, and cooldown periods.",
+      "Ability to integrate ASG with other services like CloudWatch, ELB, and SQS for dynamic scaling based on metrics.",
+      "Knowledge of termination policies and how ASG maintains balance across Availability Zones.",
+      "Recognition of when to use scaling features versus when to suspend or avoid scaling for temporary events."
+    ],
+    "signal_words": [
+      {
+        "phrase": "huge download / temporary event",
+        "points_to": "Suspend scaling processes on ASG"
+      },
+      {
+        "phrase": "average utilization / CPU utilization",
+        "points_to": "Auto Scaling with CloudWatch alarms and scaling policies"
+      },
+      {
+        "phrase": "change instance type",
+        "points_to": "Launch configuration or launch template"
+      },
+      {
+        "phrase": "nearest billing hour",
+        "points_to": "Default termination policy (OldestLaunchConfiguration, then closest to billing hour)"
+      },
+      {
+        "phrase": "custom script / user data",
+        "points_to": "User data in launch configuration/template"
+      },
+      {
+        "phrase": "cooldown period",
+        "points_to": "ASG cooldown timer prevents additional scaling actions"
+      },
+      {
+        "phrase": "notification of instance start/terminate",
+        "points_to": "SNS notification configured on ASG"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Auto Scaling Groups (ASG)",
+        "job": "Manages a fleet of EC2 instances, automatically scaling capacity up or down based on policies.",
+        "choose_when": "You need to maintain a desired number of instances, handle variable load, or ensure high availability across AZs.",
+        "avoid_when": "You have a fixed, predictable workload that doesn't change; or you need manual control over each instance lifecycle.",
+        "trap_words": "launch configuration (older, immutable) vs launch template (newer, supports versioning and more features)"
+      },
+      {
+        "name": "Launch Templates",
+        "job": "Defines instance configuration (AMI, instance type, security groups, user data) for ASG to use when launching instances.",
+        "choose_when": "You need to version your instance configuration, support mixed instances, or use newer EC2 features like T2/T3 unlimited.",
+        "avoid_when": "You are maintaining legacy systems that still use launch configurations (though AWS recommends migrating).",
+        "trap_words": "launch configuration (still valid but deprecated; exam may test differences)"
+      },
+      {
+        "name": "CloudWatch",
+        "job": "Monitors metrics (e.g., CPU, network) and triggers alarms that drive ASG scaling policies.",
+        "choose_when": "You need metric-based scaling (e.g., average CPU > 70%).",
+        "avoid_when": "You use scheduled scaling or simple manual adjustments.",
+        "trap_words": "CloudWatch Logs (not for scaling metrics)"
+      },
+      {
+        "name": "Elastic Load Balancing (ELB)",
+        "job": "Distributes incoming traffic across ASG instances and performs health checks to replace unhealthy instances.",
+        "choose_when": "You need to route traffic to a scalable group of instances and ensure only healthy instances receive traffic.",
+        "avoid_when": "You have a single instance or use direct DNS routing.",
+        "trap_words": "Classic Load Balancer (older, less features) vs ALB/NLB"
+      }
+    ],
+    "comparisons": [
+      "Launch Configuration vs Launch Template: Launch Configuration is immutable and older; Launch Template supports versioning, multiple instance types, and is recommended for new deployments.",
+      "Simple Scaling vs Step Scaling vs Target Tracking: Simple scaling waits for cooldown; Step scaling allows multiple adjustments based on alarm breach size; Target tracking automatically adjusts to maintain a target metric value.",
+      "Default Termination Policy vs Custom: Default selects AZ with most instances, then oldest launch configuration, then closest to billing hour; custom policies can be defined but are rarely tested.",
+      "Cooldown vs Health Check Grace Period: Cooldown prevents scaling actions after a scaling activity; health check grace period delays health checks after instance launch to allow bootstrapping."
+    ],
+    "exam_moves": [
+      "If a question mentions a temporary spike (e.g., huge download), the correct move is to suspend scaling processes, not change the policy or add more instances.",
+      "When changing instance type for an ASG, you must update the launch configuration/template, not the ASG itself.",
+      "Termination policy always balances across AZs first: if one AZ has more instances, an instance from that AZ is terminated before considering billing hour.",
+      "Cooldown period starts after the scaling activity completes (instance is in service), not when the activity begins.",
+      "User data scripts run only at launch; they are not re-run on instance reboot unless configured as a service.",
+      "ASG can send SNS notifications for instance launch/terminate events if configured; this is a common correct answer for notification questions.",
+      "For cost-effective scaling, use target tracking policies with appropriate metrics; avoid over-provisioning by setting proper cooldown and health check grace periods."
+    ],
+    "practice_links": [
+      "ditectrev_089",
+      "ditectrev_111",
+      "ditectrev_142",
+      "ditectrev_174",
+      "ditectrev_193",
+      "ditectrev_220",
+      "ditectrev_261",
+      "ditectrev_268",
+      "ditectrev_286",
+      "ditectrev_287",
+      "ditectrev_321",
+      "ditectrev_326",
+      "ditectrev_380",
+      "ditectrev_396",
+      "ditectrev_397",
+      "ditectrev_412",
+      "ditectrev_459",
+      "ditectrev_483",
+      "ditectrev_559",
+      "supplemental_025",
+      "supplemental_026",
+      "supplemental_027",
+      "supplemental_028",
+      "fundamentals_018"
+    ]
+  },
+  {
+    "cluster_id": "c3_3",
+    "cluster_title": "Serverless",
+    "concept_id": "c3",
+    "concept_name": "Run (Compute)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to select AWS Lambda for short, event-driven code without managing servers, minimizing operational overhead.",
+      "Understanding of Lambda concurrency controls (reserved concurrency) to protect downstream resources from overload.",
+      "Knowledge of Lambda integration patterns with API Gateway, S3, DynamoDB, and SNS for cost-effective, scalable serverless architectures.",
+      "Awareness of Lambda's role in cost optimization via Compute Savings Plans and its limitations (e.g., not for long-running tasks)."
+    ],
+    "signal_words": [
+      {
+        "phrase": "run short event-driven code without managing servers",
+        "points_to": "AWS Lambda"
+      },
+      {
+        "phrase": "prevent a Lambda function from overwhelming a downstream database",
+        "points_to": "Configure reserved concurrency for the function"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "AWS Lambda (serverless)"
+      },
+      {
+        "phrase": "millions of requests each hour with millisecond latency",
+        "points_to": "AWS Lambda + API Gateway + DynamoDB (serverless stack)"
+      },
+      {
+        "phrase": "maximize savings on all application resources",
+        "points_to": "Compute Savings Plan (covers Lambda and EC2)"
+      },
+      {
+        "phrase": "direct network access to EC2 instances",
+        "points_to": "Connect Lambda to a VPC private subnet"
+      },
+      {
+        "phrase": "fewer than 100 site visits each month",
+        "points_to": "AWS Lambda (cost-effective for low traffic)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS Lambda",
+        "job": "Runs code in response to events without provisioning or managing servers.",
+        "choose_when": "You need to execute short-lived (≤15 min), event-driven functions with automatic scaling and pay-per-use pricing.",
+        "avoid_when": "Workloads require long-running processes, stateful sessions, or consistent high CPU/memory usage (use EC2 or containers).",
+        "trap_words": "long-running, stateful, always-on, dedicated server, predictable high load"
+      },
+      {
+        "name": "Lambda reserved concurrency",
+        "job": "Limits the maximum number of concurrent executions for a function to protect downstream resources.",
+        "choose_when": "A Lambda function could overwhelm a database or API due to uncontrolled scaling.",
+        "avoid_when": "You need maximum throughput and the downstream resource can handle high concurrency (use unreserved concurrency).",
+        "trap_words": "increase performance, scale faster, unlimited concurrency"
+      }
+    ],
+    "comparisons": [
+      "AWS Lambda vs Amazon EC2: Choose Lambda for short, event-driven, serverless tasks with automatic scaling and no server management; choose EC2 for long-running, stateful, or custom environment workloads.",
+      "Lambda reserved concurrency vs Lambda provisioned concurrency: Reserved concurrency caps concurrent executions to protect downstream resources; provisioned concurrency pre-warms instances to reduce cold starts for latency-sensitive applications.",
+      "Lambda in VPC vs Lambda without VPC: Use VPC-connected Lambda when it needs direct access to resources in a private subnet (e.g., EC2, RDS); avoid VPC if not needed to reduce latency and simplify networking.",
+      "Compute Savings Plan vs Lambda reserved concurrency: Compute Savings Plan provides cost savings across Lambda and EC2; reserved concurrency is a scaling control, not a pricing model."
+    ],
+    "exam_moves": [
+      "When a question asks for 'least operational overhead' and mentions 'short event-driven code', immediately consider AWS Lambda as the primary answer.",
+      "If a Lambda function could overwhelm a downstream database, the correct answer is almost always 'Configure reserved concurrency'—not throttling, not API Gateway throttling, not SQS queue.",
+      "For cost optimization across Lambda and EC2, a Compute Savings Plan is the correct choice because it applies to both services; do not confuse with EC2 Reserved Instances.",
+      "Lambda functions that need to access resources in a VPC (e.g., EC2) must be connected to a private subnet; public subnets are not required and may be a trap.",
+      "When combining Lambda with API Gateway for a low-traffic static site, the most cost-effective solution uses Lambda for dynamic parts and S3 for static content, not EC2 or containers.",
+      "Lambda has a maximum execution timeout of 15 minutes; any workload requiring longer runtime should use EC2, ECS, or Step Functions (for orchestration).",
+      "Reserved concurrency does not reduce cost; it only limits concurrency. Do not select it for cost savings—use Savings Plans or reserved capacity instead."
+    ],
+    "practice_links": [
+      "ditectrev_444",
+      "ditectrev_673",
+      "ditectrev_678",
+      "ditectrev_685",
+      "supplemental_041",
+      "supplemental_042",
+      "supplemental_043",
+      "supplemental_044",
+      "supplemental_045",
+      "supplemental_046",
+      "supplemental_047",
+      "supplemental_048",
+      "fundamentals_004"
+    ]
+  },
+  {
+    "cluster_id": "c3_4",
+    "cluster_title": "Containers and APIs",
+    "concept_id": "c3",
+    "concept_name": "Run (Compute)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to select the right container orchestration service (ECS vs EKS vs Fargate) based on operational overhead and Kubernetes requirements.",
+      "Understanding of when to use AWS Fargate for serverless containers versus managing EC2 instances.",
+      "Knowledge of Amazon API Gateway for creating, securing, and monitoring REST APIs without managing infrastructure.",
+      "Recognition of AWS OpsWorks and CloudFormation as lifecycle management tools, but not primary container services."
+    ],
+    "signal_words": [
+      {
+        "phrase": "run containers without provisioning or managing EC2 worker nodes",
+        "points_to": "AWS Fargate"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "Fargate (for containers) or API Gateway (for APIs)"
+      },
+      {
+        "phrase": "Kubernetes with an AWS-managed control plane",
+        "points_to": "Amazon EKS"
+      },
+      {
+        "phrase": "managed AWS-native container orchestrator without requiring Kubernetes",
+        "points_to": "Amazon ECS"
+      },
+      {
+        "phrase": "publish, secure, throttle, and monitor REST APIs",
+        "points_to": "Amazon API Gateway"
+      },
+      {
+        "phrase": "Docker is the only container platform supported",
+        "points_to": "Amazon ECS (classic, not Fargate)"
+      },
+      {
+        "phrase": "logical grouping of container instances",
+        "points_to": "ECS cluster"
+      },
+      {
+        "phrase": "application life cycle tool",
+        "points_to": "AWS OpsWorks (but not a container service)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS Fargate",
+        "job": "Serverless compute engine for containers that eliminates the need to provision or manage EC2 instances.",
+        "choose_when": "Question asks for running containers with least operational overhead and no EC2 management.",
+        "avoid_when": "You need full control over the underlying EC2 instances or require Kubernetes orchestration.",
+        "trap_words": "Kubernetes, managed control plane, EC2 worker nodes (if Fargate is serverless, it doesn't manage nodes)"
+      },
+      {
+        "name": "Amazon EKS",
+        "job": "Managed Kubernetes service that runs the Kubernetes control plane for you.",
+        "choose_when": "You need Kubernetes orchestration with a managed control plane.",
+        "avoid_when": "You don't need Kubernetes or want a simpler AWS-native orchestrator.",
+        "trap_words": "serverless containers, no EC2 management (EKS can use Fargate but typically involves nodes)"
+      },
+      {
+        "name": "Amazon ECS",
+        "job": "AWS-native container orchestration service that supports Docker containers.",
+        "choose_when": "You want a managed container orchestrator without Kubernetes complexity.",
+        "avoid_when": "You require Kubernetes or want to avoid managing EC2 instances (use Fargate launch type instead).",
+        "trap_words": "Kubernetes, multi-cloud portability (ECS is AWS-specific)"
+      },
+      {
+        "name": "Amazon API Gateway",
+        "job": "Fully managed service to create, publish, secure, throttle, and monitor REST and WebSocket APIs.",
+        "choose_when": "You need to expose APIs with minimal operational overhead and built-in throttling/security.",
+        "avoid_when": "You need to run containerized workloads or orchestrate microservices directly.",
+        "trap_words": "containers, orchestration, compute (API Gateway is for APIs, not compute)"
+      }
+    ],
+    "comparisons": [
+      "ECS vs EKS: Choose ECS when you want a simpler, AWS-native orchestrator without Kubernetes. Choose EKS when you need Kubernetes compatibility or portability.",
+      "Fargate vs EC2 launch type: Choose Fargate for serverless containers with no node management. Choose EC2 launch type when you need cost optimization via reserved instances or custom AMIs.",
+      "API Gateway vs ALB: Choose API Gateway when you need API management features like throttling, authentication, and monitoring. Choose ALB when you need simple HTTP load balancing for containerized apps.",
+      "ECS vs OpsWorks: ECS is for container orchestration; OpsWorks is for configuration management and lifecycle automation of EC2 instances (not containers)."
+    ],
+    "exam_moves": [
+      "If the question says 'run containers without provisioning or managing EC2 worker nodes', the answer is almost always AWS Fargate, regardless of whether ECS or EKS is mentioned.",
+      "When 'Kubernetes' is explicitly stated, eliminate ECS and Fargate (unless Fargate is used with EKS).",
+      "For API questions, look for 'publish, secure, throttle, monitor' as direct triggers for API Gateway.",
+      "Beware of 'least operational overhead' traps: Fargate beats EC2 launch type, and API Gateway beats self-hosted API servers.",
+      "If the question mentions 'Docker' without 'Kubernetes', ECS is the native choice; EKS is overkill.",
+      "CloudFormation and OpsWorks are lifecycle tools, not container services—don't pick them for container orchestration questions."
+    ],
+    "practice_links": [
+      "ditectrev_012",
+      "ditectrev_149",
+      "ditectrev_492",
+      "ditectrev_617",
+      "supplemental_053",
+      "supplemental_054",
+      "supplemental_055",
+      "supplemental_056",
+      "supplemental_057",
+      "supplemental_058",
+      "supplemental_059",
+      "supplemental_060",
+      "supplemental_061",
+      "supplemental_062",
+      "supplemental_063",
+      "supplemental_064",
+      "supplemental_289",
+      "supplemental_290",
+      "supplemental_291",
+      "supplemental_292"
+    ]
+  },
+  {
+    "cluster_id": "c4_1",
+    "cluster_title": "Storage shape",
+    "concept_id": "c4",
+    "concept_name": "Store (Data)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to choose the correct block, file, or instance-store storage based on performance, durability, and cost requirements.",
+      "Understanding of EBS volume types, IOPS provisioning, and snapshot behavior.",
+      "Knowledge of shared file systems (EFS, FSx) for multi-AZ access and POSIX/SMB compatibility.",
+      "Recognition of when to use RAID configurations for fault tolerance or throughput limits."
+    ],
+    "signal_words": [
+      {
+        "phrase": "shared POSIX file storage across multiple Availability Zones",
+        "points_to": "Amazon EFS"
+      },
+      {
+        "phrase": "managed Windows file shares with SMB and Active Directory",
+        "points_to": "Amazon FSx for Windows File Server"
+      },
+      {
+        "phrase": "database-style applications with many random reads and writes",
+        "points_to": "Amazon EBS (especially Provisioned IOPS)"
+      },
+      {
+        "phrase": "low cost, infrequent access, low workload",
+        "points_to": "EBS Magnetic (sc1/st1 for throughput, but magnetic for lowest cost)"
+      },
+      {
+        "phrase": "force detachment of EBS volume stuck in detaching state",
+        "points_to": "Force Detach action"
+      },
+      {
+        "phrase": "EBS-optimized throughput limits total IOPS",
+        "points_to": "EBS-optimized instance or larger instance type"
+      },
+      {
+        "phrase": "snapshot creation using command line",
+        "points_to": "ec2-create-snapshot (or AWS CLI create-snapshot)"
+      },
+      {
+        "phrase": "best fault tolerance of data with EBS volumes",
+        "points_to": "RAID 1 mirroring across multiple EBS volumes"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon EBS",
+        "job": "Provides block-level storage volumes for EC2 instances, offering persistent, high-performance storage.",
+        "choose_when": "You need persistent, low-latency block storage for a single EC2 instance, especially for databases or transactional workloads.",
+        "avoid_when": "You need shared access across multiple instances or across Availability Zones.",
+        "trap_words": "shared, multi-AZ, POSIX, SMB"
+      },
+      {
+        "name": "Amazon EFS",
+        "job": "Provides a fully managed, scalable, shared POSIX file system for Linux EC2 instances.",
+        "choose_when": "You need a shared file system accessible from multiple EC2 instances across multiple Availability Zones with minimal operational overhead.",
+        "avoid_when": "You require Windows SMB protocol or Active Directory integration.",
+        "trap_words": "Windows, SMB, Active Directory, block storage"
+      },
+      {
+        "name": "Amazon FSx for Windows File Server",
+        "job": "Provides fully managed Windows file shares with native SMB protocol and Active Directory support.",
+        "choose_when": "You need a managed Windows file share that integrates with Active Directory and SMB.",
+        "avoid_when": "You need POSIX-compatible file system or Linux-only access.",
+        "trap_words": "POSIX, Linux, NFS"
+      },
+      {
+        "name": "EC2 Instance Store",
+        "job": "Provides temporary, high-performance block storage physically attached to the host EC2 instance.",
+        "choose_when": "You need very high I/O performance for temporary data, caches, or buffers that can be recreated.",
+        "avoid_when": "You need persistent data that survives instance stop/termination.",
+        "trap_words": "persistent, durable, snapshot, detach"
+      }
+    ],
+    "comparisons": [
+      "EBS vs Instance Store: Choose EBS for persistent, durable block storage; choose Instance Store for temporary, high-performance scratch data.",
+      "EBS vs EFS: Choose EBS for single-instance, low-latency block storage; choose EFS for shared POSIX file system across multiple instances and AZs.",
+      "EFS vs FSx for Windows: Choose EFS for Linux/POSIX workloads; choose FSx for Windows for Windows/SMB/Active Directory workloads.",
+      "EBS Magnetic vs EBS gp3/io2: Choose Magnetic (sc1/st1) for low-cost, infrequent access; choose gp3/io2 for consistent performance and higher IOPS.",
+      "RAID 0 vs RAID 1 with EBS: RAID 0 increases throughput but no fault tolerance; RAID 1 provides fault tolerance through mirroring."
+    ],
+    "exam_moves": [
+      "If a question mentions 'shared file system across multiple AZs' and the OS is Linux, pick EFS; if Windows, pick FSx for Windows.",
+      "When EBS volume is stuck in 'detaching' state, the correct action is 'Force Detach' (available in console/CLI).",
+      "EBS snapshots are asynchronous; you can use them while the volume is attached, but they capture only data written to the volume (not cached).",
+      "EBS-optimized instances have dedicated throughput to EBS; exceeding that throughput will bottleneck IOPS even if volumes are provisioned higher.",
+      "For fault tolerance with EBS, use RAID 1 (mirroring) across multiple volumes; RAID 0 increases performance but no redundancy.",
+      "Provisioned IOPS (io1/io2) are billed regardless of usage; you pay for provisioned IOPS and storage monthly.",
+      "When creating snapshots via CLI, the command is 'ec2-create-snapshot' (old EC2 CLI) or 'aws ec2 create-snapshot' (AWS CLI)."
+    ],
+    "practice_links": [
+      "ditectrev_014",
+      "ditectrev_030",
+      "ditectrev_041",
+      "ditectrev_062",
+      "ditectrev_076",
+      "ditectrev_077",
+      "ditectrev_085",
+      "ditectrev_091",
+      "ditectrev_102",
+      "ditectrev_151",
+      "ditectrev_166",
+      "ditectrev_167",
+      "ditectrev_170",
+      "ditectrev_184",
+      "ditectrev_204",
+      "ditectrev_210",
+      "ditectrev_231",
+      "ditectrev_235",
+      "ditectrev_276",
+      "ditectrev_295",
+      "ditectrev_304",
+      "ditectrev_311",
+      "ditectrev_312",
+      "ditectrev_322",
+      "ditectrev_330",
+      "ditectrev_338",
+      "ditectrev_352",
+      "ditectrev_367",
+      "ditectrev_370",
+      "ditectrev_402",
+      "ditectrev_404",
+      "ditectrev_423",
+      "ditectrev_463",
+      "ditectrev_472",
+      "ditectrev_494",
+      "ditectrev_514",
+      "ditectrev_523",
+      "ditectrev_604",
+      "ditectrev_607",
+      "ditectrev_608",
+      "ditectrev_625",
+      "ditectrev_647",
+      "supplemental_013",
+      "supplemental_014",
+      "supplemental_015",
+      "supplemental_016",
+      "supplemental_017",
+      "supplemental_018",
+      "supplemental_019",
+      "supplemental_020",
+      "supplemental_021",
+      "supplemental_022",
+      "supplemental_023",
+      "supplemental_024"
+    ]
+  },
+  {
+    "cluster_id": "c4_2",
+    "cluster_title": "S3 lifecycle/archive/protection",
+    "concept_id": "c4",
+    "concept_name": "Store (Data)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the right S3 storage class based on access patterns and cost (e.g., S3 Standard vs. S3 Intelligent-Tiering vs. S3 Glacier).",
+      "Configuring lifecycle rules to transition objects between storage classes or expire them to reduce costs.",
+      "Implementing data protection with S3 Object Lock (write-once-read-many) and versioning to prevent accidental deletion or overwrites.",
+      "Understanding consistency models (read-after-write for new PUTs, eventual consistency for overwrites) and durability/redundancy options (e.g., RRS vs. standard)."
+    ],
+    "signal_words": [
+      {
+        "phrase": "unpredictable access pattern",
+        "points_to": "S3 Intelligent-Tiering"
+      },
+      {
+        "phrase": "statutory requirement to protect data at rest",
+        "points_to": "S3 Object Lock or default encryption (SSE-S3/SSE-KMS)"
+      },
+      {
+        "phrase": "prevent and recover from accidental data loss",
+        "points_to": "S3 Versioning + MFA Delete"
+      },
+      {
+        "phrase": "lower costs without compromising average performance",
+        "points_to": "S3 Reduced Redundancy Storage (RRS) for non-critical/reproducible data"
+      },
+      {
+        "phrase": "archive original files after a few days",
+        "points_to": "S3 Lifecycle rule to transition to S3 Glacier"
+      },
+      {
+        "phrase": "upload 5 GB video objects",
+        "points_to": "S3 Multipart Upload"
+      },
+      {
+        "phrase": "static assets for public-facing web application",
+        "points_to": "S3 bucket policy or object ACL set to public read"
+      },
+      {
+        "phrase": "resilient to the loss of an Availability Zone",
+        "points_to": "S3 Standard or S3 Intelligent-Tiering (both store across >=3 AZs)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "S3 Storage Classes",
+        "job": "Provide different tiers of durability, availability, and access latency to optimize cost based on data access patterns.",
+        "choose_when": "You need to balance cost and performance for data with known or predictable access frequency.",
+        "avoid_when": "Access patterns are highly unpredictable and you want automatic cost optimization (use S3 Intelligent-Tiering instead).",
+        "trap_words": "Glacier Deep Archive for frequent retrieval (high cost); RRS for critical data (lower durability)."
+      },
+      {
+        "name": "Lifecycle Rules",
+        "job": "Automate transitioning objects between storage classes or deleting them after a specified time period.",
+        "choose_when": "You have data that becomes less frequently accessed over time (e.g., logs, backups) and want to reduce storage costs.",
+        "avoid_when": "You need immediate access to all data at all times (lifecycle transitions can add retrieval delays).",
+        "trap_words": "Expiration action deletes objects permanently; transition to Glacier requires 30-day minimum for Standard."
+      },
+      {
+        "name": "S3 Object Lock",
+        "job": "Enforce a write-once-read-many (WORM) model to prevent objects from being deleted or overwritten for a fixed retention period.",
+        "choose_when": "You have regulatory or compliance requirements for data retention (e.g., SEC, FINRA).",
+        "avoid_when": "You need to allow updates or deletions before the retention period ends (use versioning with MFA Delete instead).",
+        "trap_words": "Legal hold overrides retention period; governance mode can be bypassed by users with s3:BypassGovernanceRetention permission."
+      },
+      {
+        "name": "S3 Versioning",
+        "job": "Keep multiple versions of an object to protect against accidental deletion or overwrites.",
+        "choose_when": "You need to recover from unintended user actions or application failures.",
+        "avoid_when": "You want to minimize storage costs (each version incurs charges) or have strict data immutability requirements (use Object Lock).",
+        "trap_words": "Versioning must be enabled on the bucket before uploads; MFA Delete adds extra protection."
+      },
+      {
+        "name": "S3 Multipart Upload",
+        "job": "Upload large objects (>=100 MB) in parts to improve throughput and allow recovery from network failures.",
+        "choose_when": "You are uploading objects >100 MB or over unstable networks.",
+        "avoid_when": "Objects are small (<100 MB) or you need atomic uploads (single PUT is simpler).",
+        "trap_words": "Not required for objects <5 GB but recommended for >100 MB; parts can be uploaded in parallel."
+      },
+      {
+        "name": "S3 Reduced Redundancy Storage (RRS)",
+        "job": "Provide lower durability (99.99%) at a lower cost compared to standard S3 (99.999999999%).",
+        "choose_when": "Data is non-critical, easily reproducible, or can tolerate occasional loss (e.g., thumbnails, transient logs).",
+        "avoid_when": "Data is critical or cannot be regenerated (use Standard or Intelligent-Tiering).",
+        "trap_words": "RRS is deprecated for new buckets; use One Zone-IA instead for similar cost/durability trade-off."
+      }
+    ],
+    "comparisons": [
+      "S3 Standard vs S3 Intelligent-Tiering: Choose Standard when access patterns are predictable and you want lowest retrieval cost; choose Intelligent-Tiering when access patterns are unpredictable to automatically save on storage costs.",
+      "S3 Glacier vs S3 Glacier Deep Archive: Choose Glacier for archival data that may be retrieved occasionally (minutes to hours); choose Deep Archive for data that is rarely accessed and can tolerate retrieval times of 12 hours.",
+      "S3 Versioning vs S3 Object Lock: Choose Versioning to protect against accidental overwrites/deletes with multiple versions; choose Object Lock for regulatory WORM compliance where data must not be modified or deleted for a fixed period.",
+      "S3 Multipart Upload vs single PUT: Choose Multipart Upload for objects >100 MB to improve performance and resilience; use single PUT for smaller objects to keep simplicity.",
+      "S3 RRS vs One Zone-IA: Both offer lower cost with reduced durability; RRS is deprecated, so choose One Zone-IA for non-critical, reproducible data that can be recreated if the AZ fails."
+    ],
+    "exam_moves": [
+      "If a question mentions 'unpredictable access pattern' and 'cost minimization', immediately think S3 Intelligent-Tiering.",
+      "When you see 'statutory requirement to protect data at rest', look for encryption (SSE-S3, SSE-KMS) or Object Lock—not replication.",
+      "For 'prevent and recover from accidental data loss', the combo is Versioning + MFA Delete (not just versioning alone).",
+      "If the scenario involves large uploads (>100 MB) and performance issues, the answer is Multipart Upload.",
+      "When a question asks for 'lowest cost' and data is non-critical/reproducible, consider RRS or One Zone-IA (but RRS is deprecated).",
+      "Lifecycle rules can transition to Glacier after 30 days minimum from Standard; do not set a shorter transition period.",
+      "Object Lock retention modes: Governance (can be bypassed with special permissions) vs Compliance (no one can bypass)."
+    ],
+    "practice_links": [
+      "ditectrev_001",
+      "ditectrev_004",
+      "ditectrev_006",
+      "ditectrev_009",
+      "ditectrev_025",
+      "ditectrev_042",
+      "ditectrev_073",
+      "ditectrev_080",
+      "ditectrev_109",
+      "ditectrev_137",
+      "ditectrev_138",
+      "ditectrev_171",
+      "ditectrev_190",
+      "ditectrev_194",
+      "ditectrev_209",
+      "ditectrev_257",
+      "ditectrev_282",
+      "ditectrev_310",
+      "ditectrev_328",
+      "ditectrev_329",
+      "ditectrev_357",
+      "ditectrev_364",
+      "ditectrev_374",
+      "ditectrev_385",
+      "ditectrev_413",
+      "ditectrev_461",
+      "ditectrev_485",
+      "ditectrev_529",
+      "ditectrev_542",
+      "ditectrev_576",
+      "ditectrev_579",
+      "ditectrev_580",
+      "ditectrev_581",
+      "ditectrev_585",
+      "ditectrev_597",
+      "ditectrev_605",
+      "ditectrev_613",
+      "ditectrev_623",
+      "ditectrev_632",
+      "ditectrev_664",
+      "ditectrev_686",
+      "ditectrev_687",
+      "ditectrev_700",
+      "ditectrev_705",
+      "supplemental_005",
+      "supplemental_006",
+      "supplemental_007",
+      "supplemental_008",
+      "supplemental_009",
+      "supplemental_010",
+      "supplemental_011",
+      "supplemental_012"
+    ]
+  },
+  {
+    "cluster_id": "c4_3",
+    "cluster_title": "Backup and migration",
+    "concept_id": "c4",
+    "concept_name": "Store (Data)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the right migration tool based on data size, network bandwidth, and operational overhead.",
+      "Understanding EBS snapshot lifecycle, permissions, and fast restore for cloning and disaster recovery.",
+      "Differentiating between AWS Backup, DataSync, Snow Family, and Storage Gateway for backup and migration scenarios.",
+      "Recognizing when to use multipart upload vs. physical devices for large data transfers to AWS."
+    ],
+    "signal_words": [
+      {
+        "phrase": "fastest method of getting data into AWS",
+        "points_to": "AWS Snowball Edge (for large data over slow network) or multipart upload (for smaller data with good bandwidth)"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "AWS DataSync (for network transfers) or AWS Backup (for automated backup management)"
+      },
+      {
+        "phrase": "limited network bandwidth",
+        "points_to": "AWS Snowball Edge or Snowmobile"
+      },
+      {
+        "phrase": "clone large amounts of production data",
+        "points_to": "EBS snapshots with fast snapshot restore"
+      },
+      {
+        "phrase": "make snapshot public",
+        "points_to": "Modify createVolumePermission attribute"
+      },
+      {
+        "phrase": "backup window changes take effect",
+        "points_to": "immediately (for AWS Backup)"
+      },
+      {
+        "phrase": "off-site backup with low-latency access",
+        "points_to": "AWS Storage Gateway (gateway-cached or gateway-stored volumes)"
+      },
+      {
+        "phrase": "migrate archival data to Glacier",
+        "points_to": "Amazon Glacier multipart upload (for network) or Snowball Edge (for large offline transfer)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS Backup",
+        "job": "Centralized backup service to automate and manage backups across AWS services.",
+        "choose_when": "Need policy-based backup scheduling, retention management, and cross-region/account backup.",
+        "avoid_when": "Require file-level restore from on-premises or need to migrate live data.",
+        "trap_words": "manual backup, ad-hoc snapshot, no automation"
+      },
+      {
+        "name": "AWS DataSync",
+        "job": "Online data transfer service to move large datasets between on-premises and AWS over the network.",
+        "choose_when": "Need efficient, automated, and repeatable network transfer of tens of TB with minimal overhead.",
+        "avoid_when": "Network bandwidth is extremely limited (< 1 Mbps) or data is petabytes in size.",
+        "trap_words": "offline, physical device, slow link"
+      },
+      {
+        "name": "AWS Snowball Edge",
+        "job": "Physical device to transfer large amounts of data to/from AWS when network transfer is impractical.",
+        "choose_when": "Data is > 10 TB, network is slow or unreliable, or need to move data offline.",
+        "avoid_when": "Data is small (< 1 TB) or network is fast and reliable.",
+        "trap_words": "online, real-time, streaming"
+      },
+      {
+        "name": "EBS Snapshots",
+        "job": "Point-in-time backups of EBS volumes stored in S3, used for DR, cloning, and migration.",
+        "choose_when": "Need to back up EC2 instance volumes, clone volumes, or share volume data across accounts.",
+        "avoid_when": "Need cross-region backup automation (use AWS Backup) or file-level restore.",
+        "trap_words": "incremental, fast snapshot restore, createVolumePermission"
+      },
+      {
+        "name": "AWS Storage Gateway",
+        "job": "Hybrid cloud storage service providing on-premises access to virtually unlimited cloud storage.",
+        "choose_when": "Need low-latency access to frequently used data with off-site backup to AWS.",
+        "avoid_when": "Need to migrate data once (use DataSync or Snowball) or require native S3 access.",
+        "trap_words": "gateway-cached, gateway-stored, virtual tape library"
+      }
+    ],
+    "comparisons": [
+      "AWS DataSync vs Snowball Edge: Choose DataSync when network bandwidth is adequate and you want automated online transfer; choose Snowball Edge when network is slow or data is > 10 TB and offline transfer is faster.",
+      "EBS Snapshots vs AWS Backup: Choose EBS Snapshots for manual or scripted backups of specific volumes; choose AWS Backup for centralized, policy-driven backup across multiple services.",
+      "AWS Backup vs Storage Gateway: Choose AWS Backup for native AWS service backup automation; choose Storage Gateway when you need hybrid on-premises cache with cloud backup.",
+      "Multipart Upload vs Snowball Edge: Choose multipart upload for data up to a few TB with good network; choose Snowball Edge for multi-TB to PB data over slow or no network.",
+      "EBS fast snapshot restore vs standard snapshot restore: Choose fast snapshot restore when you need low-latency initialization of restored volumes for performance-sensitive workloads; avoid for cost-sensitive scenarios."
+    ],
+    "exam_moves": [
+      "If a question mentions 'fastest method' and 'limited bandwidth', the answer is almost always Snowball Edge or Snowmobile, not DataSync.",
+      "When asked about 'least operational overhead' for network transfer, prefer AWS DataSync over manual rsync or S3 CLI.",
+      "EBS snapshot permissions are controlled via 'createVolumePermission' attribute, not 'launchPermission'.",
+      "Changes to AWS Backup window take effect immediately, not at the next scheduled window.",
+      "For cloning production data with high I/O, use EBS snapshots with fast snapshot restore enabled before restoring.",
+      "If a question involves 'off-site backup' and 'low-latency access', think Storage Gateway (cached or stored volumes).",
+      "When migrating archival data to Glacier, if network is slow, use Snowball Edge; if network is adequate, use multipart upload directly to Glacier."
+    ],
+    "practice_links": [
+      "ditectrev_093",
+      "ditectrev_098",
+      "ditectrev_202",
+      "ditectrev_211",
+      "ditectrev_244",
+      "ditectrev_285",
+      "ditectrev_296",
+      "ditectrev_351",
+      "ditectrev_354",
+      "ditectrev_387",
+      "ditectrev_432",
+      "ditectrev_477",
+      "ditectrev_486",
+      "ditectrev_547",
+      "ditectrev_560",
+      "ditectrev_587",
+      "ditectrev_591",
+      "ditectrev_601",
+      "ditectrev_614",
+      "ditectrev_684",
+      "supplemental_261",
+      "supplemental_262",
+      "supplemental_263",
+      "supplemental_264",
+      "supplemental_265",
+      "supplemental_266",
+      "supplemental_267",
+      "supplemental_268",
+      "supplemental_273",
+      "supplemental_274",
+      "supplemental_275",
+      "supplemental_276"
+    ]
+  },
+  {
+    "cluster_id": "c4_4",
+    "cluster_title": "Hybrid storage",
+    "concept_id": "c4",
+    "concept_name": "Store (Data)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Understanding of hybrid cloud storage integration between on-premises and AWS",
+      "Ability to select the correct Storage Gateway type (File, Volume cached, Volume stored) based on latency, data locality, and backup requirements",
+      "Knowledge of how Storage Gateway provides low-latency access to cloud-backed storage for on-premises applications",
+      "Recognition of lifecycle management and data tiering patterns using S3 and Storage Gateway"
+    ],
+    "signal_words": [
+      {
+        "phrase": "on-premises applications low-latency file access backed by cloud storage",
+        "points_to": "AWS Storage Gateway File Gateway"
+      },
+      {
+        "phrase": "disaster recovery for local applications",
+        "points_to": "AWS Storage Gateway (general hybrid storage)"
+      },
+      {
+        "phrase": "gateway-cached vs gateway-stored volumes",
+        "points_to": "Gateway-cached: data in S3 with local cache; Gateway-stored: all data local with async backups to S3"
+      },
+      {
+        "phrase": "POSIX-compatible block based storage",
+        "points_to": "Storage Gateway Volume Gateway (cached or stored)"
+      },
+      {
+        "phrase": "single folder mount for on-premises file server",
+        "points_to": "Storage Gateway File Gateway or Volume Gateway with cached volumes"
+      },
+      {
+        "phrase": "least operational overhead for hybrid file access",
+        "points_to": "AWS Storage Gateway File Gateway (managed service)"
+      },
+      {
+        "phrase": "backup application writes to block storage",
+        "points_to": "Storage Gateway Volume Gateway (stored or cached)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS Storage Gateway File Gateway",
+        "job": "Provides a file interface (NFS/SMB) to S3, caching frequently accessed data locally for low-latency access.",
+        "choose_when": "On-premises applications need low-latency file access to cloud storage with minimal operational overhead; file-based protocols (NFS/SMB) are required.",
+        "avoid_when": "Block-level storage (iSCSI) is required; or if you need to store all data locally with async backup.",
+        "trap_words": "block storage, iSCSI, tape backup"
+      },
+      {
+        "name": "AWS Storage Gateway Volume Gateway (cached)",
+        "job": "Stores primary data in S3 and caches frequently accessed data locally, presenting as iSCSI block volumes.",
+        "choose_when": "On-premises applications require block-level storage with low-latency access to a subset of data, and total data is large (e.g., 140TB).",
+        "avoid_when": "File-based access (NFS/SMB) is needed; or if all data must be stored locally.",
+        "trap_words": "file server, NFS, SMB"
+      },
+      {
+        "name": "AWS Storage Gateway Volume Gateway (stored)",
+        "job": "Stores all data locally on-premises and asynchronously backs up point-in-time snapshots to S3.",
+        "choose_when": "On-premises applications require full local data storage with cloud backup for disaster recovery.",
+        "avoid_when": "Low-latency access to cloud data is needed; or if local storage capacity is limited.",
+        "trap_words": "low-latency cloud access, cache"
+      }
+    ],
+    "comparisons": [
+      "File Gateway vs Volume Gateway: Choose File Gateway when applications use file protocols (NFS/SMB) and need low-latency access to S3; choose Volume Gateway when applications require block-level iSCSI storage.",
+      "Gateway-cached vs Gateway-stored volumes: Choose cached when you want to store data in S3 and keep a local cache for frequently accessed data (saves local storage); choose stored when you need all data locally and only use S3 for backup.",
+      "Storage Gateway vs Direct S3 access: Choose Storage Gateway when on-premises applications need low-latency access via standard protocols (NFS/SMB/iSCSI) and caching; choose direct S3 access when applications can use S3 APIs and latency is acceptable."
+    ],
+    "exam_moves": [
+      "If the question mentions 'low-latency file access' for on-premises apps, the answer is almost always File Gateway.",
+      "When you see 'gateway-cached' vs 'gateway-stored', remember: cached = primary in S3, local cache; stored = all local, async backup.",
+      "For backup scenarios with block storage and large data (e.g., 140TB), cached volumes allow users to access data during backup.",
+      "If the question says 'least operational overhead' for hybrid file access, File Gateway is the managed choice.",
+      "Storage Gateway is not for direct cloud-to-cloud access; it's for hybrid on-premises integration.",
+      "Watch for trap words like 'block storage' when the question asks for file access—that points to Volume Gateway, not File Gateway."
+    ],
+    "practice_links": [
+      "ditectrev_056",
+      "ditectrev_342",
+      "ditectrev_389",
+      "ditectrev_570",
+      "ditectrev_645",
+      "supplemental_269",
+      "supplemental_270",
+      "supplemental_271",
+      "supplemental_272"
+    ]
+  },
+  {
+    "cluster_id": "c5_1",
+    "cluster_title": "Relational databases",
+    "concept_id": "c5",
+    "concept_name": "Remember and query data (Databases & Analytics)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to choose the right managed relational database service (RDS vs Aurora) based on workload needs like performance, availability, and operational overhead.",
+      "Understanding of RDS deployment options: Multi-AZ for high availability and failover, Read Replicas for read scaling, and RDS Proxy for connection pooling.",
+      "Knowledge of storage types (Provisioned IOPS vs Standard) and encryption (SSL/TLS) for security and performance.",
+      "Familiarity with database migration strategies using AWS DMS and Schema Conversion Tool for minimal downtime."
+    ],
+    "signal_words": [
+      {
+        "phrase": "least operational overhead",
+        "points_to": "Managed service like RDS or Aurora (avoid self-managed)"
+      },
+      {
+        "phrase": "read-heavy traffic / scale reads",
+        "points_to": "RDS Read Replicas"
+      },
+      {
+        "phrase": "high availability / failover / synchronous standby",
+        "points_to": "RDS Multi-AZ"
+      },
+      {
+        "phrase": "connection pooling / Lambda concurrency",
+        "points_to": "RDS Proxy"
+      },
+      {
+        "phrase": "minimal downtime / continuous replication",
+        "points_to": "AWS DMS"
+      },
+      {
+        "phrase": "MySQL-compatible / distributed storage / fast failover",
+        "points_to": "Amazon Aurora"
+      },
+      {
+        "phrase": "production OLTP / consistent I/O latency",
+        "points_to": "Provisioned IOPS (io1/io2)"
+      },
+      {
+        "phrase": "encryption in transit / SSL",
+        "points_to": "RDS SSL/TLS support"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon RDS",
+        "job": "Managed relational database service supporting multiple engines (MySQL, PostgreSQL, Oracle, SQL Server, MariaDB).",
+        "choose_when": "You need a fully managed database with minimal administration, automated backups, patching, and multi-AZ options.",
+        "avoid_when": "You need global-scale read replicas or faster failover than RDS Multi-AZ provides; consider Aurora.",
+        "trap_words": "self-managed, custom installation, no administration overhead (RDS is managed but not zero admin)"
+      },
+      {
+        "name": "Amazon Aurora",
+        "job": "MySQL and PostgreSQL-compatible relational database with distributed storage, auto-scaling, and up to 15 read replicas.",
+        "choose_when": "You need high performance, fast failover (typically <30 seconds), and MySQL/PostgreSQL compatibility with less operational overhead.",
+        "avoid_when": "You require Oracle or SQL Server engine, or your budget is very tight (Aurora costs more than standard RDS).",
+        "trap_words": "Oracle, SQL Server, cheapest option"
+      },
+      {
+        "name": "RDS Multi-AZ",
+        "job": "Synchronous standby replica in a different AZ for automatic failover and high availability.",
+        "choose_when": "You need high availability and automatic failover for production databases.",
+        "avoid_when": "You need to offload read traffic (use Read Replicas instead) or you need cross-region disaster recovery (use cross-region Read Replicas).",
+        "trap_words": "read scaling, performance improvement for reads, active standby for queries"
+      },
+      {
+        "name": "RDS Read Replicas",
+        "job": "Asynchronous read-only copies of your RDS database for scaling read-heavy workloads.",
+        "choose_when": "You have read-heavy traffic and can tolerate eventual consistency (replica lag).",
+        "avoid_when": "You need synchronous replication or write scaling; use Multi-AZ or Aurora.",
+        "trap_words": "write scaling, synchronous, zero lag, failover (Read Replicas can be promoted but not automatic failover)"
+      },
+      {
+        "name": "RDS Proxy",
+        "job": "Fully managed database proxy to pool and share connections, improving scalability and reducing Lambda cold starts.",
+        "choose_when": "You have highly concurrent Lambda functions or applications that open many short-lived connections.",
+        "avoid_when": "You have long-lived persistent connections or need direct database access for administrative tasks.",
+        "trap_words": "direct connection, no connection pooling needed, Lambda without RDS Proxy (can cause connection exhaustion)"
+      },
+      {
+        "name": "AWS DMS",
+        "job": "Managed service to migrate databases to AWS with minimal downtime using continuous replication.",
+        "choose_when": "You need to migrate a relational database with minimal downtime and support for heterogeneous migrations (with Schema Conversion Tool).",
+        "avoid_when": "You only need a one-time snapshot migration (use native tools or AWS Backup).",
+        "trap_words": "real-time replication (DMS is near real-time, not synchronous), zero downtime (minimal, not zero)"
+      }
+    ],
+    "comparisons": [
+      "RDS Multi-AZ vs RDS Read Replicas: Choose Multi-AZ for high availability and automatic failover (synchronous replication); choose Read Replicas for scaling read traffic (asynchronous replication).",
+      "Amazon RDS vs Amazon Aurora: Choose RDS for lower cost and broader engine support (Oracle, SQL Server); choose Aurora for higher performance, faster failover, and distributed storage (MySQL/PostgreSQL only).",
+      "Provisioned IOPS vs General Purpose (gp2/gp3): Choose Provisioned IOPS for consistent low-latency I/O in production OLTP; choose General Purpose for cost-effective baseline performance with burst capability.",
+      "RDS Proxy vs direct connection: Choose RDS Proxy when you have many short-lived connections (e.g., Lambda) to avoid connection limits; avoid when you need direct SQL access or long-running transactions.",
+      "AWS DMS vs native backup/restore: Choose DMS for minimal downtime migrations with continuous replication; choose native tools for simple, one-time migrations where downtime is acceptable."
+    ],
+    "exam_moves": [
+      "If a question asks for 'least operational overhead' for a relational database, prefer RDS or Aurora over self-managed EC2 databases.",
+      "Remember: Multi-AZ standby is NOT used for read/write operations; it's only for failover. Read Replicas are for read scaling.",
+      "Read Replicas require InnoDB storage engine for MySQL/MariaDB; other engines may not support replication.",
+      "RDS Proxy is specifically designed to handle Lambda concurrency; if Lambda is mentioned with database connections, consider RDS Proxy.",
+      "For encryption in transit, RDS supports SSL/TLS for all engines; enable it by downloading the certificate and configuring the client.",
+      "When migrating with minimal downtime, AWS DMS is the go-to service; use Schema Conversion Tool for heterogeneous migrations (e.g., Oracle to Aurora).",
+      "Aurora's fast failover (typically <30 seconds) is a key differentiator from RDS Multi-AZ (typically 1-2 minutes)."
+    ],
+    "practice_links": [
+      "ditectrev_008",
+      "ditectrev_010",
+      "ditectrev_017",
+      "ditectrev_023",
+      "ditectrev_027",
+      "ditectrev_028",
+      "ditectrev_034",
+      "ditectrev_044",
+      "ditectrev_049",
+      "ditectrev_052",
+      "ditectrev_058",
+      "ditectrev_069",
+      "ditectrev_071",
+      "ditectrev_083",
+      "ditectrev_092",
+      "ditectrev_095",
+      "ditectrev_099",
+      "ditectrev_122",
+      "ditectrev_126",
+      "ditectrev_127",
+      "ditectrev_140",
+      "ditectrev_162",
+      "ditectrev_177",
+      "ditectrev_178",
+      "ditectrev_182",
+      "ditectrev_185",
+      "ditectrev_186",
+      "ditectrev_197",
+      "ditectrev_214",
+      "ditectrev_222",
+      "ditectrev_229",
+      "ditectrev_233",
+      "ditectrev_246",
+      "ditectrev_252",
+      "ditectrev_258",
+      "ditectrev_263",
+      "ditectrev_265",
+      "ditectrev_281",
+      "ditectrev_284",
+      "ditectrev_294",
+      "ditectrev_303",
+      "ditectrev_308",
+      "ditectrev_323",
+      "ditectrev_324",
+      "ditectrev_327",
+      "ditectrev_336",
+      "ditectrev_341",
+      "ditectrev_359",
+      "ditectrev_373",
+      "ditectrev_395",
+      "ditectrev_401",
+      "ditectrev_403",
+      "ditectrev_431",
+      "ditectrev_434",
+      "ditectrev_435",
+      "ditectrev_438",
+      "ditectrev_467",
+      "ditectrev_470",
+      "ditectrev_473",
+      "ditectrev_479",
+      "ditectrev_499",
+      "ditectrev_510",
+      "ditectrev_515",
+      "ditectrev_521",
+      "ditectrev_524",
+      "ditectrev_541",
+      "ditectrev_564",
+      "ditectrev_568",
+      "ditectrev_592",
+      "ditectrev_593",
+      "ditectrev_596",
+      "ditectrev_603",
+      "ditectrev_618",
+      "ditectrev_627",
+      "ditectrev_642",
+      "ditectrev_646",
+      "ditectrev_656",
+      "ditectrev_658",
+      "ditectrev_659",
+      "ditectrev_660",
+      "ditectrev_680",
+      "ditectrev_694",
+      "ditectrev_703",
+      "ditectrev_708",
+      "supplemental_049",
+      "supplemental_050",
+      "supplemental_051",
+      "supplemental_052",
+      "supplemental_209",
+      "supplemental_210",
+      "supplemental_211",
+      "supplemental_212",
+      "supplemental_213",
+      "supplemental_214",
+      "supplemental_215",
+      "supplemental_216",
+      "supplemental_217",
+      "supplemental_218",
+      "supplemental_219",
+      "supplemental_220",
+      "supplemental_253",
+      "supplemental_254",
+      "supplemental_255",
+      "supplemental_256",
+      "supplemental_257",
+      "supplemental_260"
+    ]
+  },
+  {
+    "cluster_id": "c5_2",
+    "cluster_title": "NoSQL",
+    "concept_id": "c5",
+    "concept_name": "Remember and query data (Databases & Analytics)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Recognizing DynamoDB as a fully managed, scalable NoSQL database for key-value and document workloads.",
+      "Understanding DynamoDB's ability to handle high throughput (millions of requests/second) with single-digit millisecond latency.",
+      "Identifying use cases like session management, metadata storage, JSON documents, and real-time data ingestion.",
+      "Knowing DynamoDB's scaling limits (default 10,000 WCU/RCU per table, can increase via AWS support) and atomic operations (increment/decrement)."
+    ],
+    "signal_words": [
+      {
+        "phrase": "fast, highly scalable managed NoSQL database",
+        "points_to": "DynamoDB"
+      },
+      {
+        "phrase": "millions of users, real-time tabulation, durable, scalable, highly available",
+        "points_to": "DynamoDB"
+      },
+      {
+        "phrase": "user preferences, 50KB per user, 5 million customers, cost-effective, highly available",
+        "points_to": "DynamoDB with Fine-Grained Access Control"
+      },
+      {
+        "phrase": "maximum write throughput, beyond 10,000, contact AWS",
+        "points_to": "DynamoDB provisioned throughput limits"
+      },
+      {
+        "phrase": "search functionality among S3 objects",
+        "points_to": "DynamoDB for metadata (not S3 itself)"
+      },
+      {
+        "phrase": "in-place atomic updates, increment, decrement",
+        "points_to": "DynamoDB atomic operations"
+      },
+      {
+        "phrase": "fully managed NoSQL, rapid growth, millions of users, hundreds of thousands of writes/reads per second",
+        "points_to": "DynamoDB"
+      },
+      {
+        "phrase": "cross-region disaster recovery, RTO 2 hours, RPO 24 hours, synchronize modified elements",
+        "points_to": "DynamoDB cross-region replication (Data Pipeline or Global Tables)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon DynamoDB",
+        "job": "Fully managed NoSQL key-value and document database with single-digit millisecond latency at any scale.",
+        "choose_when": "Need a serverless, scalable NoSQL database for high-traffic web apps, gaming, IoT, session management, or metadata storage.",
+        "avoid_when": "Require complex relational queries, joins, or transactions across multiple tables; need SQL interface; or have small, predictable workloads where RDS is cheaper.",
+        "trap_words": "relational, SQL, joins, complex queries, ACID transactions across multiple items (DynamoDB transactions exist but are limited)"
+      }
+    ],
+    "comparisons": [
+      "DynamoDB vs RDS: Choose DynamoDB for high-scale, low-latency key-value/document workloads with unpredictable traffic; choose RDS for relational data, complex queries, and ACID transactions.",
+      "DynamoDB vs ElastiCache: Choose DynamoDB for durable, persistent storage; choose ElastiCache for temporary, in-memory caching with sub-millisecond latency.",
+      "DynamoDB vs S3: Choose DynamoDB for frequent, low-latency reads/writes of small items (<400KB); choose S3 for large objects, static content, or archival storage.",
+      "DynamoDB vs DocumentDB: Choose DynamoDB for key-value or simple document models with high throughput; choose DocumentDB for MongoDB-compatible document workloads requiring richer query capabilities."
+    ],
+    "exam_moves": [
+      "If a question mentions 'millions of users' or 'real-time' with 'NoSQL', DynamoDB is almost always the answer.",
+      "For user preferences or session data, DynamoDB with Fine-Grained Access Control (FGAC) and Web Identity Federation is a common pattern.",
+      "When you see 'atomic increment/decrement', think DynamoDB's UpdateItem with ADD action.",
+      "DynamoDB has a default limit of 10,000 WCU/RCU per table; exceeding that requires a service limit increase via AWS Support.",
+      "For cross-region DR with DynamoDB, consider Global Tables (active-active) or Data Pipeline (scheduled copy) depending on RPO/RTO.",
+      "DynamoDB does not support complex queries like joins; use it for simple key-based access patterns.",
+      "If the question involves 'searching S3 objects', the correct answer is to store metadata in DynamoDB and query that."
+    ],
+    "practice_links": [
+      "ditectrev_031",
+      "ditectrev_048",
+      "ditectrev_082",
+      "ditectrev_101",
+      "ditectrev_113",
+      "ditectrev_116",
+      "ditectrev_139",
+      "ditectrev_158",
+      "ditectrev_289",
+      "ditectrev_347",
+      "ditectrev_366",
+      "ditectrev_421",
+      "ditectrev_425",
+      "ditectrev_487",
+      "ditectrev_489",
+      "ditectrev_497",
+      "ditectrev_545",
+      "ditectrev_643",
+      "supplemental_221",
+      "supplemental_222",
+      "supplemental_223",
+      "supplemental_224"
+    ]
+  },
+  {
+    "cluster_id": "c5_3",
+    "cluster_title": "Cache",
+    "concept_id": "c5",
+    "concept_name": "Remember and query data (Databases & Analytics)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to choose the right caching service based on data structure needs (simple vs complex) and latency requirements.",
+      "Understanding of when to use a dedicated DynamoDB cache (DAX) versus a general-purpose in-memory cache (ElastiCache).",
+      "Knowledge of high availability and multi-AZ deployment patterns for caching layers.",
+      "Recognition of operational overhead trade-offs between managed services and self-managed caching."
+    ],
+    "signal_words": [
+      {
+        "phrase": "reduce DynamoDB read latency to microseconds",
+        "points_to": "DAX"
+      },
+      {
+        "phrase": "cache session data and support complex data structures such as sorted sets",
+        "points_to": "ElastiCache for Redis"
+      },
+      {
+        "phrase": "cache simple objects across multiple nodes with easy horizontal scaling",
+        "points_to": "ElastiCache for Memcached"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "fully managed service (DAX or ElastiCache)"
+      },
+      {
+        "phrase": "high availability of the cache",
+        "points_to": "multi-AZ deployment (Redis with replication group or Memcached across AZs)"
+      },
+      {
+        "phrase": "single-node cache cluster",
+        "points_to": "risk of single point of failure"
+      },
+      {
+        "phrase": "reduce cost associated with scaling web applications",
+        "points_to": "ElastiCache (offloads database reads)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "DAX (DynamoDB Accelerator)",
+        "job": "Provides an in-memory cache for DynamoDB tables to reduce read latency to microseconds.",
+        "choose_when": "You need to accelerate DynamoDB reads for frequently accessed items with minimal code changes.",
+        "avoid_when": "You need to cache data from non-DynamoDB sources or require complex data structures like sorted sets.",
+        "trap_words": "any cache for DynamoDB, session data, complex data structures"
+      },
+      {
+        "name": "Amazon ElastiCache for Redis",
+        "job": "A managed in-memory data store supporting complex data structures (sorted sets, lists, hashes) and session caching.",
+        "choose_when": "You need to cache session data, support complex data types, or require persistence and replication.",
+        "avoid_when": "You only need a simple key-value cache for DynamoDB or require multi-threaded processing of simple objects.",
+        "trap_words": "simple objects, horizontal scaling with multiple nodes, Memcached features"
+      },
+      {
+        "name": "Amazon ElastiCache for Memcached",
+        "job": "A managed in-memory cache for simple key-value objects, designed for easy horizontal scaling across nodes.",
+        "choose_when": "You need to cache simple objects (e.g., HTML fragments) and scale out by adding nodes.",
+        "avoid_when": "You need complex data structures, persistence, or high availability with automatic failover.",
+        "trap_words": "session data, sorted sets, persistence, multi-AZ failover"
+      }
+    ],
+    "comparisons": [
+      "DAX vs ElastiCache: Choose DAX when caching DynamoDB data specifically; choose ElastiCache for general-purpose caching or non-DynamoDB sources.",
+      "ElastiCache for Redis vs Memcached: Choose Redis when you need complex data structures, persistence, or high availability with replication; choose Memcached for simple object caching with easy horizontal scaling and multi-threaded performance.",
+      "Single-node vs Multi-AZ cache: Single-node is cheaper but a single point of failure; multi-AZ (Redis replication group or Memcached across AZs) is required for high availability under load.",
+      "ElastiCache vs RDS Read Replica: Use ElastiCache to offload frequent read queries and reduce latency; use RDS Read Replica for read scaling of relational data that requires SQL queries."
+    ],
+    "exam_moves": [
+      "If the question mentions 'DynamoDB' and 'microsecond latency', the answer is almost always DAX.",
+      "If the question says 'session data' and 'complex data structures', pick ElastiCache for Redis, not Memcached.",
+      "For high availability with Memcached, you must deploy multiple nodes across different AZs because Memcached does not support replication.",
+      "Watch for 'least operational overhead' – this usually points to a fully managed AWS service, not a self-managed cache on EC2.",
+      "If a single-node cache is used and the question asks about maintaining availability under increased load, the correct answer is to add nodes/AZs for redundancy.",
+      "ElastiCache can reduce costs by offloading database reads, but it does not replace the database itself."
+    ],
+    "practice_links": [
+      "ditectrev_106",
+      "ditectrev_382",
+      "ditectrev_480",
+      "supplemental_225",
+      "supplemental_226",
+      "supplemental_227",
+      "supplemental_228",
+      "supplemental_229",
+      "supplemental_230",
+      "supplemental_231",
+      "supplemental_232",
+      "supplemental_233",
+      "supplemental_234",
+      "supplemental_235",
+      "supplemental_236"
+    ]
+  },
+  {
+    "cluster_id": "c5_4",
+    "cluster_title": "Search",
+    "concept_id": "c5",
+    "concept_name": "Remember and query data (Databases & Analytics)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to choose the right search and analytics service for full-text, log, and operational analytics workloads.",
+      "Understanding of OpenSearch cluster architecture, including node types, shard strategy, and multi-AZ deployments.",
+      "Knowledge of integrating OpenSearch with other AWS services for ingestion, visualization, and security.",
+      "Recognition of when to use OpenSearch versus other database or analytics services based on query patterns and data structure."
+    ],
+    "signal_words": [
+      {
+        "phrase": "full-text search",
+        "points_to": "OpenSearch"
+      },
+      {
+        "phrase": "log analytics",
+        "points_to": "OpenSearch"
+      },
+      {
+        "phrase": "real-time application monitoring",
+        "points_to": "OpenSearch"
+      },
+      {
+        "phrase": "unstructured or semi-structured data search",
+        "points_to": "OpenSearch"
+      },
+      {
+        "phrase": "visualize log data with dashboards",
+        "points_to": "OpenSearch Dashboards"
+      },
+      {
+        "phrase": "ingest from Kinesis Data Firehose",
+        "points_to": "OpenSearch"
+      },
+      {
+        "phrase": "indexing and query latency",
+        "points_to": "OpenSearch shard strategy"
+      },
+      {
+        "phrase": "cross-cluster search",
+        "points_to": "OpenSearch"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon OpenSearch Service",
+        "job": "Managed service to deploy, operate, and scale OpenSearch clusters for search, log analytics, and real-time monitoring.",
+        "choose_when": "You need full-text search, log analytics, or real-time application monitoring with dashboards.",
+        "avoid_when": "You need relational queries with joins and ACID transactions (use RDS or Aurora).",
+        "trap_words": "SQL queries, OLTP, ACID, relational data model"
+      }
+    ],
+    "comparisons": [
+      "OpenSearch vs RDS: Choose OpenSearch for full-text search and log analytics on unstructured data; choose RDS for structured relational data with ACID transactions.",
+      "OpenSearch vs DynamoDB: Choose OpenSearch for complex search queries and aggregations; choose DynamoDB for key-value and document access patterns with low-latency at scale.",
+      "OpenSearch vs Athena: Choose OpenSearch for interactive search and real-time analytics on streaming data; choose Athena for ad-hoc SQL queries on data in S3 (e.g., historical log analysis).",
+      "OpenSearch vs CloudWatch Logs Insights: Choose OpenSearch for advanced search, visualization, and integration with other data sources; choose CloudWatch Logs Insights for simple log querying within AWS-native monitoring."
+    ],
+    "exam_moves": [
+      "If a question mentions 'full-text search' or 'log analytics', immediately consider OpenSearch as the primary service.",
+      "When you see 'ingest from Kinesis Data Firehose' or 'streaming data', think of OpenSearch as the destination for real-time indexing.",
+      "If the scenario requires 'dashboards for visualizing log data', OpenSearch Dashboards (Kibana) is the built-in solution.",
+      "Watch for 'multi-AZ' or 'dedicated master nodes' – these are key to resilience and cluster stability in OpenSearch.",
+      "If the question involves 'SQL queries on S3 data', it's likely Athena, not OpenSearch.",
+      "When cost is a concern and data is rarely queried, consider S3 with Athena or S3 Select instead of OpenSearch.",
+      "If the requirement is 'real-time application monitoring with alerts', OpenSearch combined with Elasticsearch Alerting or third-party tools is appropriate."
+    ],
+    "practice_links": []
+  },
+  {
+    "cluster_id": "c5_5",
+    "cluster_title": "Analytics and streaming",
+    "concept_id": "c5",
+    "concept_name": "Remember and query data (Databases & Analytics)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Choosing the right analytics service for batch vs. real-time processing.",
+      "Understanding EMR cluster states and cost optimization.",
+      "Integrating streaming data with Kinesis, Lambda, and S3.",
+      "Using serverless SQL (Athena) and ETL (Glue) on S3 data."
+    ],
+    "signal_words": [
+      {
+        "phrase": "petabytes of data / data warehousing",
+        "points_to": "Amazon Redshift"
+      },
+      {
+        "phrase": "real-time / near-real-time / streaming",
+        "points_to": "Amazon Kinesis (Data Streams or Data Firehose)"
+      },
+      {
+        "phrase": "serverless SQL queries on S3",
+        "points_to": "Amazon Athena"
+      },
+      {
+        "phrase": "managed ETL / data catalog",
+        "points_to": "AWS Glue"
+      },
+      {
+        "phrase": "big data processing / Hadoop / Spark",
+        "points_to": "Amazon EMR"
+      },
+      {
+        "phrase": "ordered stream / multiple consumers",
+        "points_to": "Amazon Kinesis Data Streams"
+      },
+      {
+        "phrase": "deliver streaming data directly to S3",
+        "points_to": "Amazon Data Firehose"
+      },
+      {
+        "phrase": "convert database schemas",
+        "points_to": "AWS Schema Conversion Tool"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon Redshift",
+        "job": "Fully managed petabyte-scale data warehouse for SQL-based analytics.",
+        "choose_when": "You need to run complex SQL queries on structured data at scale, or replace an on-premises data warehouse.",
+        "avoid_when": "Data is unstructured or you need real-time streaming ingestion.",
+        "trap_words": "real-time, streaming, unstructured"
+      },
+      {
+        "name": "Amazon Athena",
+        "job": "Serverless interactive query service that runs SQL directly on data in S3.",
+        "choose_when": "You need to query data in S3 without managing infrastructure, and can tolerate seconds-to-minutes latency.",
+        "avoid_when": "You need sub-second queries or frequent updates to data.",
+        "trap_words": "low-latency, transactional, real-time"
+      },
+      {
+        "name": "Amazon EMR",
+        "job": "Managed Hadoop/Spark framework for processing large datasets using clusters.",
+        "choose_when": "You need to run custom big data frameworks (Spark, Hive, HBase) on large datasets.",
+        "avoid_when": "You want a serverless solution or only need simple SQL queries.",
+        "trap_words": "serverless, simple SQL, no cluster management"
+      },
+      {
+        "name": "Amazon Kinesis Data Streams",
+        "job": "Real-time data streaming service that ingests and stores ordered data for multiple consumers.",
+        "choose_when": "You need to process streaming data in real-time with ordered records and multiple consumers.",
+        "avoid_when": "You only need to deliver data to S3 without custom processing.",
+        "trap_words": "batch, one-time delivery, simple S3 sink"
+      },
+      {
+        "name": "Amazon Data Firehose",
+        "job": "Fully managed service to load streaming data into S3, Redshift, or Elasticsearch with near-real-time delivery.",
+        "choose_when": "You need to reliably deliver streaming data to S3 or other destinations with minimal administration.",
+        "avoid_when": "You need ordered streams or multiple independent consumers.",
+        "trap_words": "ordered, multiple consumers, custom processing"
+      },
+      {
+        "name": "AWS Glue",
+        "job": "Serverless ETL service that prepares and transforms data for analytics, with a built-in data catalog.",
+        "choose_when": "You need to run managed ETL jobs and maintain a central metadata catalog.",
+        "avoid_when": "You need real-time streaming or interactive SQL queries.",
+        "trap_words": "real-time, interactive queries, streaming"
+      }
+    ],
+    "comparisons": [
+      "Amazon Kinesis Data Streams vs Amazon Data Firehose: Choose Data Streams when you need ordered data and multiple consumers; choose Data Firehose when you need simple delivery to S3 with minimal overhead.",
+      "Amazon Athena vs Amazon Redshift: Choose Athena for serverless ad-hoc queries on S3 data; choose Redshift for high-performance data warehousing with complex joins and frequent updates.",
+      "Amazon EMR vs AWS Glue: Choose EMR when you need custom big data frameworks (Spark, Hive) and full control; choose Glue for serverless, managed ETL with automatic schema discovery.",
+      "Amazon Kinesis Data Streams vs Amazon SQS: Choose Kinesis for ordered streaming data with multiple consumers; choose SQS for decoupled message passing with at-least-once delivery."
+    ],
+    "exam_moves": [
+      "If a question mentions 'petabytes' and 'data warehouse', the answer is almost always Amazon Redshift.",
+      "For streaming scenarios, distinguish between Kinesis Data Streams (ordered, multiple consumers) and Data Firehose (simple S3 delivery).",
+      "When EMR cluster states appear, remember that 'STOPPED' is not a valid state; valid states include STARTING, RUNNING, WAITING, TERMINATING, TERMINATED.",
+      "If the question asks for 'least operational overhead' and involves SQL on S3, choose Athena; for ETL on S3, choose Glue.",
+      "For near-real-time processing with Lambda, prefer Kinesis Data Streams over Firehose if you need custom processing per record.",
+      "When converting database schemas between engines, the AWS Schema Conversion Tool is the correct service.",
+      "Cost optimization on EMR: use smaller instances with higher I/O performance if CPUs are idle."
+    ],
+    "practice_links": [
+      "ditectrev_038",
+      "ditectrev_040",
+      "ditectrev_181",
+      "ditectrev_315",
+      "ditectrev_339",
+      "ditectrev_345",
+      "ditectrev_355",
+      "ditectrev_386",
+      "ditectrev_390",
+      "ditectrev_399",
+      "ditectrev_451",
+      "ditectrev_548",
+      "ditectrev_572",
+      "ditectrev_595",
+      "ditectrev_661",
+      "ditectrev_679",
+      "ditectrev_696",
+      "ditectrev_710",
+      "supplemental_085",
+      "supplemental_086",
+      "supplemental_087",
+      "supplemental_088",
+      "supplemental_089",
+      "supplemental_090",
+      "supplemental_091",
+      "supplemental_092",
+      "supplemental_237",
+      "supplemental_238",
+      "supplemental_239",
+      "supplemental_240",
+      "supplemental_241",
+      "supplemental_242",
+      "supplemental_243",
+      "supplemental_244",
+      "supplemental_245",
+      "supplemental_246",
+      "supplemental_247",
+      "supplemental_248",
+      "supplemental_249",
+      "supplemental_250",
+      "supplemental_251",
+      "supplemental_252",
+      "supplemental_258",
+      "supplemental_259"
+    ]
+  },
+  {
+    "cluster_id": "c6_1",
+    "cluster_title": "Messaging",
+    "concept_id": "c6",
+    "concept_name": "Decouple and operate (Architecture & Management)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to decouple application components using queues and topics for scalability and fault tolerance.",
+      "Understanding of message ordering, deduplication, and priority handling with SQS FIFO and standard queues.",
+      "Knowledge of fan-out patterns using SNS to distribute messages to multiple subscribers.",
+      "Recognition of when to use SQS vs SNS vs SES based on delivery semantics and use case."
+    ],
+    "signal_words": [
+      {
+        "phrase": "decouple",
+        "points_to": "SQS or SNS"
+      },
+      {
+        "phrase": "process each order exactly once",
+        "points_to": "SQS FIFO queue"
+      },
+      {
+        "phrase": "highest priority",
+        "points_to": "Multiple SQS queues with priority polling"
+      },
+      {
+        "phrase": "fan-out",
+        "points_to": "SNS topic with multiple SQS subscriptions"
+      },
+      {
+        "phrase": "push messaging",
+        "points_to": "SNS"
+      },
+      {
+        "phrase": "email sending",
+        "points_to": "SES"
+      },
+      {
+        "phrase": "preserve message order",
+        "points_to": "SQS FIFO"
+      },
+      {
+        "phrase": "rapid influx of traffic",
+        "points_to": "SQS for buffering"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon SQS (Simple Queue Service)",
+        "job": "Fully managed message queuing for decoupling application components.",
+        "choose_when": "Need to buffer requests, handle variable load, or ensure at-least-once delivery with standard queues or exactly-once with FIFO.",
+        "avoid_when": "Require real-time push delivery or need to broadcast to multiple consumers without polling.",
+        "trap_words": "single-threaded, low latency, push"
+      },
+      {
+        "name": "Amazon SNS (Simple Notification Service)",
+        "job": "Fully managed pub/sub messaging for fan-out notifications to multiple endpoints.",
+        "choose_when": "Need to push messages to many subscribers (SQS, Lambda, HTTP, email) simultaneously.",
+        "avoid_when": "Require ordered processing or exactly-once delivery; SNS is at-least-once and unordered.",
+        "trap_words": "order, exactly once, queue"
+      },
+      {
+        "name": "Amazon SES (Simple Email Service)",
+        "job": "Cloud-based email sending service for transactional and marketing emails.",
+        "choose_when": "Need to send high-volume emails (notifications, newsletters) with low latency.",
+        "avoid_when": "Require message queuing or pub/sub for application components.",
+        "trap_words": "queue, topic, push notification"
+      }
+    ],
+    "comparisons": [
+      "SQS Standard vs SQS FIFO: Choose Standard for high throughput and at-least-once delivery; choose FIFO when message order and exactly-once processing are critical.",
+      "SQS vs SNS: Choose SQS for polling-based decoupling with consumer pulling messages; choose SNS for push-based fan-out to multiple subscribers.",
+      "SNS vs SES: Choose SNS for push notifications to applications (SQS, Lambda, HTTP); choose SES for sending emails to end users.",
+      "Single SQS queue vs Multiple SQS queues: Use multiple queues with priority polling when different message priorities are required; use a single queue for simple load leveling."
+    ],
+    "exam_moves": [
+      "If the question mentions 'exactly once' and 'order', immediately think SQS FIFO.",
+      "When you see 'fan-out' or 'broadcast to multiple consumers', select SNS with SQS subscriptions.",
+      "For 'priority processing', use two SQS queues (high and low) with consumers polling high first.",
+      "SQS is pull-based; SNS is push-based. Never use SNS alone for ordered processing.",
+      "SES is for email only; do not confuse with SNS for application notifications.",
+      "SQS messages can be stored up to 14 days; use visibility timeout to prevent duplicate processing.",
+      "SNS can send to SQS, Lambda, HTTP/S, email, SMS; SQS cannot push to consumers."
+    ],
+    "practice_links": [
+      "ditectrev_026",
+      "ditectrev_036",
+      "ditectrev_123",
+      "ditectrev_154",
+      "ditectrev_223",
+      "ditectrev_236",
+      "ditectrev_242",
+      "ditectrev_260",
+      "ditectrev_273",
+      "ditectrev_361",
+      "ditectrev_405",
+      "ditectrev_466",
+      "ditectrev_474",
+      "ditectrev_495",
+      "ditectrev_533",
+      "ditectrev_539",
+      "ditectrev_566",
+      "ditectrev_569",
+      "ditectrev_573",
+      "ditectrev_583",
+      "ditectrev_588",
+      "ditectrev_641",
+      "ditectrev_665",
+      "ditectrev_675",
+      "ditectrev_681",
+      "ditectrev_682",
+      "ditectrev_689",
+      "supplemental_065",
+      "supplemental_066",
+      "supplemental_067",
+      "supplemental_068",
+      "supplemental_069",
+      "supplemental_070",
+      "supplemental_071",
+      "supplemental_072",
+      "supplemental_073",
+      "supplemental_074",
+      "supplemental_075",
+      "supplemental_076"
+    ]
+  },
+  {
+    "cluster_id": "c6_2",
+    "cluster_title": "Events & Workflows",
+    "concept_id": "c6",
+    "concept_name": "Decouple and operate (Architecture & Management)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to choose between event routing (EventBridge) and workflow orchestration (Step Functions) based on requirements.",
+      "Understanding of content-based filtering vs. stateful coordination with retries and branching.",
+      "Recognition of legacy SWF use cases for long-running, human-in-the-loop processes.",
+      "Knowledge of operational overhead trade-offs between managed services and custom solutions."
+    ],
+    "signal_words": [
+      {
+        "phrase": "route events from many AWS services and SaaS applications using content-based rules",
+        "points_to": "Amazon EventBridge"
+      },
+      {
+        "phrase": "coordinate a multi-step serverless workflow with retries and branching",
+        "points_to": "AWS Step Functions"
+      },
+      {
+        "phrase": "least operational overhead",
+        "points_to": "prefer managed service (EventBridge or Step Functions) over custom code"
+      },
+      {
+        "phrase": "order fulfillment process with human intervention and steps that may repeat",
+        "points_to": "Amazon SWF (legacy, but still tested for long-running processes)"
+      },
+      {
+        "phrase": "distributed and auditable business processes",
+        "points_to": "Amazon SWF"
+      },
+      {
+        "phrase": "synchronous and asynchronous tasks which are distributed and fault tolerant",
+        "points_to": "Amazon SWF"
+      },
+      {
+        "phrase": "domain (in SWF context)",
+        "points_to": "a collection of related workflows"
+      },
+      {
+        "phrase": "simple work flow",
+        "points_to": "Amazon SWF (acronym)"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Amazon EventBridge",
+        "job": "Serverless event bus that routes events from AWS services and SaaS applications to targets based on content-based rules.",
+        "choose_when": "You need to filter and route events from multiple sources (e.g., AWS services, SaaS) with minimal code and no state management.",
+        "avoid_when": "You need to coordinate a multi-step workflow with branching, retries, or human approval steps.",
+        "trap_words": "workflow, orchestration, multi-step, branching, retries, state machine"
+      },
+      {
+        "name": "AWS Step Functions",
+        "job": "Serverless workflow orchestration service that coordinates multiple AWS services into state machines with retries, branching, and error handling.",
+        "choose_when": "You need to build a multi-step, stateful workflow with conditional logic, retries, and parallel execution.",
+        "avoid_when": "You only need simple event routing without state management or complex orchestration.",
+        "trap_words": "event routing, content-based filtering, SaaS integration, simple publish-subscribe"
+      },
+      {
+        "name": "Amazon SWF",
+        "job": "Legacy workflow service for coordinating distributed tasks, especially those involving human intervention or long-running processes (up to 1 year).",
+        "choose_when": "You have a long-running business process (days to months) that requires explicit human decisions, step repetition, or external activity workers.",
+        "avoid_when": "You need a serverless, fully managed workflow with minimal operational overhead; prefer Step Functions for modern architectures.",
+        "trap_words": "serverless, lambda-only, short duration, simple orchestration, event-driven"
+      }
+    ],
+    "comparisons": [
+      "EventBridge vs Step Functions: Choose EventBridge when you need to route events based on content with no stateful orchestration; choose Step Functions when you need to coordinate a multi-step workflow with branching and retries.",
+      "Step Functions vs SWF: Choose Step Functions for serverless, short-duration workflows (up to 1 year but typically minutes/hours) with automatic scaling; choose SWF for legacy or long-running processes (up to 1 year) that require external decider/worker instances and human-in-the-loop steps.",
+      "EventBridge vs SNS: EventBridge offers content-based filtering and routing to multiple targets with rules; SNS is simpler pub/sub with topic-based filtering and fan-out to many subscribers."
+    ],
+    "exam_moves": [
+      "If the question mentions 'content-based rules' and 'routing events from AWS services and SaaS applications', the answer is almost always EventBridge.",
+      "If the question mentions 'multi-step workflow', 'retries', 'branching', or 'state machine', the answer is Step Functions.",
+      "If the question describes a long-running process (days to months) with human intervention, step repetition, or external workers, consider SWF (but note it's legacy).",
+      "Watch for 'least operational overhead' – this usually points to a fully managed service (EventBridge or Step Functions) over custom code or EC2-based solutions.",
+      "SWF questions often test domain knowledge: a 'domain' is a collection of related workflows, and SWF stands for Simple Work Flow (not Simple Workflow Service).",
+      "For SWF, remember it uses 'deciders' and 'activity workers' – these are often run on EC2 instances in Auto Scaling groups.",
+      "If the question asks for a serverless solution, prefer Step Functions over SWF (SWF is not serverless; it requires managing decider/worker instances)."
+    ],
+    "practice_links": [
+      "ditectrev_070",
+      "ditectrev_278",
+      "ditectrev_332",
+      "ditectrev_376",
+      "ditectrev_553",
+      "supplemental_077",
+      "supplemental_078",
+      "supplemental_079",
+      "supplemental_080",
+      "supplemental_081",
+      "supplemental_082",
+      "supplemental_083",
+      "supplemental_084"
+    ]
+  },
+  {
+    "cluster_id": "c6_3",
+    "cluster_title": "DR and availability",
+    "concept_id": "c6",
+    "concept_name": "Decouple and operate (Architecture & Management)",
+    "exam_domains": [
+      "Resilience",
+      "Reliability",
+      "Disaster Recovery"
+    ],
+    "what_this_tests": [
+      "Ability to select the correct DR strategy (pilot light, warm standby, multi-site) based on RTO/RPO requirements.",
+      "Understanding of how to use Route 53 routing policies (failover, latency, geolocation) for multi-region failover.",
+      "Knowledge of cross-region AMI copying, EBS snapshots, and RDS read replicas for data replication.",
+      "Recognition of global services (IAM, Route 53) that do not need to be recreated per region."
+    ],
+    "signal_words": [
+      {
+        "phrase": "disaster recovery",
+        "points_to": "Multi-region strategy, AMI copy, cross-region replication"
+      },
+      {
+        "phrase": "failover",
+        "points_to": "Route 53 failover routing, multi-AZ, multi-region"
+      },
+      {
+        "phrase": "high availability",
+        "points_to": "Multiple AZs, ELB, EC2 Auto Scaling"
+      },
+      {
+        "phrase": "RTO / RPO",
+        "points_to": "DR strategy selection (pilot light, warm standby, multi-site)"
+      },
+      {
+        "phrase": "data corruption",
+        "points_to": "Point-in-time recovery, backups to S3, transaction logs"
+      },
+      {
+        "phrase": "business continuity",
+        "points_to": "Quick resource launch, pre-provisioned AMIs, infrastructure as code"
+      },
+      {
+        "phrase": "entire data center fails",
+        "points_to": "Multiple AZs within a region"
+      },
+      {
+        "phrase": "mirror image in another region",
+        "points_to": "Cross-region AMI copy, but IAM and Route 53 are global"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "Route 53",
+        "job": "DNS routing with health checks and failover policies to direct traffic to healthy endpoints across regions.",
+        "choose_when": "You need automated DNS failover between regions or AZs.",
+        "avoid_when": "You only need simple DNS resolution without health checks.",
+        "trap_words": "latency-based routing (not for failover), geolocation (not for DR)"
+      },
+      {
+        "name": "EC2 + AMI",
+        "job": "Create and copy AMIs across regions to launch identical instances for DR.",
+        "choose_when": "You need to replicate EC2 instances to another region for DR.",
+        "avoid_when": "You need real-time data replication (use RDS cross-region replicas instead).",
+        "trap_words": "EBS snapshots (must be copied to target region first)"
+      },
+      {
+        "name": "ELB (Elastic Load Balancing)",
+        "job": "Distribute traffic across multiple AZs for high availability.",
+        "choose_when": "You need to balance load across instances in different AZs.",
+        "avoid_when": "You need cross-region load balancing (use Route 53).",
+        "trap_words": "single AZ deployment (defeats HA purpose)"
+      },
+      {
+        "name": "RDS",
+        "job": "Multi-AZ for high availability; cross-region read replicas for DR.",
+        "choose_when": "You need database HA within a region or DR with read replicas.",
+        "avoid_when": "You need active-active multi-region writes (use Aurora Global Database).",
+        "trap_words": "Multi-AZ (not for DR across regions)"
+      },
+      {
+        "name": "S3",
+        "job": "Store backups and transaction logs for point-in-time recovery.",
+        "choose_when": "You need cost-effective, durable storage for DR backups.",
+        "avoid_when": "You need low-latency database failover (use RDS).",
+        "trap_words": "S3 standard (cross-region replication adds cost)"
+      }
+    ],
+    "comparisons": [
+      "Multi-AZ vs Multi-Region: Multi-AZ protects against AZ failure within a region; Multi-Region protects against region failure.",
+      "Pilot Light vs Warm Standby: Pilot Light keeps minimal core services running in DR region; Warm Standby scales up a full-sized environment.",
+      "Route 53 Failover vs Latency Routing: Failover is for active-passive DR; Latency routing is for performance-based distribution, not DR.",
+      "AMI Copy vs EBS Snapshot Copy: AMI copy includes instance metadata and can launch instances directly; EBS snapshot copy is for volumes only.",
+      "RDS Multi-AZ vs Cross-Region Read Replica: Multi-AZ is synchronous HA within region; Cross-Region Read Replica is asynchronous DR with possible data loss."
+    ],
+    "exam_moves": [
+      "If a question mentions 'data corruption' and RPO < 1 hour, choose point-in-time recovery with transaction logs, not just periodic snapshots.",
+      "When asked about 'global services' that don't need recreation per region, always consider IAM and Route 53 (they are global).",
+      "For 'highest availability' within a region, always deploy across multiple AZs, not just multiple instances in one AZ.",
+      "If RTO is very low (minutes), choose warm standby or multi-site; if RTO is hours, pilot light or backup/restore may be acceptable.",
+      "Remember that data transfer between regions for replication (e.g., RDS cross-region replicas) is free, but standard data transfer costs apply for other traffic.",
+      "When designing for failure, ensure the application handles component failures gracefully (e.g., retries, circuit breakers)."
+    ],
+    "practice_links": [
+      "ditectrev_081",
+      "ditectrev_164",
+      "ditectrev_249",
+      "ditectrev_255",
+      "ditectrev_353",
+      "ditectrev_418",
+      "ditectrev_442",
+      "ditectrev_498",
+      "ditectrev_513",
+      "ditectrev_670",
+      "fundamentals_001",
+      "fundamentals_006",
+      "fundamentals_013",
+      "fundamentals_020"
+    ]
+  },
+  {
+    "cluster_id": "c6_4",
+    "cluster_title": "Cost and governance",
+    "concept_id": "c6",
+    "concept_name": "Decouple and operate (Architecture & Management)",
+    "exam_domains": [
+      "Security | Resilience | Performance | Cost"
+    ],
+    "what_this_tests": [
+      "Ability to select cost management tools (Cost Explorer, Budgets) for tracking, forecasting, and alerting on AWS spend.",
+      "Understanding of multi-account governance using AWS Organizations, Control Tower, and consolidated billing for cost oversight and administrative autonomy.",
+      "Knowledge of commitment-based discounts (Savings Plans, Reserved Instances) and how they reduce costs with minimal operational overhead.",
+      "Familiarity with AWS Support tiers and Trusted Advisor categories for cost optimization and operational health."
+    ],
+    "signal_words": [
+      {
+        "phrase": "analyze historical AWS spending and usage trends",
+        "points_to": "AWS Cost Explorer"
+      },
+      {
+        "phrase": "centrally provision and govern a multi-account AWS environment using landing-zone best practices",
+        "points_to": "AWS Control Tower"
+      },
+      {
+        "phrase": "control costs by committing to a consistent amount of compute usage across EC2, Fargate, and Lambda",
+        "points_to": "Compute Savings Plans"
+      },
+      {
+        "phrase": "corporate IT governance and cost oversight of all AWS resources consumed by its divisions",
+        "points_to": "AWS Organizations + Consolidated Billing"
+      },
+      {
+        "phrase": "ensure that all future notifications are not missed",
+        "points_to": "AWS account alternate contacts"
+      },
+      {
+        "phrase": "four levels of AWS Premium Support",
+        "points_to": "Basic, Developer, Business, Enterprise"
+      },
+      {
+        "phrase": "Trusted Advisor insight regarding which four categories",
+        "points_to": "Performance, cost optimization, security, fault tolerance"
+      },
+      {
+        "phrase": "different costs for the exact same storage size in different regions",
+        "points_to": "Regional pricing variation"
+      }
+    ],
+    "core_services": [
+      {
+        "name": "AWS Cost Explorer",
+        "job": "Visualizes, analyzes, and forecasts AWS spending and usage with pre-built reports.",
+        "choose_when": "You need to explore historical cost data, identify trends, or create custom cost and usage reports.",
+        "avoid_when": "You need real-time cost alerts or proactive budget enforcement.",
+        "trap_words": "real-time, alert, budget threshold"
+      },
+      {
+        "name": "AWS Budgets",
+        "job": "Sets custom cost and usage budgets and sends alerts when thresholds are exceeded.",
+        "choose_when": "You want proactive notifications on cost or usage against a plan, or to automate actions (e.g., stop instances) when budget is exceeded.",
+        "avoid_when": "You need to analyze historical trends or forecast future spend.",
+        "trap_words": "historical analysis, forecasting, trend"
+      },
+      {
+        "name": "AWS Organizations",
+        "job": "Centrally manage multiple AWS accounts, apply service control policies (SCPs), and enable consolidated billing.",
+        "choose_when": "You need to govern a multi-account environment, enforce policies, or aggregate billing for cost oversight.",
+        "avoid_when": "You only need a single account with no policy enforcement.",
+        "trap_words": "landing zone, automated provisioning, guardrails"
+      },
+      {
+        "name": "AWS Control Tower",
+        "job": "Automates the setup of a multi-account AWS environment following AWS best practices (landing zone).",
+        "choose_when": "You need to quickly provision a governed multi-account environment with built-in guardrails and least operational overhead.",
+        "avoid_when": "You already have a custom multi-account setup and only need policy enforcement (use Organizations SCPs).",
+        "trap_words": "manual account creation, single account"
+      },
+      {
+        "name": "Compute Savings Plans",
+        "job": "Offers lower prices on EC2, Fargate, and Lambda usage in exchange for a 1- or 3-year commitment to a consistent amount of compute (measured in $/hour).",
+        "choose_when": "You have flexible compute usage across EC2, Fargate, and Lambda and want the broadest coverage with minimal management.",
+        "avoid_when": "You need a specific instance family discount (use EC2 Instance Savings Plans or Reserved Instances).",
+        "trap_words": "specific instance type, regional reservation"
+      },
+      {
+        "name": "Consolidated Billing",
+        "job": "Combines usage across multiple AWS accounts into a single bill, enabling volume discounts and centralized cost tracking.",
+        "choose_when": "You have multiple accounts under AWS Organizations and want to aggregate costs and benefit from tiered pricing.",
+        "avoid_when": "You need separate billing per account with no aggregation.",
+        "trap_words": "single account, separate invoices"
+      }
+    ],
+    "comparisons": [
+      "AWS Cost Explorer vs AWS Budgets: Cost Explorer is for historical analysis and forecasting; Budgets is for proactive alerts and threshold-based actions.",
+      "AWS Organizations vs AWS Control Tower: Organizations provides account management and policy enforcement; Control Tower automates landing zone setup with guardrails and is preferred when you need a quick, best-practices multi-account environment.",
+      "Compute Savings Plans vs EC2 Instance Savings Plans: Compute Savings Plans apply to EC2, Fargate, and Lambda and are more flexible; EC2 Instance Savings Plans apply only to a specific instance family in a region and offer deeper discounts for that family.",
+      "Consolidated Billing vs separate accounts: Consolidated Billing aggregates usage for volume discounts and simplifies cost oversight; separate accounts keep billing isolated but lose volume pricing benefits.",
+      "AWS Support Plans: Basic (no support), Developer (business hours email), Business (24/7 email/chat/phone, Trusted Advisor), Enterprise (Technical Account Manager, concierge support)."
+    ],
+    "exam_moves": [
+      "When a question asks for 'least operational overhead' to set up a multi-account governed environment, choose AWS Control Tower over manually configuring Organizations.",
+      "If the scenario mentions 'committing to a consistent amount of compute usage across EC2, Fargate, and Lambda', the answer is Compute Savings Plans, not Reserved Instances.",
+      "For cost analysis without real-time needs, pick Cost Explorer; for budget alerts or automated actions, pick AWS Budgets.",
+      "Remember that Trusted Advisor provides checks in four categories: cost optimization, security, fault tolerance, and performance (not 'service limits' or 'compliance').",
+      "When a question involves missed root user notifications, the fix is to configure alternate contacts (billing, operations, security) at the account level, not just the root email.",
+      "Consolidated Billing has two account types: Paying account (master) and Linked account (member). The paying account can see all linked account usage but cannot access their resources unless granted.",
+      "AWS Support tiers: Basic (free, no support), Developer (email during business hours), Business (24/7 chat/phone, full Trusted Advisor), Enterprise (TAM, concierge)."
+    ],
+    "practice_links": [
+      "ditectrev_068",
+      "ditectrev_107",
+      "ditectrev_157",
+      "ditectrev_176",
+      "ditectrev_191",
+      "ditectrev_221",
+      "ditectrev_238",
+      "ditectrev_240",
+      "ditectrev_267",
+      "ditectrev_392",
+      "ditectrev_439",
+      "ditectrev_441",
+      "ditectrev_491",
+      "ditectrev_496",
+      "ditectrev_551",
+      "ditectrev_558",
+      "ditectrev_654",
+      "ditectrev_663",
+      "ditectrev_674",
+      "ditectrev_676",
+      "ditectrev_688",
+      "ditectrev_704",
+      "ditectrev_707",
+      "supplemental_105",
+      "supplemental_106",
+      "supplemental_107",
+      "supplemental_108",
+      "supplemental_293",
+      "supplemental_294",
+      "supplemental_295",
+      "supplemental_296",
+      "supplemental_305",
+      "supplemental_306",
+      "supplemental_307",
+      "supplemental_308",
+      "supplemental_309",
+      "supplemental_310",
+      "supplemental_311",
+      "supplemental_312",
+      "fundamentals_007",
+      "fundamentals_015",
+      "fundamentals_019",
+      "fundamentals_021",
+      "fundamentals_024",
+      "fundamentals_026"
+    ]
+  }
+]

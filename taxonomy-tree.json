@@ -1,0 +1,205 @@
+{
+  "level_0": {
+    "title": "The SAA Core Skill",
+    "description": "Given a business requirement or scenario, select the AWS service or architecture that perfectly balances the competing demands of the situation."
+  },
+  "level_1": {
+    "title": "The Exam Decision Lenses",
+    "domains": [
+      {
+        "name": "Security",
+        "weight": "30%",
+        "focus": "Protect access, encrypt data, isolate networks, and ensure compliance."
+      },
+      {
+        "name": "Resilience",
+        "weight": "26%",
+        "focus": "Survive failure, ensure high availability, design DR, and scale dynamically."
+      },
+      {
+        "name": "Performance",
+        "weight": "24%",
+        "focus": "Optimize speed, reduce latency, and match compute to workload."
+      },
+      {
+        "name": "Cost",
+        "weight": "20%",
+        "focus": "Minimize spend without compromising required security or performance."
+      }
+    ]
+  },
+  "level_2_and_3": {
+    "title": "Core Concepts and Topic Clusters",
+    "concepts": [
+      {
+        "id": "c1",
+        "name": "Guard (Access and Data)",
+        "clusters": [
+          {
+            "id": "c1_1",
+            "name": "Identity and permissions",
+            "services": ["IAM", "IAM Identity Center", "Organizations SCPs", "Cognito"]
+          },
+          {
+            "id": "c1_2",
+            "name": "Encryption and secrets",
+            "services": ["KMS", "CloudHSM", "Secrets Manager", "Parameter Store", "Macie"]
+          },
+          {
+            "id": "c1_3",
+            "name": "Network/application protection",
+            "services": ["WAF", "Shield", "Security Groups", "NACLs", "Network Firewall"]
+          },
+          {
+            "id": "c1_4",
+            "name": "Audit, detection, compliance",
+            "services": ["CloudTrail", "GuardDuty", "Security Hub", "Inspector", "Config"]
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "name": "Connect (Traffic)",
+        "clusters": [
+          {
+            "id": "c2_1",
+            "name": "VPC foundations",
+            "services": ["VPCs", "Subnets", "Route Tables", "Internet Gateways", "NAT Gateways"]
+          },
+          {
+            "id": "c2_2",
+            "name": "Private AWS access",
+            "services": ["VPC Endpoints (Gateway, Interface)", "PrivateLink"]
+          },
+          {
+            "id": "c2_3",
+            "name": "Load balancing, DNS, edge",
+            "services": ["Route 53", "CloudFront", "Global Accelerator", "ALB", "NLB", "GLB"]
+          },
+          {
+            "id": "c2_4",
+            "name": "Hybrid and multi-VPC networking",
+            "services": ["Site-to-Site VPN", "Direct Connect", "Transit Gateway"]
+          }
+        ]
+      },
+      {
+        "id": "c3",
+        "name": "Run (Compute)",
+        "clusters": [
+          {
+            "id": "c3_1",
+            "name": "Compute choice",
+            "services": ["EC2", "Elastic Beanstalk"]
+          },
+          {
+            "id": "c3_2",
+            "name": "Scaling",
+            "services": ["Auto Scaling Groups (ASG)", "Launch Templates"]
+          },
+          {
+            "id": "c3_3",
+            "name": "Serverless",
+            "services": ["Lambda"]
+          },
+          {
+            "id": "c3_4",
+            "name": "Containers and APIs",
+            "services": ["ECS", "EKS", "Fargate", "API Gateway"]
+          }
+        ]
+      },
+      {
+        "id": "c4",
+        "name": "Store (Data)",
+        "clusters": [
+          {
+            "id": "c4_1",
+            "name": "Storage shape",
+            "services": ["EBS", "EFS", "FSx"]
+          },
+          {
+            "id": "c4_2",
+            "name": "S3 lifecycle/archive/protection",
+            "services": ["S3 Storage Classes", "Lifecycle Rules", "Object Lock"]
+          },
+          {
+            "id": "c4_3",
+            "name": "Backup and migration",
+            "services": ["AWS Backup", "DataSync", "Snow Family"]
+          },
+          {
+            "id": "c4_4",
+            "name": "Hybrid storage",
+            "services": ["Storage Gateway"]
+          }
+        ]
+      },
+      {
+        "id": "c5",
+        "name": "Remember and query data (Databases & Analytics)",
+        "clusters": [
+          {
+            "id": "c5_1",
+            "name": "Relational databases",
+            "services": ["RDS", "Aurora"]
+          },
+          {
+            "id": "c5_2",
+            "name": "NoSQL",
+            "services": ["DynamoDB"]
+          },
+          {
+            "id": "c5_3",
+            "name": "Cache",
+            "services": ["ElastiCache", "DAX"]
+          },
+          {
+            "id": "c5_4",
+            "name": "Search",
+            "services": ["OpenSearch"]
+          },
+          {
+            "id": "c5_5",
+            "name": "Analytics and streaming",
+            "services": ["Redshift", "Athena", "EMR", "Kinesis", "Glue"]
+          }
+        ]
+      },
+      {
+        "id": "c6",
+        "name": "Decouple and operate (Architecture & Management)",
+        "clusters": [
+          {
+            "id": "c6_1",
+            "name": "Messaging",
+            "services": ["SQS", "SNS"]
+          },
+          {
+            "id": "c6_2",
+            "name": "Events & Workflows",
+            "services": ["EventBridge", "Step Functions"]
+          },
+          {
+            "id": "c6_3",
+            "name": "DR and availability",
+            "services": ["Route 53 routing", "Multi-Region setups"]
+          },
+          {
+            "id": "c6_4",
+            "name": "Cost and governance",
+            "services": ["Cost Explorer", "AWS Budgets", "Organizations"]
+          }
+        ]
+      }
+    ]
+  },
+  "level_4": {
+    "title": "Topic Page Structure",
+    "description": "Strict markdown template for all leaf nodes (topic pages)."
+  },
+  "level_5": {
+    "title": "Question Engine Schema",
+    "description": "Required mapping format for incoming practice questions."
+  }
+}
