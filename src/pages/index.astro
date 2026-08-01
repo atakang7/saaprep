@@ -1,236 +1,203 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getTaxonomyTree, getPracticeQuestions } from '../lib/data';
+import { getPracticeQuestions } from '../lib/data';
 
-const taxonomy = getTaxonomyTree();
 const questions = getPracticeQuestions();
-const domains = taxonomy.level_1.domains;
-const concepts = taxonomy.level_2_and_3.concepts;
 ---
 
-<BaseLayout title="SAA-C03 UNICORN | Exam Engine">
-  <section class="hero-section">
-    <div class="hero-badge">⚡ AWS SAA-C03 DRILL ENGINE</div>
-    <h1 class="hero-title">
-      AWS Solutions Architect <br />
-      <span class="text-gradient">Zero-Distraction Practice</span>
-    </h1>
-    <p class="hero-sub">
-      Raw, verified exam pattern question bank powered by a clean, hyper-responsive black UI.
-    </p>
+<BaseLayout title="SAA-C03 | Practice Arena">
+  <div class="simulator-container glass-card">
+    {questions.map((q, idx) => (
+      <div class="question-block" id={`q-${q.id}`} style={idx === 0 ? "" : "display: none;"}>
+        <div class="question-meta">
+          <span class="question-number">QUESTION {q.id} OF {questions.length}</span>
+        </div>
 
-    <div class="hero-cta-group">
-      <a href="/practice" class="btn btn-unicorn">Launch Practice Arena →</a>
-      <a href="/concepts" class="btn btn-dark">View Taxonomy</a>
-    </div>
-  </section>
+        <h2 class="question-text">{q.question}</h2>
 
-  <!-- Metric Badges -->
-  <section class="metrics-grid">
-    <div class="glass-card metric-card">
-      <span class="metric-value">{questions.length}</span>
-      <span class="metric-label">Verified Questions</span>
-    </div>
-    <div class="glass-card metric-card">
-      <span class="metric-value">4</span>
-      <span class="metric-label">Exam Decision Lenses</span>
-    </div>
-    <div class="glass-card metric-card">
-      <span class="metric-value">{concepts.length}</span>
-      <span class="metric-label">Core Action Domains</span>
-    </div>
-  </section>
+        <div class="options-group">
+          {q.options.map((opt) => (
+            <button class="option-btn" data-answer={q.answer} data-opt={opt.charAt(0)}>
+              {opt}
+            </button>
+          ))}
+        </div>
 
-  <!-- Exam Domain Lenses -->
-  <section class="section-container">
-    <h2 class="section-title">Exam Decision Lenses</h2>
-    <div class="domains-grid">
-      {domains.map((domain: any) => (
-        <div class="glass-card domain-card">
-          <div class="domain-header">
-            <h3>{domain.name}</h3>
-            <span class="domain-weight">{domain.weight}</span>
+        <div class="answer-section" style="display: none;">
+          <div class="answer-badge">ANSWER: {q.answer}</div>
+          <div class="explanation-box">
+            <ul>
+              {q.explanation.map((exp) => (
+                <li>{exp}</li>
+              ))}
+            </ul>
           </div>
-          <p>{domain.focus}</p>
         </div>
-      ))}
-    </div>
-  </section>
 
-  <!-- Core Clusters Overview -->
-  <section class="section-container">
-    <h2 class="section-title">Curriculum Taxonomy</h2>
-    <div class="concepts-grid">
-      {concepts.map((concept: any) => (
-        <div class="glass-card concept-card">
-          <h3>{concept.name}</h3>
-          <ul class="cluster-list">
-            {concept.clusters.map((cluster: any) => (
-              <li>
-                <span class="cluster-name">{cluster.name}</span>
-                <span class="service-tags">{cluster.services.slice(0, 3).join(', ')}</span>
-              </li>
-            ))}
-          </ul>
+        <div class="controls-bar">
+          <button class="btn-ctrl btn-prev" disabled={idx === 0}>← Prev</button>
+          <button class="btn-ctrl btn-reveal">Show Answer</button>
+          <button class="btn-ctrl btn-next" disabled={idx === questions.length - 1}>Next →</button>
         </div>
-      ))}
-    </div>
-  </section>
+      </div>
+    ))}
+  </div>
 </BaseLayout>
 
+<script>
+  let currentIndex = 0;
+  const totalQuestions = document.querySelectorAll('.question-block').length;
+
+  function updateQuestion(newIndex: number) {
+    const currentBlock = document.querySelectorAll('.question-block')[currentIndex] as HTMLElement;
+    const nextBlock = document.querySelectorAll('.question-block')[newIndex] as HTMLElement;
+    if (currentBlock && nextBlock) {
+      currentBlock.style.display = 'none';
+      nextBlock.style.display = 'block';
+      currentIndex = newIndex;
+    }
+  }
+
+  document.querySelectorAll('.btn-next').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentIndex < totalQuestions - 1) updateQuestion(currentIndex + 1);
+    });
+  });
+
+  document.querySelectorAll('.btn-prev').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (currentIndex > 0) updateQuestion(currentIndex - 1);
+    });
+  });
+
+  document.querySelectorAll('.btn-reveal').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const parent = (e.target as HTMLElement).closest('.question-block');
+      const answerSection = parent?.querySelector('.answer-section') as HTMLElement;
+      if (answerSection) {
+        answerSection.style.display = answerSection.style.display === 'none' ? 'block' : 'none';
+      }
+    });
+  });
+
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLElement;
+      const parent = target.closest('.question-block');
+      const correctAns = target.getAttribute('data-answer');
+      const chosen = target.getAttribute('data-opt');
+
+      parent?.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.remove('selected', 'correct', 'wrong');
+      });
+
+      if (chosen === correctAns) {
+        target.classList.add('correct');
+      } else {
+        target.classList.add('wrong');
+      }
+    });
+  });
+</script>
+
 <style>
-  .hero-section {
-    text-align: center;
-    padding: 2.5rem 1rem 3.5rem;
+  .simulator-container {
+    padding: 1.75rem;
+    max-width: 800px;
+    margin: 0 auto;
   }
-  .hero-badge {
-    display: inline-block;
-    padding: 0.3rem 0.85rem;
-    border-radius: 6px;
-    background: #0a0a0f;
-    border: 1px solid #2d2b55;
-    color: var(--unicorn-cyan);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    margin-bottom: 1.5rem;
-  }
-  .hero-title {
-    font-size: 3rem;
-    font-weight: 900;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
+  .question-meta {
     margin-bottom: 1rem;
   }
-  .hero-sub {
-    font-size: 1.05rem;
-    color: var(--text-secondary);
-    max-width: 580px;
-    margin: 0 auto 2rem;
-  }
-  .hero-cta-group {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-  }
-  .btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-  }
-  .btn-unicorn {
-    background: var(--unicorn-pink);
-    color: white;
-    box-shadow: 0 0 15px rgba(255, 42, 133, 0.35);
-  }
-  .btn-unicorn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(255, 42, 133, 0.55);
-  }
-  .btn-dark {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    color: var(--text-primary);
-  }
-  .btn-dark:hover {
-    background: var(--bg-card-hover);
-    border-color: #2d2b55;
-  }
-
-  /* Metrics Grid */
-  .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.25rem;
-    margin-bottom: 3.5rem;
-  }
-  .metric-card {
-    padding: 1.5rem;
-    text-align: center;
-  }
-  .metric-value {
-    display: block;
-    font-size: 2.25rem;
-    font-weight: 900;
-    color: var(--unicorn-cyan);
-  }
-  .metric-label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-
-  .section-container {
-    margin-bottom: 3.5rem;
-  }
-  .section-title {
-    font-size: 1.5rem;
+  .question-number {
     font-weight: 800;
-    margin-bottom: 1.25rem;
-    letter-spacing: -0.01em;
-  }
-
-  .domains-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1.25rem;
-  }
-  .domain-card {
-    padding: 1.25rem;
-  }
-  .domain-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-  }
-  .domain-header h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-  }
-  .domain-weight {
-    background: rgba(0, 240, 255, 0.1);
-    color: var(--unicorn-cyan);
-    padding: 0.15rem 0.5rem;
-    border-radius: 4px;
-    font-weight: 700;
-    font-size: 0.75rem;
-  }
-
-  .concepts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.25rem;
-  }
-  .concept-card {
-    padding: 1.25rem;
-  }
-  .concept-card h3 {
-    margin-bottom: 0.85rem;
-    font-size: 1.1rem;
-    color: var(--unicorn-purple);
-  }
-  .cluster-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-  .cluster-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0.35rem;
-  }
-  .cluster-name {
-    color: var(--text-primary);
-    font-weight: 500;
-  }
-  .service-tags {
     color: var(--text-muted);
     font-size: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+  .question-text {
+    font-size: 1.1rem;
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+  .options-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    margin-bottom: 1.5rem;
+  }
+  .option-btn {
+    background: #06060a;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .option-btn:hover {
+    background: #12121a;
+    border-color: #2d2b55;
+  }
+  .option-btn.correct {
+    background: rgba(0, 255, 170, 0.1);
+    border-color: var(--unicorn-emerald);
+    color: var(--unicorn-emerald);
+  }
+  .option-btn.wrong {
+    background: rgba(255, 42, 133, 0.1);
+    border-color: var(--unicorn-pink);
+    color: var(--unicorn-pink);
+  }
+  .answer-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #0a0a10;
+    border-radius: 6px;
+    border-left: 3px solid var(--unicorn-pink);
+  }
+  .answer-badge {
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--unicorn-emerald);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+  .explanation-box ul {
+    list-style-type: disc;
+    padding-left: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+  .explanation-box li {
+    margin-bottom: 0.3rem;
+  }
+  .controls-bar {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+  }
+  .btn-ctrl {
+    padding: 0.45rem 0.9rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    background: #0a0a0f;
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .btn-ctrl:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .btn-ctrl:not(:disabled):hover {
+    border-color: var(--unicorn-pink);
+    color: var(--unicorn-pink);
   }
 </style>
