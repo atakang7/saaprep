@@ -7,7 +7,7 @@ const questions = getPracticeQuestions();
 const domains = taxonomy.level_1.domains;
 const concepts = taxonomy.level_2_and_3.concepts;
 
-// Semantic color mapping per domain/cluster
+// High contrast accessible domain colors
 const domainColors: Record<string, string> = {
   "Security": "var(--color-security)",
   "Resilience": "var(--color-compute)",
@@ -16,9 +16,9 @@ const domainColors: Record<string, string> = {
 };
 ---
 
-<BaseLayout title="SAA-C03 | AWS Certification Engine">
+<BaseLayout title="SAA-C03 | Practice Platform">
   <section class="hero-section">
-    <div class="hero-badge">SAA-C03 EXAM PREP</div>
+    <div class="hero-badge">AWS SAA-C03 PREP</div>
     <h1 class="hero-title">
       AWS Solutions Architect <br />
       <span class="text-gradient">Practice Platform</span>
@@ -53,10 +53,10 @@ const domainColors: Record<string, string> = {
       {domains.map((domain: any) => {
         const color = domainColors[domain.name] || "var(--color-network)";
         return (
-          <div class="glass-card domain-card" style={`--card-theme: ${color};`}>
+          <div class="glass-card domain-card">
             <div class="domain-header">
               <h3 style={`color: ${color};`}>{domain.name}</h3>
-              <span class="domain-weight" style={`background: ${color}20; color: ${color}; border-color: ${color}40;`}>{domain.weight}</span>
+              <span class="domain-weight" style={`background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid ${color};`}>{domain.weight}</span>
             </div>
             <p>{domain.focus}</p>
           </div>
@@ -69,26 +69,24 @@ const domainColors: Record<string, string> = {
 <style>
   .hero-section {
     text-align: center;
-    padding: 3rem 1rem 3.5rem;
+    padding: 2.5rem 1rem 3rem;
   }
   .hero-badge {
     display: inline-block;
     padding: 0.35rem 0.85rem;
     border-radius: 6px;
-    background: #08080e;
+    background: #181d2a;
     border: 1px solid var(--color-security);
     color: var(--color-security);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     margin-bottom: 1.25rem;
-    box-shadow: 0 0 12px rgba(255, 42, 133, 0.25);
   }
   .hero-title {
     font-size: 2.75rem;
     font-weight: 900;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+    line-height: 1.2;
     margin-bottom: 1.75rem;
   }
   .hero-cta-group {
@@ -100,27 +98,25 @@ const domainColors: Record<string, string> = {
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
     font-weight: 700;
-    font-size: 0.9rem;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.95rem;
+    transition: all 0.2s;
   }
   .btn-primary {
     background: var(--color-security);
-    color: white;
-    box-shadow: 0 0 15px rgba(255, 42, 133, 0.35);
+    color: #ffffff;
   }
   .btn-primary:hover {
+    background: #e11d48;
     transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(255, 42, 133, 0.6);
   }
   .btn-secondary {
-    background: #06060a;
+    background: #181d2a;
     border: 1px solid var(--border-subtle);
-    color: var(--text-primary);
+    color: #ffffff;
   }
   .btn-secondary:hover {
-    background: #12121a;
+    background: #23293a;
     border-color: var(--color-network);
-    color: var(--color-network);
   }
 
   .metrics-grid {
@@ -139,8 +135,9 @@ const domainColors: Record<string, string> = {
     font-weight: 900;
   }
   .metric-label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
+    font-weight: 600;
   }
 
   .section-container {
@@ -157,31 +154,26 @@ const domainColors: Record<string, string> = {
     gap: 1.25rem;
   }
   .domain-card {
-    padding: 1.25rem;
-  }
-  .domain-card:hover {
-    border-color: var(--card-theme);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), 0 0 15px var(--card-theme);
+    padding: 1.5rem;
   }
   .domain-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.65rem;
+    margin-bottom: 0.75rem;
   }
   .domain-header h3 {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 800;
   }
   .domain-weight {
-    border: 1px solid;
-    padding: 0.15rem 0.5rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 4px;
     font-weight: 800;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
   }
   .domain-card p {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
     line-height: 1.5;
   }

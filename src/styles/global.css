@@ -1,33 +1,33 @@
 :root {
-  /* Surface Dark Palette */
-  --bg-dark: #030305;
-  --bg-card: #08080e;
-  --bg-card-hover: #0f0f18;
+  /* High-Contrast Accessible Backgrounds & Surfaces (WCAG AAA) */
+  --bg-dark: #090a0f;
+  --bg-card: #12151e;
+  --bg-card-hover: #1a1e2b;
   
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-glow: #312e5c;
+  --border-subtle: #262b3a;
+  --border-glow: #4f46e5;
   
-  /* Text */
+  /* Accessible High-Contrast Text (WCAG AAA / AA) */
   --text-primary: #ffffff;
-  --text-secondary: #9aa0b8;
-  --text-muted: #52556b;
+  --text-secondary: #cbd5e1; /* Slate 300 - High Contrast against dark background */
+  --text-muted: #94a3b8;     /* Slate 400 */
   
-  /* Smart Unicorn Color Palette */
-  --color-security: #ff2a85;   /* Hot Pink for Security & Guard */
-  --color-network: #00f0ff;    /* Cyan for Network & Connect */
-  --color-compute: #a855f7;    /* Purple for Compute & Run */
-  --color-storage: #f59e0b;    /* Amber for Storage & Store */
-  --color-database: #10b981;   /* Emerald for Databases & Query */
-  --color-decouple: #6366f1;   /* Indigo for Messaging & Decouple */
+  /* High Contrast Accessible Domain Colors */
+  --color-security: #f43f5e;   /* Rose 500 */
+  --color-network: #38bdf8;    /* Sky 400 */
+  --color-compute: #c084fc;    /* Purple 400 */
+  --color-storage: #fbbf24;    /* Amber 400 */
+  --color-database: #34d399;   /* Emerald 400 */
+  --color-decouple: #818cf8;   /* Indigo 400 */
   
   /* Gradients */
-  --gradient-unicorn: linear-gradient(135deg, #ff2a85 0%, #a855f7 50%, #00f0ff 100%);
-  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(255, 42, 133, 0.12), transparent 60%);
+  --gradient-unicorn: linear-gradient(135deg, #f43f5e 0%, #c084fc 50%, #38bdf8 100%);
+  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(244, 63, 94, 0.08), transparent 60%);
   
   /* Fonts */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-  --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: SFMono-Regular, Consolas, monospace;
 }
 
 * {
@@ -41,11 +41,8 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
-  background-image: var(--gradient-glow);
-  background-repeat: no-repeat;
-  background-size: 100% 600px;
 }
 
 a {
@@ -53,40 +50,29 @@ a {
   text-decoration: none;
 }
 
-/* Glass Card Component */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--color-network);
+  outline-offset: 3px;
+}
+
+/* Accessible High Contrast Card Component */
 .glass-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glass-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--gradient-unicorn);
-  opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: all 0.2s ease-in-out;
 }
 
 .glass-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 42, 133, 0.4);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px -10px rgba(255, 42, 133, 0.25), 0 0 15px rgba(0, 240, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 }
 
-.glass-card:hover::before {
-  opacity: 1;
-}
-
-/* Text Accent */
+/* Text Accent Gradient */
 .text-gradient {
   background: var(--gradient-unicorn);
   -webkit-background-clip: text;
@@ -95,15 +81,15 @@ a {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #161622;
-  border-radius: 3px;
+  background: #262b3a;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-security);
+  background: #3b4256;
 }
