@@ -100,30 +100,37 @@ function parseSseEvents(buffer, onEvent) {
   return remainder;
 }
 
-function structuredRows(text) {
-  const compactText = cleanString(text, 3000)
+function aiLineText(text) {
+  return cleanString(text, 3000)
     .replace(/\*\*/g, '')
     .replace(/`/g, '')
     .replace(/\s+/g, ' ')
+    .replace(/\b(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g, '\n$1: ')
+    .replace(/\n+/g, '\n')
     .trim();
-  const labelPattern = /(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g;
-  const matches = Array.from(compactText.matchAll(labelPattern));
+}
+
+function structuredRows(text) {
+  const lineText = aiLineText(text);
   const rows = [];
 
-  matches.forEach((match, index) => {
+  lineText.split('\n').forEach((line) => {
+    const match = line.match(/^(Verdict|Giveaway|Why|Trap|Check):\s*(.*)$/);
+    if (!match) {
+      if (rows.length > 0) {
+        rows[rows.length - 1].text = `${rows[rows.length - 1].text} ${line}`.trim();
+      }
+      return;
+    }
+
     const label = match[1][0].toUpperCase() + match[1].slice(1).toLowerCase();
-    const start = (match.index || 0) + match[0].length;
-    const end = matches[index + 1]?.index ?? compactText.length;
-    const textValue = compactText
-      .slice(start, end)
-      .replace(/^[:\-–—\s]+/, '')
-      .trim();
+    const textValue = match[2].replace(/^[:\-–—\s]+/, '').trim();
 
     if (textValue) rows.push({ label, text: textValue });
   });
 
   if (rows.length > 0) return rows;
-  return compactText ? [{ label: 'Verdict', text: compactText }] : [];
+  return lineText ? [{ label: 'Verdict', text: lineText }] : [];
 }
 
 function completeRows(rows) {

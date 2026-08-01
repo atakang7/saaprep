@@ -343,24 +343,30 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     output.replaceChildren(wrapper);
   }
 
-  function structuredAiRows(text: string) {
-    const compactText = text
+  function aiLineText(text: string) {
+    return text
       .replace(/\*\*/g, '')
       .replace(/`/g, '')
       .replace(/\s+/g, ' ')
+      .replace(/\b(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g, '\n$1: ')
+      .replace(/\n+/g, '\n')
       .trim();
-    const labelPattern = /(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g;
-    const matches = Array.from(compactText.matchAll(labelPattern));
+  }
+
+  function structuredAiRows(text: string) {
+    const lineText = aiLineText(text);
     const rows: Array<{ label: string; text: string }> = [];
 
-    matches.forEach((match, index) => {
+    lineText.split('\n').forEach((line) => {
+      const match = line.match(/^(Verdict|Giveaway|Why|Trap|Check):\s*(.*)$/);
+      if (!match) {
+        const previous = rows[rows.length - 1];
+        if (previous) previous.text = `${previous.text} ${line}`.trim();
+        return;
+      }
+
       const label = match[1][0].toUpperCase() + match[1].slice(1).toLowerCase();
-      const start = (match.index || 0) + match[0].length;
-      const end = matches[index + 1]?.index ?? compactText.length;
-      const rowText = compactText
-        .slice(start, end)
-        .replace(/^[:\-–—\s]+/, '')
-        .trim();
+      const rowText = match[2].replace(/^[:\-–—\s]+/, '').trim();
 
       if (rowText) rows.push({ label, text: rowText });
     });
