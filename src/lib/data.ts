@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export interface Question {
-  id: number;
+  id: number | string;
   title: string;
   question: string;
   options: string[];
@@ -12,6 +12,34 @@ export interface Question {
 }
 
 export function getPracticeQuestions(): Question[] {
+  const jsonPath = path.resolve(process.cwd(), 'questions.json');
+  if (fs.existsSync(jsonPath)) {
+    try {
+      const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      if (Array.isArray(rawData) && rawData.length > 0) {
+        return rawData.map((q: any, index: number) => {
+          const formattedOptions = (q.options || []).map((opt: string, optIdx: number) => {
+            if (/^[A-E]\.\s/.test(opt)) return opt;
+            return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
+          });
+
+          return {
+            id: q.id || index + 1,
+            title: `SAA-C03 Question #${index + 1}`,
+            question: q.question || '',
+            options: formattedOptions,
+            answer: q.answer || '',
+            explanation: q.explanation || [`Correct Answer: ${q.answer}`],
+            references: q.references || ['AWS SAA-C03 Official Exam Guide']
+          };
+        });
+      }
+    } catch (e) {
+      console.error('Error parsing questions.json:', e);
+    }
+  }
+
+  // Fallback to markdown loading
   const filePath = path.resolve(process.cwd(), '01_AWS_Fundamentals.md');
   if (!fs.existsSync(filePath)) return [];
   const fileContent = fs.readFileSync(filePath, 'utf-8');
