@@ -5,170 +5,364 @@ import { getTaxonomyTree } from '../lib/data';
 const taxonomy = getTaxonomyTree();
 const concepts = taxonomy.level_2_and_3.concepts;
 
-// High contrast accessible theme colors
-const conceptThemes: Record<string, { color: string; label: string }> = {
-  "c1": { color: "var(--color-security)", label: "SECURITY & GUARD" },
-  "c2": { color: "var(--color-network)", label: "NETWORK & TRAFFIC" },
-  "c3": { color: "var(--color-compute)", label: "COMPUTE & RUN" },
-  "c4": { color: "var(--color-storage)", label: "STORAGE & DATA" },
-  "c5": { color: "var(--color-database)", label: "DATABASES & QUERY" },
-  "c6": { color: "var(--color-decouple)", label: "DECOUPLE & OPERATE" }
+// Concept theme colors
+const conceptThemes: Record<string, { color: string; label: string; icon: string }> = {
+  "c1": { color: "#ff2a70", label: "SECURITY, GUARD & IDENTITY", icon: "🛡️" },
+  "c2": { color: "#00e5ff", label: "NETWORK, TRAFFIC & INGRESS", icon: "⚡" },
+  "c3": { color: "#a855f7", label: "COMPUTE & WORKLOAD EXECUTION", icon: "⚙️" },
+  "c4": { color: "#f59e0b", label: "STORAGE & DATA PERSISTENCE", icon: "📦" },
+  "c5": { color: "#10b981", label: "DATABASE & ANALYTICS CLUSTER", icon: "🗄️" },
+  "c6": { color: "#ec4899", label: "DECOUPLING & ASYNC EVENT BUS", icon: "🔄" }
 };
 ---
 
-<BaseLayout title="Taxonomy Tree | SAA-C03">
-  <div class="taxonomy-header">
-    <div class="header-badge">DECISION TAXONOMY</div>
-    <h1 class="header-title">
-      Architectural <span class="text-gradient">Service Clusters</span>
-    </h1>
-    <p class="header-sub">
-      Categorized AWS services mapped to specific architectural decision domains.
-    </p>
-  </div>
+<BaseLayout title="Taxonomy Tree | SAA-C03 UNICORN">
+  <div class="tree-page-container">
+    
+    <!-- HEADER -->
+    <header class="tree-header">
+      <div class="header-tag">[HIERARCHICAL TOPOLOGY MAP]</div>
+      <h1 class="header-title">// SAA-C03 TAXONOMY TREE</h1>
+      <p class="header-sub">Interactive hierarchical tree diagram mapping SAA-C03 exam domains, concept clusters, and service leaves.</p>
+    </header>
 
-  <div class="taxonomy-grid">
-    {concepts.map((concept: any) => {
-      const theme = conceptThemes[concept.id] || { color: "var(--color-network)", label: concept.id.toUpperCase() };
-      return (
-        <div class="glass-card concept-section">
-          <div class="concept-header">
-            <span class="concept-badge" style={`background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid ${theme.color};`}>
-              {theme.label}
-            </span>
-            <h2 class="concept-title">{concept.name}</h2>
-          </div>
+    <!-- LITERAL VISUAL TREE CANVAS -->
+    <div class="tree-canvas-card">
+      
+      <!-- ROOT NODE -->
+      <div class="tree-root-node">
+        <div class="root-badge">ROOT</div>
+        <div class="root-title">🌲 SAA-C03 ARCHITECTURAL EXAM TAXONOMY</div>
+        <div class="root-meta">[4 DOMAINS • 6 CONCEPTS • 18 CLUSTERS • 35+ SERVICES]</div>
+      </div>
 
-          <div class="clusters-grid">
-            {concept.clusters.map((cluster: any) => (
-              <div class="cluster-card">
-                <div class="cluster-title-wrap">
-                  <span class="cluster-icon" style={`color: ${theme.color};`}>✦</span>
-                  <a href={`/topics/${cluster.id}`} class="cluster-link" style={`--hover-color: ${theme.color};`}>
-                    <h3 class="cluster-title">{cluster.name}</h3>
-                  </a>
-                </div>
-                <div class="services-pills">
-                  {cluster.services.map((svc: string) => (
-                    <span 
-                      class="service-pill" 
-                      style={`border-color: ${theme.color}; color: #ffffff;`}
-                    >
-                      {svc}
-                    </span>
-                  ))}
+      <!-- MAIN TRUNK BRANCH CONNECTOR -->
+      <div class="trunk-connector-line">│</div>
+
+      <!-- LEVEL 1 & 2 BRANCHES CONTAINER -->
+      <div class="tree-branches-stack">
+        {concepts.map((concept: any, cIdx: number) => {
+          const theme = conceptThemes[concept.id] || { color: "#00e5ff", label: concept.id.toUpperCase(), icon: "✦" };
+          const isLastConcept = cIdx === concepts.length - 1;
+
+          return (
+            <div class="branch-concept-node">
+              
+              <!-- CONCEPT LEVEL 1 BRANCH HEADER -->
+              <div class="concept-branch-header">
+                <span class="branch-connector-prefix">{isLastConcept ? '└──' : '├──'}</span>
+                <div class="concept-card-pill" style={`border-left: 4px solid ${theme.color};`}>
+                  <span class="cc-icon">{theme.icon}</span>
+                  <span class="cc-num">DOMAIN 0{cIdx + 1}</span>
+                  <h2 class="cc-label" style={`color: ${theme.color};`}>{theme.label}</h2>
+                  <span class="cc-badge">[CONCEPT-CLUSTER]</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      );
-    })}
+
+              <!-- LEVEL 2 CLUSTER SUB-BRANCHES -->
+              <div class="clusters-subbranch-list">
+                {concept.clusters.map((cluster: any, clIdx: number) => {
+                  const isLastCluster = clIdx === concept.clusters.length - 1;
+
+                  return (
+                    <div class="cluster-subbranch-item">
+                      
+                      <!-- CLUSTER LINE CONNECTOR -->
+                      <div class="cluster-line-row">
+                        <span class="tree-line-indent">│   </span>
+                        <span class="tree-branch-symbol">{isLastCluster ? '└──' : '├──'}</span>
+                        <a href={`/topics/${cluster.id}`} class="cluster-node-box">
+                          <span class="cluster-node-id">CLUSTER 0{clIdx + 1}</span>
+                          <span class="cluster-node-name">{cluster.name}</span>
+                          <span class="cluster-arrow">View Topic →</span>
+                        </a>
+                      </div>
+
+                      <!-- LEVEL 3 SERVICE LEAF NODES -->
+                      <div class="services-leaf-list">
+                        {cluster.services.map((svcName: string, sIdx: number) => {
+                          const isLastService = sIdx === cluster.services.length - 1;
+                          const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+                          return (
+                            <div class="service-leaf-row">
+                              <span class="tree-line-indent">│   </span>
+                              <span class="tree-line-indent">{isLastCluster ? '    ' : '│   '}</span>
+                              <span class="tree-leaf-symbol">{isLastService ? '└──' : '├──'}</span>
+                              <a href={`/services/${svcId}`} class="service-leaf-chip">
+                                <span class="leaf-dot" style={`background: ${theme.color};`}></span>
+                                <span class="leaf-name">{svcName}</span>
+                                <span class="leaf-tag">LEAF</span>
+                              </a>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+
+    </div>
+
   </div>
 </BaseLayout>
 
 <style>
-  .taxonomy-header {
-    text-align: center;
-    margin-bottom: 3.5rem;
+  .tree-page-container {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 1rem 0 5rem;
   }
-  .header-badge {
-    display: inline-block;
-    padding: 0.35rem 0.85rem;
-    border-radius: 6px;
-    background: #181d2a;
-    border: 1px solid var(--color-security);
-    color: var(--color-security);
-    font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    margin-bottom: 1rem;
+
+  .tree-header {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1.5rem;
   }
-  .header-title {
-    font-size: 2.75rem;
+
+  .header-tag {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
     font-weight: 900;
-    margin-bottom: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.4rem;
   }
+
+  .header-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
+    letter-spacing: -0.02em;
+  }
+
   .header-sub {
     color: var(--text-secondary);
     font-size: 1rem;
-    max-width: 580px;
-    margin: 0 auto;
-    font-weight: 500;
   }
-  .taxonomy-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  .concept-section {
+
+  /* TREE CANVAS CARD */
+  .tree-canvas-card {
+    background: #06070a;
+    border: 1px solid #1e2230;
     padding: 2rem;
+    font-family: var(--font-mono);
   }
-  .concept-header {
+
+  /* ROOT NODE */
+  .tree-root-node {
+    background: #0d0f17;
+    border: 2px solid var(--color-network);
+    padding: 1.25rem 1.5rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.75rem;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 1rem;
+    justify-content: space-between;
   }
-  .concept-badge {
+
+  .root-badge {
+    font-size: 0.65rem;
+    font-weight: 900;
+    background: var(--color-network);
+    color: #000;
+    padding: 0.2rem 0.5rem;
+  }
+
+  .root-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #ffffff;
+  }
+
+  .root-meta {
+    font-size: 0.65rem;
+    color: var(--text-muted);
     font-weight: 800;
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
   }
-  .concept-title {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--text-primary);
+
+  .trunk-connector-line {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    padding-left: 2rem;
+    line-height: 1;
+    margin: 0.2rem 0;
   }
-  .clusters-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.25rem;
+
+  /* BRANCHES STACK */
+  .tree-branches-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
   }
-  .cluster-card {
-    background: #181d2a;
-    border: 1px solid var(--border-subtle);
-    padding: 1.25rem;
-    border-radius: 10px;
+
+  .branch-concept-node {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
   }
-  .cluster-title-wrap {
+
+  .concept-branch-header {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 1rem;
   }
-  .cluster-icon {
-    font-size: 0.95rem;
+
+  .branch-connector-prefix {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    font-weight: 900;
   }
-  .cluster-link {
-    text-decoration: none;
-    outline: none;
-  }
-  .cluster-link:hover .cluster-title {
-    color: var(--hover-color);
-    text-decoration: underline;
-  }
-  .cluster-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    transition: color 0.2s ease;
-  }
-  .services-pills {
+
+  .concept-card-pill {
+    background: #0f121d;
+    border: 1px solid #252a3b;
+    padding: 0.85rem 1.25rem;
+    flex: 1;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
+    align-items: center;
+    gap: 0.85rem;
   }
-  .service-pill {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid;
-    padding: 0.3rem 0.7rem;
-    border-radius: 6px;
+
+  .cc-icon {
+    font-size: 1.1rem;
+  }
+
+  .cc-num {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 900;
+  }
+
+  .cc-label {
+    font-size: 1rem;
+    font-weight: 900;
+    margin: 0;
+    flex: 1;
+  }
+
+  .cc-badge {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+  }
+
+  /* CLUSTER SUBBRANCHES */
+  .clusters-subbranch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cluster-subbranch-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .cluster-line-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tree-line-indent {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    white-space: pre;
+    font-weight: 900;
+  }
+
+  .tree-branch-symbol {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 900;
+  }
+
+  .cluster-node-box {
+    background: #141824;
+    border: 1px solid #2d3448;
+    padding: 0.65rem 1rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex: 1;
+  }
+
+  .cluster-node-id {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    font-weight: 900;
+  }
+
+  .cluster-node-name {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #ffffff;
+    flex: 1;
+  }
+
+  .cluster-arrow {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  /* SERVICES LEAF LIST */
+  .services-leaf-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .service-leaf-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tree-leaf-symbol {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .service-leaf-chip {
+    background: #181d2c;
+    border: 1px solid #283046;
+    padding: 0.45rem 0.85rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .leaf-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .leaf-name {
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 900;
+    color: #ffffff;
+  }
+
+  .leaf-tag {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.05rem 0.3rem;
   }
 </style>
