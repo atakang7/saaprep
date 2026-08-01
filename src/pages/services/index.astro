@@ -1,138 +1,291 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllServices, getTaxonomyTree } from '../../lib/data';
+import { getTaxonomyTree, getAllServices } from '../../lib/data';
 
 const services = getAllServices();
 const taxonomy = getTaxonomyTree();
+const concepts = taxonomy.level_2_and_3.concepts;
 
-// Group unique services by domain
-const uniqueServicesMap = new Map<string, any>();
-services.forEach(svc => {
-  if (!uniqueServicesMap.has(svc.name)) {
-    uniqueServicesMap.set(svc.name, svc);
-  }
-});
-
-const grouped: Record<string, any[]> = {};
-Array.from(uniqueServicesMap.values()).forEach(svc => {
-  const domain = (svc.exam_domains && svc.exam_domains[0]) || 'Core AWS';
-  if (!grouped[domain]) grouped[domain] = [];
-  grouped[domain].push(svc);
-});
+// Concept Themes
+const conceptThemes: Record<string, { color: string; label: string; icon: string }> = {
+  "c1": { color: "var(--color-security)", label: "SECURITY, GUARD & IDENTITY PIPELINE", icon: "🛡️" },
+  "c2": { color: "var(--color-network)", label: "NETWORK, TRAFFIC & INGRESS PIPELINE", icon: "⚡" },
+  "c3": { color: "var(--color-compute)", label: "COMPUTE & WORKLOAD EXECUTION PIPELINE", icon: "⚙️" },
+  "c4": { color: "var(--color-storage)", label: "STORAGE & PERSISTENCE PIPELINE", icon: "📦" },
+  "c5": { color: "var(--color-database)", label: "DATABASE & ANALYTICS DATA PIPELINE", icon: "🗄️" },
+  "c6": { color: "var(--color-decouple)", label: "DECOUPLING & ASYNC EVENT PIPELINE", icon: "🔄" }
+};
 ---
 
-<BaseLayout title="All AWS Services | SAA-C03">
-  <div class="services-index-container">
+<BaseLayout title="AWS Service Architecture Directory | SAA-C03">
+  <div class="services-diagram-container">
+    
+    <!-- HEADER -->
     <header class="index-header">
-      <h1 class="index-title">AWS Service Directory</h1>
-      <p class="index-sub">Complete catalog of required services for the SAA-C03 exam.</p>
+      <div class="header-tag">[ARCHITECTURAL DIAGRAM FLOW DIRECTORY]</div>
+      <h1 class="index-title">// AWS SERVICE FLOW MAPS</h1>
+      <p class="index-sub">Interactive end-to-end data flow pipelines mapped to SAA-C03 exam taxonomy.</p>
     </header>
 
-    <div class="domains-container">
-      {Object.keys(grouped).map(domainName => (
-        <section class="domain-section glass-card">
-          <h2 class="domain-title">{domainName}</h2>
-          <div class="services-grid">
-            {grouped[domainName].map((svc: any) => (
-              <a href={`/services/${svc.id}`} class="service-link-card">
-                <div class="svc-icon">✦</div>
-                <div class="svc-content">
-                  <h3>{svc.name}</h3>
-                  <p>{svc.job}</p>
+    <!-- DIAGRAM FLOW PIPELINES BY CONCEPT -->
+    <div class="pipelines-stack">
+      {concepts.map((concept: any, conceptIdx: number) => {
+        const theme = conceptThemes[concept.id] || { color: "var(--color-network)", label: concept.name.toUpperCase(), icon: "✦" };
+
+        return (
+          <section class="pipeline-section">
+            
+            <!-- PIPELINE HEADER -->
+            <div class="pipeline-header">
+              <div class="ph-title-group">
+                <span class="ph-num">0{conceptIdx + 1}</span>
+                <span class="ph-label" style={`color: ${theme.color};`}>{theme.label}</span>
+              </div>
+              <span class="ph-badge">[DATA-FLOW-MAP]</span>
+            </div>
+
+            <!-- ARCHITECTURE DIAGRAM CANVAS -->
+            <div class="diagram-canvas-box">
+              
+              <!-- CLUSTER FLOW STAGES -->
+              {concept.clusters.map((cluster: any, clusterIdx: number) => (
+                <div class="cluster-flow-block">
+                  <div class="cluster-flow-header">
+                    <span class="cfh-tag">STAGE 0{clusterIdx + 1}</span>
+                    <span class="cfh-name">{cluster.name}</span>
+                  </div>
+
+                  <!-- SERVICES IN THIS STAGE PIPELINE -->
+                  <div class="flow-nodes-row">
+                    {cluster.services.map((svcName: string, svcIdx: number) => {
+                      const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      return (
+                        <a href={`/services/${svcId}`} class="flow-node-card">
+                          <div class="fn-meta">
+                            <span class="fn-step">NODE 0{svcIdx + 1}</span>
+                            <span class="fn-type" style={`color: ${theme.color};`}>AWS SERVICE</span>
+                          </div>
+                          <div class="fn-title">{svcName}</div>
+                          <span class="fn-link">View Diagram Blueprint →</span>
+                        </a>
+                      );
+                    })}
+                  </div>
                 </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      ))}
+              ))}
+
+              <!-- ASCII PIPELINE MAP -->
+              <div class="ascii-flow-map">
+                <div class="ascii-header">// SAA-C03 DATA TRANSIT TOPOLOGY MAP</div>
+                <pre class="ascii-code">
+{concept.clusters.map((c: any, i: number) => `[STAGE 0${i + 1}: ${c.name.padEnd(24)}] ──(${c.services.join(' / ')})──►`).join('\n  │\n  ▼\n')} [PRODUCTION SAA-C03 ARCHITECTURE SUCCESS]
+                </pre>
+              </div>
+
+            </div>
+
+          </section>
+        );
+      })}
     </div>
+
   </div>
 </BaseLayout>
 
 <style>
-  .services-index-container {
-    max-width: 1000px;
+  .services-diagram-container {
+    max-width: 1050px;
     margin: 0 auto;
-    padding: 1rem 1rem 5rem;
+    padding: 1rem 0 5rem;
   }
-  
+
   .index-header {
-    text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 3.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 2rem;
   }
-  
-  .index-title {
-    font-size: 2.5rem;
+
+  .header-tag {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
     font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
     margin-bottom: 0.5rem;
   }
-  
+
+  .index-title {
+    font-size: 2.75rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    font-family: var(--font-mono);
+  }
+
   .index-sub {
     color: var(--text-secondary);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 
-  .domains-container {
+  /* PIPELINES STACK */
+  .pipelines-stack {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
+    gap: 3.5rem;
   }
 
-  .domain-section {
-    padding: 2rem;
-    border-top-width: 4px;
-    border-top-color: var(--color-network);
-  }
-
-  .domain-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0.5rem;
-  }
-
-  .services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  .pipeline-section {
+    display: flex;
+    flex-direction: column;
     gap: 1.25rem;
   }
 
-  .service-link-card {
+  .pipeline-header {
     display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background: #090a0f;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.75rem;
+  }
+
+  .ph-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .ph-num {
+    font-size: 1rem;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    color: var(--text-muted);
+  }
+
+  .ph-label {
+    font-size: 1rem;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+  }
+
+  .ph-badge {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  /* DIAGRAM CANVAS */
+  .diagram-canvas-box {
+    background: #06070a;
     border: 1px solid var(--border-subtle);
-    border-radius: 8px;
-    transition: all 0.2s;
+    padding: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .cluster-flow-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .cluster-flow-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .cfh-tag {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    color: var(--color-network);
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid var(--color-network);
+    padding: 0.1rem 0.4rem;
+  }
+
+  .cfh-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  /* NODES ROW */
+  .flow-nodes-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 0.85rem;
+  }
+
+  .flow-node-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    padding: 1rem;
     text-decoration: none;
     color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.75rem;
   }
 
-  .service-link-card:hover {
-    border-color: var(--color-network);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  .fn-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .svc-icon {
-    color: var(--color-network);
-    font-size: 1.25rem;
+  .fn-step {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-weight: 900;
   }
 
-  .svc-content h3 {
-    font-size: 1rem;
+  .fn-type {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
     font-weight: 800;
-    margin-bottom: 0.25rem;
   }
 
-  .svc-content p {
-    font-size: 0.85rem;
+  .fn-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--text-primary);
+  }
+
+  .fn-link {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
     color: var(--text-secondary);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-weight: 700;
+  }
+
+  /* ASCII PIPELINE MAP */
+  .ascii-flow-map {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1.25rem;
+  }
+
+  .ascii-header {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-weight: 900;
+    margin-bottom: 0.65rem;
+  }
+
+  .ascii-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: #030406;
+    padding: 1.25rem;
+    border: 1px solid var(--border-subtle);
+    overflow-x: auto;
+    line-height: 1.55;
   }
 </style>
