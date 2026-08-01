@@ -1,23 +1,31 @@
 :root {
-  --bg-dark: #020204;
-  --bg-card: #08080d;
-  --bg-card-hover: #0e0e17;
-  --border-subtle: #161622;
+  /* Surface Dark Palette */
+  --bg-dark: #030305;
+  --bg-card: #08080e;
+  --bg-card-hover: #0f0f18;
+  
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.08);
   --border-glow: #312e5c;
   
+  /* Text */
   --text-primary: #ffffff;
   --text-secondary: #9aa0b8;
   --text-muted: #52556b;
   
-  --unicorn-pink: #ff2a85;
-  --unicorn-purple: #a855f7;
-  --unicorn-violet: #7c3aed;
-  --unicorn-cyan: #00f0ff;
-  --unicorn-emerald: #00ffaa;
+  /* Smart Unicorn Color Palette */
+  --color-security: #ff2a85;   /* Hot Pink for Security & Guard */
+  --color-network: #00f0ff;    /* Cyan for Network & Connect */
+  --color-compute: #a855f7;    /* Purple for Compute & Run */
+  --color-storage: #f59e0b;    /* Amber for Storage & Store */
+  --color-database: #10b981;   /* Emerald for Databases & Query */
+  --color-decouple: #6366f1;   /* Indigo for Messaging & Decouple */
   
+  /* Gradients */
   --gradient-unicorn: linear-gradient(135deg, #ff2a85 0%, #a855f7 50%, #00f0ff 100%);
   --gradient-glow: radial-gradient(circle at 50% 0%, rgba(255, 42, 133, 0.12), transparent 60%);
   
+  /* Fonts */
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 }
@@ -45,7 +53,7 @@ a {
   text-decoration: none;
 }
 
-/* Unicorn Dynamic Interactive Cards */
+/* Glass Card Component */
 .glass-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
@@ -70,7 +78,7 @@ a {
 .glass-card:hover {
   background: var(--bg-card-hover);
   border-color: rgba(255, 42, 133, 0.4);
-  transform: translateY(-3px) scale(1.01);
+  transform: translateY(-3px);
   box-shadow: 0 12px 30px -10px rgba(255, 42, 133, 0.25), 0 0 15px rgba(0, 240, 255, 0.15);
 }
 
@@ -78,7 +86,7 @@ a {
   opacity: 1;
 }
 
-/* Text Accent Gradient */
+/* Text Accent */
 .text-gradient {
   background: var(--gradient-unicorn);
   -webkit-background-clip: text;
@@ -97,5 +105,5 @@ a {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--unicorn-pink);
+  background: var(--color-security);
 }

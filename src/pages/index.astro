@@ -6,11 +6,19 @@ const taxonomy = getTaxonomyTree();
 const questions = getPracticeQuestions();
 const domains = taxonomy.level_1.domains;
 const concepts = taxonomy.level_2_and_3.concepts;
+
+// Semantic color mapping per domain/cluster
+const domainColors: Record<string, string> = {
+  "Security": "var(--color-security)",
+  "Resilience": "var(--color-compute)",
+  "Performance": "var(--color-network)",
+  "Cost": "var(--color-storage)"
+};
 ---
 
 <BaseLayout title="SAA-C03 | AWS Certification Engine">
   <section class="hero-section">
-    <div class="hero-badge">SAA-C03</div>
+    <div class="hero-badge">SAA-C03 EXAM PREP</div>
     <h1 class="hero-title">
       AWS Solutions Architect <br />
       <span class="text-gradient">Practice Platform</span>
@@ -18,22 +26,22 @@ const concepts = taxonomy.level_2_and_3.concepts;
 
     <div class="hero-cta-group">
       <a href="/practice" class="btn btn-primary">Start Practice Arena →</a>
-      <a href="/concepts" class="btn btn-secondary">View Taxonomy</a>
+      <a href="/concepts" class="btn btn-secondary">Explore Taxonomy</a>
     </div>
   </section>
 
   <!-- Metric Cards -->
   <section class="metrics-grid">
     <div class="glass-card metric-card">
-      <span class="metric-value">{questions.length}</span>
+      <span class="metric-value text-gradient">{questions.length}</span>
       <span class="metric-label">Practice Questions</span>
     </div>
     <div class="glass-card metric-card">
-      <span class="metric-value">4</span>
+      <span class="metric-value" style="color: var(--color-security);">4</span>
       <span class="metric-label">Decision Lenses</span>
     </div>
     <div class="glass-card metric-card">
-      <span class="metric-value">{concepts.length}</span>
+      <span class="metric-value" style="color: var(--color-network);">{concepts.length}</span>
       <span class="metric-label">Core Action Domains</span>
     </div>
   </section>
@@ -42,15 +50,18 @@ const concepts = taxonomy.level_2_and_3.concepts;
   <section class="section-container">
     <h2 class="section-title">Exam Decision Lenses</h2>
     <div class="domains-grid">
-      {domains.map((domain: any) => (
-        <div class="glass-card domain-card">
-          <div class="domain-header">
-            <h3>{domain.name}</h3>
-            <span class="domain-weight">{domain.weight}</span>
+      {domains.map((domain: any) => {
+        const color = domainColors[domain.name] || "var(--color-network)";
+        return (
+          <div class="glass-card domain-card" style={`--card-theme: ${color};`}>
+            <div class="domain-header">
+              <h3 style={`color: ${color};`}>{domain.name}</h3>
+              <span class="domain-weight" style={`background: ${color}20; color: ${color}; border-color: ${color}40;`}>{domain.weight}</span>
+            </div>
+            <p>{domain.focus}</p>
           </div>
-          <p>{domain.focus}</p>
-        </div>
-      ))}
+        );
+      })}
     </div>
   </section>
 </BaseLayout>
@@ -62,15 +73,16 @@ const concepts = taxonomy.level_2_and_3.concepts;
   }
   .hero-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    background: #0a0a0f;
-    border: 1px solid #2d2b55;
-    color: var(--unicorn-cyan);
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    background: #08080e;
+    border: 1px solid var(--color-security);
+    color: var(--color-security);
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     margin-bottom: 1.25rem;
+    box-shadow: 0 0 12px rgba(255, 42, 133, 0.25);
   }
   .hero-title {
     font-size: 2.75rem;
@@ -89,16 +101,16 @@ const concepts = taxonomy.level_2_and_3.concepts;
     border-radius: 8px;
     font-weight: 700;
     font-size: 0.9rem;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-primary {
-    background: var(--unicorn-pink);
+    background: var(--color-security);
     color: white;
     box-shadow: 0 0 15px rgba(255, 42, 133, 0.35);
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 25px rgba(255, 42, 133, 0.55);
+    box-shadow: 0 0 25px rgba(255, 42, 133, 0.6);
   }
   .btn-secondary {
     background: #06060a;
@@ -107,7 +119,8 @@ const concepts = taxonomy.level_2_and_3.concepts;
   }
   .btn-secondary:hover {
     background: #12121a;
-    border-color: #2d2b55;
+    border-color: var(--color-network);
+    color: var(--color-network);
   }
 
   .metrics-grid {
@@ -124,7 +137,6 @@ const concepts = taxonomy.level_2_and_3.concepts;
     display: block;
     font-size: 2.25rem;
     font-weight: 900;
-    color: var(--unicorn-cyan);
   }
   .metric-label {
     font-size: 0.85rem;
@@ -147,26 +159,30 @@ const concepts = taxonomy.level_2_and_3.concepts;
   .domain-card {
     padding: 1.25rem;
   }
+  .domain-card:hover {
+    border-color: var(--card-theme);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), 0 0 15px var(--card-theme);
+  }
   .domain-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.65rem;
   }
   .domain-header h3 {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 800;
   }
   .domain-weight {
-    background: rgba(0, 240, 255, 0.1);
-    color: var(--unicorn-cyan);
-    padding: 0.15rem 0.45rem;
+    border: 1px solid;
+    padding: 0.15rem 0.5rem;
     border-radius: 4px;
-    font-weight: 700;
+    font-weight: 800;
     font-size: 0.75rem;
   }
   .domain-card p {
     font-size: 0.85rem;
     color: var(--text-secondary);
+    line-height: 1.5;
   }
 </style>

@@ -4,44 +4,64 @@ import { getTaxonomyTree } from '../lib/data';
 
 const taxonomy = getTaxonomyTree();
 const concepts = taxonomy.level_2_and_3.concepts;
+
+// Semantic theme color assignment for concept groups
+const conceptThemes: Record<string, { color: string; label: string }> = {
+  "c1": { color: "var(--color-security)", label: "SECURITY & GUARD" },
+  "c2": { color: "var(--color-network)", label: "NETWORK & TRAFFIC" },
+  "c3": { color: "var(--color-compute)", label: "COMPUTE & RUN" },
+  "c4": { color: "var(--color-storage)", label: "STORAGE & DATA" },
+  "c5": { color: "var(--color-database)", label: "DATABASES & QUERY" },
+  "c6": { color: "var(--color-decouple)", label: "DECOUPLE & OPERATE" }
+};
 ---
 
 <BaseLayout title="Taxonomy Tree | SAA-C03 UNICORN">
   <div class="taxonomy-header">
-    <div class="header-badge">CURRICULUM GRAPH</div>
+    <div class="header-badge">DECISION TAXONOMY</div>
     <h1 class="header-title">
-      Architectural <span class="text-gradient">Decision Taxonomy</span>
+      Architectural <span class="text-gradient">Service Clusters</span>
     </h1>
     <p class="header-sub">
-      Deep cluster breakdown of AWS services mapped directly to SAA-C03 decision lenses.
+      Categorized AWS services mapped to specific architectural decision domains.
     </p>
   </div>
 
   <div class="taxonomy-grid">
-    {concepts.map((concept: any) => (
-      <div class="glass-card concept-section">
-        <div class="concept-header">
-          <span class="concept-badge">{concept.id.toUpperCase()}</span>
-          <h2 class="concept-title">{concept.name}</h2>
-        </div>
+    {concepts.map((concept: any) => {
+      const theme = conceptThemes[concept.id] || { color: "var(--color-network)", label: concept.id.toUpperCase() };
+      return (
+        <div class="glass-card concept-section" style={`--theme-color: ${theme.color};`}>
+          <div class="concept-header">
+            <span class="concept-badge" style={`background: ${theme.color}15; color: ${theme.color}; border-color: ${theme.color}40;`}>
+              {theme.label}
+            </span>
+            <h2 class="concept-title">{concept.name}</h2>
+          </div>
 
-        <div class="clusters-grid">
-          {concept.clusters.map((cluster: any) => (
-            <div class="cluster-card">
-              <div class="cluster-title-wrap">
-                <span class="cluster-icon">✦</span>
-                <h3 class="cluster-title">{cluster.name}</h3>
+          <div class="clusters-grid">
+            {concept.clusters.map((cluster: any) => (
+              <div class="cluster-card">
+                <div class="cluster-title-wrap">
+                  <span class="cluster-icon" style={`color: ${theme.color};`}>✦</span>
+                  <h3 class="cluster-title">{cluster.name}</h3>
+                </div>
+                <div class="services-pills">
+                  {cluster.services.map((svc: string) => (
+                    <span 
+                      class="service-pill" 
+                      style={`--pill-theme: ${theme.color};`}
+                    >
+                      {svc}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div class="services-pills">
-                {cluster.services.map((svc: string) => (
-                  <span class="service-pill">{svc}</span>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
+      );
+    })}
   </div>
 </BaseLayout>
 
@@ -55,8 +75,8 @@ const concepts = taxonomy.level_2_and_3.concepts;
     padding: 0.25rem 0.75rem;
     border-radius: 6px;
     background: #08080d;
-    border: 1px solid var(--unicorn-pink);
-    color: var(--unicorn-pink);
+    border: 1px solid var(--color-security);
+    color: var(--color-security);
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
@@ -83,6 +103,10 @@ const concepts = taxonomy.level_2_and_3.concepts;
   .concept-section {
     padding: 2rem;
   }
+  .concept-section:hover {
+    border-color: var(--theme-color);
+    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px var(--theme-color);
+  }
   .concept-header {
     display: flex;
     align-items: center;
@@ -92,17 +116,15 @@ const concepts = taxonomy.level_2_and_3.concepts;
     padding-bottom: 1rem;
   }
   .concept-badge {
-    background: rgba(0, 240, 255, 0.1);
-    color: var(--unicorn-cyan);
-    border: 1px solid rgba(0, 240, 255, 0.3);
+    border: 1px solid;
     font-weight: 800;
     padding: 0.3rem 0.75rem;
     border-radius: 6px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     letter-spacing: 0.05em;
   }
   .concept-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 800;
     color: var(--text-primary);
   }
@@ -120,9 +142,9 @@ const concepts = taxonomy.level_2_and_3.concepts;
   }
   .cluster-card:hover {
     background: #0d0d16;
-    border-color: var(--unicorn-purple);
+    border-color: var(--theme-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   }
   .cluster-title-wrap {
     display: flex;
@@ -131,11 +153,10 @@ const concepts = taxonomy.level_2_and_3.concepts;
     margin-bottom: 1rem;
   }
   .cluster-icon {
-    color: var(--unicorn-pink);
     font-size: 0.9rem;
   }
   .cluster-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-primary);
   }
@@ -146,8 +167,8 @@ const concepts = taxonomy.level_2_and_3.concepts;
   }
   .service-pill {
     background: rgba(255, 255, 255, 0.04);
-    color: var(--unicorn-cyan);
-    border: 1px solid rgba(0, 240, 255, 0.2);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
     padding: 0.25rem 0.65rem;
     border-radius: 6px;
     font-size: 0.8rem;
@@ -155,9 +176,9 @@ const concepts = taxonomy.level_2_and_3.concepts;
     transition: all 0.15s ease;
   }
   .service-pill:hover {
-    background: var(--unicorn-cyan);
+    background: var(--pill-theme);
     color: #000;
-    border-color: var(--unicorn-cyan);
-    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    border-color: var(--pill-theme);
+    box-shadow: 0 0 12px var(--pill-theme);
   }
 </style>
