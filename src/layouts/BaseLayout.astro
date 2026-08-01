@@ -19,24 +19,29 @@ const { title = "SAA-C03" } = Astro.props;
     <meta name="description" content="AWS SAA-C03 Practice Platform" />
   </head>
   <body>
+    <!-- EXTREME LEFT-TO-RIGHT FULL-WIDTH NAVBAR -->
     <header class="navbar">
       <div class="nav-container">
-        <a href="/" class="brand">SAA-C03</a>
+        <div class="brand-group">
+          <a href="/" class="brand">SAA-C03</a>
+          <span class="brand-badge">[TACTICAL-DRILL]</span>
+        </div>
         <nav class="nav-links">
           <button id="search-btn" class="nav-item search-trigger">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <span>Search</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>SEARCH</span>
             <kbd class="nav-kbd">⌘K</kbd>
           </button>
-          <a href="/practice" class="nav-item">Practice</a>
-          <a href="/services" class="nav-item">Services</a>
-          <a href="/concepts" class="nav-item">Taxonomy</a>
+          <a href="/practice" class="nav-item">PRACTICE</a>
+          <a href="/services" class="nav-item">SERVICES</a>
+          <a href="/concepts" class="nav-item">TAXONOMY</a>
         </nav>
       </div>
     </header>
 
+    <!-- EXTREME FULL-WIDTH LAYOUT CONTAINER -->
     <div class="app-layout">
-      <!-- DETAILED SIDEBAR NAV -->
+      <!-- SIDEBAR AT EXTREME LEFT -->
       <SidebarNav />
 
       <!-- MAIN CONTENT AREA -->
@@ -45,7 +50,7 @@ const { title = "SAA-C03" } = Astro.props;
       </main>
     </div>
 
-    <!-- Raycast/Spotlight Command Palette -->
+    <!-- Command Palette Modal -->
     <SearchModal />
 
     <script>
@@ -62,83 +67,98 @@ const { title = "SAA-C03" } = Astro.props;
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(3, 3, 5, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    width: 100%;
+    background: #050608;
     border-bottom: 1px solid var(--border-subtle);
   }
 
   .nav-container {
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 0.75rem 1.5rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.65rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   .brand {
     font-weight: 900;
     font-size: 1.1rem;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
     color: var(--text-primary);
-    background: var(--gradient-unicorn);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     text-decoration: none;
+  }
+
+  .brand-badge {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-weight: 700;
   }
 
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
 
   .nav-item {
-    font-size: 0.9rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
     color: var(--text-secondary);
-    font-weight: 600;
+    font-weight: 800;
+    letter-spacing: 0.05em;
     text-decoration: none;
   }
 
   .search-trigger {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    background: rgba(255, 255, 255, 0.04);
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-subtle);
-    padding: 0.4rem 0.85rem;
-    border-radius: 8px;
+    padding: 0.35rem 0.75rem;
     cursor: pointer;
+    color: var(--text-secondary);
   }
 
   .nav-kbd {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border-subtle);
     color: var(--text-muted);
-    padding: 0.1rem 0.35rem;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+    font-size: 0.6rem;
     font-family: var(--font-mono);
   }
 
-  /* LAYOUT FLEX CONTAINER */
+  /* FULL-WIDTH FLUSH LAYOUT CONTAINER */
   .app-layout {
     display: flex;
-    max-width: 1400px;
-    margin: 0 auto;
-    min-height: calc(100vh - 60px);
+    width: 100%;
+    max-width: 100%;
+    min-height: calc(100vh - 49px);
   }
 
   .main-content {
     flex-grow: 1;
     min-width: 0;
-    padding: 2rem 2.5rem;
+    padding: 2.5rem 3rem;
+    max-width: 1200px;
   }
 
   @media (max-width: 900px) {
     .main-content {
       padding: 1.5rem 1rem;
+    }
+    .nav-container {
+      padding: 0.65rem 1rem;
     }
   }
 </style>
