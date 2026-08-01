@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import SearchModal from '../components/SearchModal.astro';
 import SidebarNav from '../components/SidebarNav.astro';
+import AccessibilityToolbar from '../components/AccessibilityToolbar.astro';
 
 interface Props {
   title?: string;
@@ -32,6 +33,10 @@ const { title = "SAA-C03" } = Astro.props;
             <span>SEARCH</span>
             <kbd class="nav-kbd">⌘K</kbd>
           </button>
+          
+          <!-- ACCESSIBILITY CONTROLS TOOLBAR -->
+          <AccessibilityToolbar />
+
           <a href="/practice" class="nav-item">PRACTICE</a>
           <a href="/services" class="nav-item">SERVICES</a>
           <a href="/concepts" class="nav-item">TAXONOMY</a>
@@ -106,7 +111,7 @@ const { title = "SAA-C03" } = Astro.props;
   .nav-links {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   .nav-item {

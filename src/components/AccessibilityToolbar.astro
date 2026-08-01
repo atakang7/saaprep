@@ -1,0 +1,246 @@
+---
+---
+
+<div class="a11y-toolbar">
+  <button id="a11y-toggle-btn" class="a11y-btn" title="Accessibility Settings" aria-label="Accessibility Settings">
+    <span class="a11y-icon">♿</span>
+    <span class="a11y-label">A11Y</span>
+  </button>
+
+  <div id="a11y-menu" class="a11y-menu hidden">
+    <div class="a11y-header">
+      <span>ACCESSIBILITY CONTROLS</span>
+      <button id="a11y-close-btn" class="a11y-close">✕</button>
+    </div>
+
+    <!-- FONT SIZE CONTROL -->
+    <div class="a11y-control-group">
+      <label class="a11y-lbl">FONT SIZE</label>
+      <div class="a11y-btn-grid">
+        <button class="a11y-opt-btn" data-a11y-type="font-size" data-val="100">Normal (100%)</button>
+        <button class="a11y-opt-btn" data-a11y-type="font-size" data-val="115">Large (115%)</button>
+        <button class="a11y-opt-btn" data-a11y-type="font-size" data-val="130">XL (130%)</button>
+      </div>
+    </div>
+
+    <!-- FONT FAMILY CONTROL -->
+    <div class="a11y-control-group">
+      <label class="a11y-lbl">FONT FAMILY</label>
+      <div class="a11y-btn-grid">
+        <button class="a11y-opt-btn" data-a11y-type="font-family" data-val="mono">Mono (Code)</button>
+        <button class="a11y-opt-btn" data-a11y-type="font-family" data-val="sans">Sans-Serif</button>
+        <button class="a11y-opt-btn" data-a11y-type="font-family" data-val="serif">Serif (Reader)</button>
+      </div>
+    </div>
+
+    <!-- COLOR CONTRAST / THEME CONTROL -->
+    <div class="a11y-control-group">
+      <label class="a11y-lbl">COLOR CONTRAST</label>
+      <div class="a11y-btn-grid">
+        <button class="a11y-opt-btn" data-a11y-type="theme" data-val="obsidian">Obsidian Dark</button>
+        <button class="a11y-opt-btn" data-a11y-type="theme" data-val="high-contrast">AAA High Contrast</button>
+        <button class="a11y-opt-btn" data-a11y-type="theme" data-val="oled">OLED True Black</button>
+        <button class="a11y-opt-btn" data-a11y-type="theme" data-val="cyan">Cyan Matrix</button>
+      </div>
+    </div>
+
+    <!-- RESET ALL -->
+    <button id="a11y-reset-btn" class="a11y-reset-btn">Reset To Defaults</button>
+  </div>
+</div>
+
+<script>
+  const toggleBtn = document.getElementById('a11y-toggle-btn');
+  const closeBtn = document.getElementById('a11y-close-btn');
+  const resetBtn = document.getElementById('a11y-reset-btn');
+  const menu = document.getElementById('a11y-menu');
+  const optBtns = document.querySelectorAll('.a11y-opt-btn');
+
+  // Toggle Menu
+  toggleBtn?.addEventListener('click', () => {
+    menu?.classList.toggle('hidden');
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    menu?.classList.add('hidden');
+  });
+
+  // Apply Preferences
+  function applySetting(type: string, val: string) {
+    localStorage.setItem(`a11y_${type}`, val);
+    
+    if (type === 'font-size') {
+      document.documentElement.style.fontSize = `${val}%`;
+    } else if (type === 'font-family') {
+      document.documentElement.setAttribute('data-font', val);
+    } else if (type === 'theme') {
+      document.documentElement.setAttribute('data-theme', val);
+    }
+
+    updateActiveState();
+  }
+
+  function updateActiveState() {
+    optBtns.forEach(btn => {
+      const type = btn.getAttribute('data-a11y-type');
+      const val = btn.getAttribute('data-val');
+      const stored = localStorage.getItem(`a11y_${type}`);
+      
+      const isDefault = !stored && (val === '100' || val === 'mono' || val === 'obsidian');
+      if (stored === val || isDefault) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  // Event Listeners
+  optBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-a11y-type');
+      const val = btn.getAttribute('data-val');
+      if (type && val) {
+        applySetting(type, val);
+      }
+    });
+  });
+
+  resetBtn?.addEventListener('click', () => {
+    localStorage.removeItem('a11y_font-size');
+    localStorage.removeItem('a11y_font-family');
+    localStorage.removeItem('a11y_theme');
+    document.documentElement.style.fontSize = '100%';
+    document.documentElement.removeAttribute('data-font');
+    document.documentElement.removeAttribute('data-theme');
+    updateActiveState();
+  });
+
+  // Load Saved Preferences on Startup
+  const savedFontSize = localStorage.getItem('a11y_font-size');
+  const savedFontFamily = localStorage.getItem('a11y_font-family');
+  const savedTheme = localStorage.getItem('a11y_theme');
+
+  if (savedFontSize) document.documentElement.style.fontSize = `${savedFontSize}%`;
+  if (savedFontFamily) document.documentElement.setAttribute('data-font', savedFontFamily);
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+
+  updateActiveState();
+</script>
+
+<style>
+  .a11y-toolbar {
+    position: relative;
+  }
+
+  .a11y-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-subtle);
+    padding: 0.35rem 0.6rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .a11y-icon {
+    font-size: 0.85rem;
+  }
+
+  .a11y-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 280px;
+    background: #090a0e;
+    border: 1px solid var(--border-strong);
+    padding: 1.25rem;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+
+  .a11y-menu.hidden {
+    display: none;
+  }
+
+  .a11y-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.5rem;
+  }
+
+  .a11y-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+
+  .a11y-control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .a11y-lbl {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  .a11y-btn-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .a11y-opt-btn {
+    flex: 1;
+    min-width: 75px;
+    padding: 0.35rem 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .a11y-opt-btn.active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--color-network);
+    color: var(--text-primary);
+    font-weight: 900;
+  }
+
+  .a11y-reset-btn {
+    width: 100%;
+    padding: 0.4rem;
+    background: rgba(255, 42, 133, 0.08);
+    border: 1px solid var(--color-security);
+    color: var(--color-security);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+</style>
