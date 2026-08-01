@@ -8,20 +8,20 @@ const domains = taxonomy.level_1.domains;
 const concepts = taxonomy.level_2_and_3.concepts;
 ---
 
-<BaseLayout title="SAA-C03 PRO | Modern AWS Certification Platform">
+<BaseLayout title="SAA-C03 UNICORN | Exam Engine">
   <section class="hero-section">
-    <div class="badge">SAA-C03 EXAM READY</div>
+    <div class="hero-badge">⚡ AWS SAA-C03 DRILL ENGINE</div>
     <h1 class="hero-title">
-      Architect AWS Systems with <br />
-      <span class="text-gradient">Zero-Distraction Mastery</span>
+      AWS Solutions Architect <br />
+      <span class="text-gradient">Zero-Distraction Practice</span>
     </h1>
     <p class="hero-sub">
-      A high-performance static platform designed for rapid recall, decision lens taxonomy, and authentic AWS exam-pattern practice.
+      Raw, verified exam pattern question bank powered by a clean, hyper-responsive black UI.
     </p>
 
     <div class="hero-cta-group">
-      <a href="/practice" class="btn btn-primary">Start Exam Simulator →</a>
-      <a href="/concepts" class="btn btn-secondary">Explore Taxonomy Tree</a>
+      <a href="/practice" class="btn btn-unicorn">Launch Practice Arena →</a>
+      <a href="/concepts" class="btn btn-dark">View Taxonomy</a>
     </div>
   </section>
 
@@ -29,21 +29,21 @@ const concepts = taxonomy.level_2_and_3.concepts;
   <section class="metrics-grid">
     <div class="glass-card metric-card">
       <span class="metric-value">{questions.length}</span>
-      <span class="metric-label">Fundamentals Practice Questions</span>
+      <span class="metric-label">Verified Questions</span>
     </div>
     <div class="glass-card metric-card">
       <span class="metric-value">4</span>
-      <span class="metric-label">AWS Decision Lenses</span>
+      <span class="metric-label">Exam Decision Lenses</span>
     </div>
     <div class="glass-card metric-card">
       <span class="metric-value">{concepts.length}</span>
-      <span class="metric-label">Architectural Clusters</span>
+      <span class="metric-label">Core Action Domains</span>
     </div>
   </section>
 
   <!-- Exam Domain Lenses -->
   <section class="section-container">
-    <h2 class="section-title">The 4 Exam Decision Lenses</h2>
+    <h2 class="section-title">Exam Decision Lenses</h2>
     <div class="domains-grid">
       {domains.map((domain: any) => (
         <div class="glass-card domain-card">
@@ -59,7 +59,7 @@ const concepts = taxonomy.level_2_and_3.concepts;
 
   <!-- Core Clusters Overview -->
   <section class="section-container">
-    <h2 class="section-title">AWS Core Action Domains</h2>
+    <h2 class="section-title">Curriculum Taxonomy</h2>
     <div class="concepts-grid">
       {concepts.map((concept: any) => (
         <div class="glass-card concept-card">
@@ -81,32 +81,32 @@ const concepts = taxonomy.level_2_and_3.concepts;
 <style>
   .hero-section {
     text-align: center;
-    padding: 3rem 1rem 4rem;
+    padding: 2.5rem 1rem 3.5rem;
   }
-  .badge {
+  .hero-badge {
     display: inline-block;
-    padding: 0.35rem 1rem;
-    border-radius: 9999px;
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid var(--border-glow);
-    color: var(--accent-cyan);
-    font-size: 0.8rem;
+    padding: 0.3rem 0.85rem;
+    border-radius: 6px;
+    background: #0a0a0f;
+    border: 1px solid #2d2b55;
+    color: var(--unicorn-cyan);
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.05em;
     margin-bottom: 1.5rem;
   }
   .hero-title {
-    font-size: 3.25rem;
-    font-weight: 800;
-    line-height: 1.15;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1.1;
     letter-spacing: -0.03em;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
   .hero-sub {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     color: var(--text-secondary);
-    max-width: 680px;
-    margin: 0 auto 2.5rem;
+    max-width: 580px;
+    margin: 0 auto 2rem;
   }
   .hero-cta-group {
     display: flex;
@@ -114,109 +114,116 @@ const concepts = taxonomy.level_2_and_3.concepts;
     justify-content: center;
   }
   .btn {
-    padding: 0.85rem 1.75rem;
-    border-radius: 12px;
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
     transition: all 0.2s;
   }
-  .btn-primary {
-    background: var(--gradient-hero);
+  .btn-unicorn {
+    background: var(--unicorn-pink);
     color: white;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 15px rgba(255, 42, 133, 0.35);
   }
-  .btn-primary:hover {
+  .btn-unicorn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 0 25px rgba(255, 42, 133, 0.55);
   }
-  .btn-secondary {
+  .btn-dark {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     color: var(--text-primary);
   }
-  .btn-secondary:hover {
+  .btn-dark:hover {
     background: var(--bg-card-hover);
-    border-color: var(--text-muted);
+    border-color: #2d2b55;
   }
 
   /* Metrics Grid */
   .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 4rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 3.5rem;
   }
   .metric-card {
-    padding: 1.75rem;
+    padding: 1.5rem;
     text-align: center;
   }
   .metric-value {
     display: block;
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--accent-cyan);
+    font-size: 2.25rem;
+    font-weight: 900;
+    color: var(--unicorn-cyan);
   }
   .metric-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    font-weight: 500;
   }
 
   .section-container {
-    margin-bottom: 4rem;
+    margin-bottom: 3.5rem;
   }
   .section-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.01em;
   }
 
   .domains-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
   }
   .domain-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
   .domain-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .domain-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
   }
   .domain-weight {
-    background: rgba(56, 189, 248, 0.15);
-    color: var(--accent-cyan);
-    padding: 0.2rem 0.6rem;
-    border-radius: 6px;
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--unicorn-cyan);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   .concepts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
   }
   .concept-card {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
   .concept-card h3 {
-    margin-bottom: 1rem;
-    color: var(--accent-indigo);
+    margin-bottom: 0.85rem;
+    font-size: 1.1rem;
+    color: var(--unicorn-purple);
   }
   .cluster-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
   .cluster-list li {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
-    border-bottom: 1px dashed var(--border-subtle);
-    padding-bottom: 0.4rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.35rem;
   }
   .cluster-name {
     color: var(--text-primary);
@@ -224,6 +231,6 @@ const concepts = taxonomy.level_2_and_3.concepts;
   }
   .service-tags {
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 </style>

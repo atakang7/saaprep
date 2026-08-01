@@ -1,25 +1,25 @@
 :root {
-  --bg-dark: #080c14;
-  --bg-card: rgba(15, 23, 42, 0.75);
-  --bg-card-hover: rgba(30, 41, 59, 0.85);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-glow: rgba(99, 102, 241, 0.4);
+  --bg-dark: #030305;
+  --bg-card: #0a0a0f;
+  --bg-card-hover: #12121a;
+  --border-subtle: #1c1c28;
+  --border-glow: #2d2b55;
   
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #ffffff;
+  --text-secondary: #9ea0b6;
+  --text-muted: #56586e;
   
-  --accent-cyan: #38bdf8;
-  --accent-indigo: #6366f1;
-  --accent-purple: #a855f7;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
+  --unicorn-pink: #ff2a85;
+  --unicorn-purple: #9d4edd;
+  --unicorn-violet: #7b2cbf;
+  --unicorn-cyan: #00f0ff;
+  --unicorn-emerald: #00ffaa;
   
-  --gradient-hero: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #38bdf8 100%);
-  --gradient-glow: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.25), transparent 70%);
+  --gradient-unicorn: linear-gradient(135deg, #ff2a85 0%, #9d4edd 50%, #00f0ff 100%);
+  --gradient-unicorn-dark: linear-gradient(180deg, rgba(255, 42, 133, 0.08) 0%, rgba(0, 0, 0, 0) 100%);
   
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 * {
@@ -33,10 +33,11 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   min-height: 100vh;
-  line-height: 1.6;
-  background-image: var(--gradient-glow);
-  background-attachment: fixed;
+  line-height: 1.5;
   overflow-x: hidden;
+  background-image: var(--gradient-unicorn-dark);
+  background-repeat: no-repeat;
+  background-size: 100% 600px;
 }
 
 a {
@@ -44,41 +45,38 @@ a {
   text-decoration: none;
 }
 
-/* Glassmorphism Card Utility */
+/* Unicorn Black Card Styling */
 .glass-card {
   background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-subtle);
-  border-radius: 16px;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
   background: var(--bg-card-hover);
-  border-color: var(--border-glow);
-  box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.2);
-  transform: translateY(-2px);
+  border-color: rgba(255, 42, 133, 0.3);
+  box-shadow: 0 0 20px rgba(255, 42, 133, 0.15);
 }
 
-/* Hero Glow text */
+/* Text Accent */
 .text-gradient {
-  background: var(--gradient-hero);
+  background: var(--gradient-unicorn);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
+  background: #1c1c28;
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #2d2b55;
 }
