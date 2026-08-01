@@ -1,0 +1,287 @@
+---
+import { getTaxonomyTree } from '../lib/data';
+
+const taxonomy = getTaxonomyTree();
+const concepts = taxonomy.level_2_and_3.concepts;
+const currentPath = Astro.url.pathname;
+
+const conceptThemes: Record<string, string> = {
+  "c1": "var(--color-security)",
+  "c2": "var(--color-network)",
+  "c3": "var(--color-compute)",
+  "c4": "var(--color-storage)",
+  "c5": "var(--color-database)",
+  "c6": "var(--color-decouple)"
+};
+---
+
+<aside class="sidebar-wrapper" id="sidebar">
+  <div class="sidebar-inner">
+    <div class="sidebar-header">
+      <span class="sb-title">STUDY BLUEPRINT</span>
+      <span class="sb-badge">SAA-C03</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <!-- CORE NAVIGATION -->
+      <div class="sb-section">
+        <a href="/practice" class={`sb-nav-link ${currentPath === '/practice' ? 'active' : ''}`}>
+          <span class="sb-icon">🎯</span>
+          <span>Practice Arena</span>
+        </a>
+        <a href="/services" class={`sb-nav-link ${currentPath === '/services' ? 'active' : ''}`}>
+          <span class="sb-icon">📚</span>
+          <span>All Services Directory</span>
+        </a>
+        <a href="/concepts" class={`sb-nav-link ${currentPath === '/concepts' ? 'active' : ''}`}>
+          <span class="sb-icon">🌳</span>
+          <span>Taxonomy Tree</span>
+        </a>
+      </div>
+
+      <!-- DOMAINS & CLUSTERS -->
+      <div class="sb-tree-header">DECISION DOMAINS</div>
+
+      {concepts.map((concept: any) => {
+        const themeColor = conceptThemes[concept.id] || "var(--color-network)";
+        return (
+          <details class="sb-concept-group" open>
+            <summary class="sb-concept-summary" style={`border-left-color: ${themeColor};`}>
+              <span class="sb-concept-name">{concept.name}</span>
+              <span class="sb-arrow">▾</span>
+            </summary>
+
+            <div class="sb-clusters-list">
+              {concept.clusters.map((cluster: any) => {
+                const topicUrl = `/topics/${cluster.id}`;
+                const isTopicActive = currentPath === topicUrl;
+                return (
+                  <div class="sb-cluster-item">
+                    <a href={topicUrl} class={`sb-cluster-link ${isTopicActive ? 'active' : ''}`}>
+                      <span class="sb-bullet" style={`background: ${themeColor};`}></span>
+                      <span>{cluster.name}</span>
+                    </a>
+
+                    <div class="sb-services-sublist">
+                      {cluster.services.map((svcName: string) => {
+                        const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                        const svcUrl = `/services/${svcId}`;
+                        const isSvcActive = currentPath === svcUrl;
+                        return (
+                          <a href={svcUrl} class={`sb-svc-link ${isSvcActive ? 'active' : ''}`}>
+                            {svcName}
+                          </a>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
+        );
+      })}
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .sidebar-wrapper {
+    width: 280px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    border-right: 1px solid var(--border-subtle);
+    background: #05060a;
+    overflow-y: auto;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar-wrapper {
+      display: none; /* Hide on mobile or integrate responsive toggle */
+    }
+  }
+
+  .sidebar-inner {
+    padding: 1.25rem 1rem 3rem;
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .sb-title {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .sb-badge {
+    font-size: 0.65rem;
+    font-weight: 900;
+    background: rgba(255, 42, 133, 0.15);
+    color: var(--color-security);
+    border: 1px solid var(--color-security);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .sb-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sb-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.15s;
+  }
+
+  .sb-nav-link:hover, .sb-nav-link.active {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+  }
+
+  .sb-nav-link.active {
+    border-left: 3px solid var(--color-network);
+  }
+
+  .sb-tree-header {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    padding-left: 0.5rem;
+  }
+
+  .sb-concept-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .sb-concept-summary {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.65rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    border-left: 3px solid;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+    margin-bottom: 0.35rem;
+  }
+
+  .sb-concept-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .sb-concept-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sb-arrow {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+  }
+
+  details[open] .sb-arrow {
+    transform: rotate(180deg);
+  }
+
+  .sb-clusters-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 0.75rem;
+    margin-top: 0.35rem;
+  }
+
+  .sb-cluster-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sb-cluster-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+
+  .sb-cluster-link:hover, .sb-cluster-link.active {
+    color: var(--text-primary);
+  }
+
+  .sb-cluster-link.active {
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .sb-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .sb-services-sublist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding-left: 1.25rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .sb-svc-link {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .sb-svc-link:hover, .sb-svc-link.active {
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .sb-svc-link.active {
+    color: var(--color-network);
+    border-color: var(--color-network);
+    font-weight: 800;
+  }
+</style>
