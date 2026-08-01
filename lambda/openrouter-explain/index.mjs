@@ -110,7 +110,7 @@ function aiLineText(text) {
     .trim();
 }
 
-function structuredRows(text) {
+function structuredRows(text, allowFallback = false) {
   const lineText = aiLineText(text);
   const rows = [];
 
@@ -130,7 +130,7 @@ function structuredRows(text) {
   });
 
   if (rows.length > 0) return rows;
-  return lineText ? [{ label: 'Verdict', text: lineText }] : [];
+  return allowFallback && lineText ? [{ label: 'Verdict', text: lineText }] : [];
 }
 
 function completeRows(rows) {
@@ -263,7 +263,7 @@ async function streamOpenRouterToClient(openRouterResponse, responseStream) {
 
   if (buffer.trim()) parseSseEvents(`${buffer}\n\n`, handleEvent);
   if (accumulatedText.trim()) {
-    writeSse(responseStream, 'rows', { rows: completeRows(structuredRows(accumulatedText)) });
+    writeSse(responseStream, 'rows', { rows: completeRows(structuredRows(accumulatedText, true)) });
   }
   writeSse(responseStream, 'done', { ok: wroteText });
 }
