@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllServices, getPracticeQuestions, getServiceDiagramFlow } from '../../lib/data';
-import VisualArchitectureDiagram from '../../components/VisualArchitectureDiagram.astro';
+import ProArchitectureDiagram from '../../components/ProArchitectureDiagram.astro';
 
 export async function getStaticPaths() {
   const services = getAllServices();
@@ -89,9 +89,9 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
       </div>
     </header>
 
-    <!-- ARCHITECTURE DATA FLOW DIAGRAM PIPELINE -->
+    <!-- PRO ARCHITECTURE DATA FLOW DIAGRAM PIPELINE -->
     <section class="content-block">
-      <VisualArchitectureDiagram title={`${svc.name} Data Transit Pipeline`} steps={diagramFlow} color={theme.color} />
+      <ProArchitectureDiagram title={`${svc.name.toUpperCase()} PRODUCTION ARCHITECTURE PIPELINE`} serviceName={svc.name} nodes={diagramFlow} color={theme.color} />
     </section>
 
     <!-- DECISION MATRIX -->
