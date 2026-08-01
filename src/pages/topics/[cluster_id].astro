@@ -1,0 +1,253 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import fs from 'node:fs';
+import path from 'node:path';
+
+export async function getStaticPaths() {
+  const filePath = path.join(process.cwd(), 'topic-pages.json');
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  
+  return data.map((topic: any) => ({
+    params: { cluster_id: topic.cluster_id },
+    props: { topic }
+  }));
+}
+
+const { topic } = Astro.props;
+
+// Re-use theme mapping
+const conceptThemes: Record<string, { color: string; label: string }> = {
+  "c1": { color: "var(--color-security)", label: "SECURITY & GUARD" },
+  "c2": { color: "var(--color-network)", label: "NETWORK & TRAFFIC" },
+  "c3": { color: "var(--color-compute)", label: "COMPUTE & RUN" },
+  "c4": { color: "var(--color-storage)", label: "STORAGE & DATA" },
+  "c5": { color: "var(--color-database)", label: "DATABASES & QUERY" },
+  "c6": { color: "var(--color-decouple)", label: "DECOUPLE & OPERATE" }
+};
+
+const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)", label: topic.concept_id.toUpperCase() };
+---
+
+<BaseLayout title={`${topic.cluster_title} | SAA-C03`}>
+  <div class="topic-container">
+    <div class="breadcrumbs">
+      <a href="/concepts">← Back to Taxonomy</a>
+    </div>
+
+    <div class="topic-header" style={`border-top-color: ${theme.color};`}>
+      <div class="topic-meta">
+        <span class="topic-badge" style={`background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid ${theme.color};`}>
+          {theme.label}
+        </span>
+      </div>
+      <h1 class="topic-title">{topic.cluster_title}</h1>
+      <div class="domains-list">
+        {topic.exam_domains.map((d: string) => (
+          <span class="domain-tag">{d}</span>
+        ))}
+      </div>
+    </div>
+
+    <div class="section glass-card">
+      <h2>What This Tests</h2>
+      <ul class="test-points">
+        {topic.what_this_tests.map((point: string) => (
+          <li>{point}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="section glass-card">
+      <h2>Core Services</h2>
+      <div class="services-grid">
+        {topic.core_services.map((svc: any) => (
+          <div class="service-block">
+            <h3 style={`color: ${theme.color};`}>{svc.name}</h3>
+            <p><strong>Job:</strong> {svc.job}</p>
+            <p class="text-success"><strong>Choose When:</strong> {svc.choose_when}</p>
+            <p class="text-danger"><strong>Avoid When:</strong> {svc.avoid_when}</p>
+            <p class="trap-words"><strong>Trap Words:</strong> {svc.trap_words}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="section glass-card">
+      <h2>Signal Words & Traps</h2>
+      <table class="signals-table">
+        <thead>
+          <tr>
+            <th>If you see...</th>
+            <th>Think...</th>
+          </tr>
+        </thead>
+        <tbody>
+          {topic.signal_words.map((sw: any) => (
+            <tr>
+              <td>"{sw.phrase}"</td>
+              <td style={`color: ${theme.color}; font-weight: 700;`}>{sw.points_to}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section glass-card">
+      <h2>Key Comparisons</h2>
+      <ul class="comparisons-list">
+        {topic.comparisons.map((comp: string) => (
+          <li>{comp}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="section glass-card">
+      <h2>Exam Moves</h2>
+      <ul class="exam-moves-list">
+        {topic.exam_moves.map((move: string) => (
+          <li>{move}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .topic-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem 0 4rem;
+  }
+  .breadcrumbs {
+    margin-bottom: 2rem;
+  }
+  .breadcrumbs a {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .breadcrumbs a:hover {
+    color: var(--text-primary);
+  }
+  
+  .topic-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-top-width: 4px;
+    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    margin-bottom: 2rem;
+  }
+  .topic-meta {
+    margin-bottom: 1rem;
+  }
+  .topic-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+  .topic-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+  .domains-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .domain-tag {
+    background: #181d2a;
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--border-subtle);
+  }
+
+  .section {
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  .section h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.75rem;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  ul li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-weight: bold;
+  }
+
+  .services-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .service-block {
+    background: #090a0f;
+    padding: 1.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
+  }
+  .service-block h3 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+  }
+  .service-block p {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+  }
+  .text-success {
+    color: var(--color-database) !important;
+  }
+  .text-danger {
+    color: var(--color-security) !important;
+  }
+  .trap-words {
+    color: var(--color-storage) !important;
+  }
+
+  .signals-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .signals-table th, .signals-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .signals-table th {
+    font-weight: 800;
+    color: var(--text-primary);
+    background: #090a0f;
+  }
+  .signals-table td {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+</style>

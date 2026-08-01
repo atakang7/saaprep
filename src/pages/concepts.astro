@@ -44,7 +44,9 @@ const conceptThemes: Record<string, { color: string; label: string }> = {
               <div class="cluster-card">
                 <div class="cluster-title-wrap">
                   <span class="cluster-icon" style={`color: ${theme.color};`}>✦</span>
-                  <h3 class="cluster-title">{cluster.name}</h3>
+                  <a href={`/topics/${cluster.id}`} class="cluster-link" style={`--hover-color: ${theme.color};`}>
+                    <h3 class="cluster-title">{cluster.name}</h3>
+                  </a>
                 </div>
                 <div class="services-pills">
                   {cluster.services.map((svc: string) => (
@@ -142,10 +144,19 @@ const conceptThemes: Record<string, { color: string; label: string }> = {
   .cluster-icon {
     font-size: 0.95rem;
   }
+  .cluster-link {
+    text-decoration: none;
+    outline: none;
+  }
+  .cluster-link:hover .cluster-title {
+    color: var(--hover-color);
+    text-decoration: underline;
+  }
   .cluster-title {
     font-size: 1rem;
     font-weight: 700;
     color: var(--text-primary);
+    transition: color 0.2s ease;
   }
   .services-pills {
     display: flex;
