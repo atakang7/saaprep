@@ -52,6 +52,11 @@ const { title = "SAA-C03" } = Astro.props;
       <!-- MAIN CONTENT AREA -->
       <main class="main-content">
         <slot />
+        
+        <!-- AI GENERATED CONTENT DISCLAIMER FOOTER -->
+        <footer class="ai-disclaimer-footer">
+          <span>AI-generated study materials for AWS SAA-C03 preparation. Verify against official AWS Documentation.</span>
+        </footer>
       </main>
     </div>
 
@@ -156,6 +161,20 @@ const { title = "SAA-C03" } = Astro.props;
     min-width: 0;
     padding: 2.5rem 3rem;
     max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* AI GENERATED DISCLAIMER FOOTER */
+  .ai-disclaimer-footer {
+    margin-top: 2.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-align: center;
   }
 
   @media (max-width: 900px) {
