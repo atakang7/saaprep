@@ -1,0 +1,236 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getAllServices } from '../../lib/data';
+
+export async function getStaticPaths() {
+  const services = getAllServices();
+  return services.map(svc => ({
+    params: { service_id: svc.id },
+    props: { svc }
+  }));
+}
+
+const { svc } = Astro.props;
+
+// Re-use theme mapping
+const conceptThemes: Record<string, { color: string; label: string }> = {
+  "c1": { color: "var(--color-security)", label: "SECURITY & GUARD" },
+  "c2": { color: "var(--color-network)", label: "NETWORK & TRAFFIC" },
+  "c3": { color: "var(--color-compute)", label: "COMPUTE & RUN" },
+  "c4": { color: "var(--color-storage)", label: "STORAGE & DATA" },
+  "c5": { color: "var(--color-database)", label: "DATABASES & QUERY" },
+  "c6": { color: "var(--color-decouple)", label: "DECOUPLE & OPERATE" }
+};
+
+const theme = conceptThemes[svc.concept_id] || { color: "var(--color-network)", label: svc.concept_id.toUpperCase() };
+---
+
+<BaseLayout title={`${svc.name} | AWS Service Drill`}>
+  <div class="service-container">
+    <div class="nav-bar-mini">
+      <a href={`/topics/${svc.cluster_id}`} class="back-link">← Back to {svc.cluster_title}</a>
+      <div class="tags">
+        <span class="topic-tag" style={`border-color: ${theme.color}; color: ${theme.color};`}>
+          {theme.label}
+        </span>
+      </div>
+    </div>
+
+    <header class="service-hero">
+      <div class="hero-icon" style={`color: ${theme.color}; border-color: ${theme.color};`}>
+        ✦
+      </div>
+      <h1 class="service-title">{svc.name}</h1>
+      <p class="service-job">{svc.job}</p>
+    </header>
+
+    <div class="logic-grid">
+      <div class="logic-card choose-card glass-card">
+        <div class="logic-header">
+          <span class="logic-icon">✓</span>
+          <h2>When to Choose</h2>
+        </div>
+        <p class="logic-text">{svc.choose_when}</p>
+      </div>
+
+      <div class="logic-card avoid-card glass-card">
+        <div class="logic-header">
+          <span class="logic-icon">✕</span>
+          <h2>When to Avoid</h2>
+        </div>
+        <p class="logic-text">{svc.avoid_when}</p>
+      </div>
+    </div>
+
+    <div class="trap-section glass-card">
+      <div class="trap-header">
+        <span class="trap-icon">⚠️</span>
+        <h2>Exam Traps & Distractors</h2>
+      </div>
+      <p class="trap-text">{svc.trap_words}</p>
+    </div>
+    
+  </div>
+</BaseLayout>
+
+<style>
+  .service-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem 5rem;
+  }
+  
+  .nav-bar-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4rem;
+  }
+  
+  .back-link {
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+  }
+  
+  .back-link:hover {
+    color: var(--text-primary);
+  }
+  
+  .topic-tag {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    letter-spacing: 0.05em;
+  }
+
+  .service-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+  
+  .hero-icon {
+    font-size: 2.5rem;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+  }
+
+  .service-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .service-job {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 700px;
+    line-height: 1.6;
+  }
+
+  .logic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .logic-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .logic-card {
+    padding: 2.5rem;
+    border-top-width: 4px;
+  }
+
+  .choose-card {
+    border-top-color: var(--color-database);
+    background: linear-gradient(180deg, rgba(52, 211, 153, 0.05) 0%, transparent 100%);
+  }
+
+  .avoid-card {
+    border-top-color: var(--color-security);
+    background: linear-gradient(180deg, rgba(244, 63, 94, 0.05) 0%, transparent 100%);
+  }
+
+  .logic-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .logic-icon {
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  .choose-card .logic-icon, .choose-card h2 { color: var(--color-database); }
+  .avoid-card .logic-icon, .avoid-card h2 { color: var(--color-security); }
+
+  .logic-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+
+  .logic-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .trap-section {
+    padding: 2.5rem;
+    border-top-width: 4px;
+    border-top-color: var(--color-storage);
+    background: linear-gradient(180deg, rgba(251, 191, 36, 0.05) 0%, transparent 100%);
+  }
+
+  .trap-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .trap-icon {
+    font-size: 1.5rem;
+  }
+
+  .trap-header h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-storage);
+  }
+
+  .trap-text {
+    font-size: 1.1rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    background: rgba(0,0,0,0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+  }
+</style>

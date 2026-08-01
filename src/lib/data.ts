@@ -13,6 +13,7 @@ export interface Question {
 
 export function getPracticeQuestions(): Question[] {
   const filePath = path.resolve(process.cwd(), '01_AWS_Fundamentals.md');
+  if (!fs.existsSync(filePath)) return [];
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   
   const questions: Question[] = [];
@@ -73,6 +74,70 @@ export function getPracticeQuestions(): Question[] {
 
 export function getTaxonomyTree() {
   const filePath = path.resolve(process.cwd(), 'taxonomy-tree.json');
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  return JSON.parse(fileContent);
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
+
+export function getAllTopics() {
+  const filePath = path.resolve(process.cwd(), 'topic-pages.json');
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
+
+export function getAllServices() {
+  const topics = getAllTopics();
+  const services: any[] = [];
+  
+  topics.forEach((topic: any) => {
+    if (topic.core_services) {
+      topic.core_services.forEach((svc: any) => {
+        const serviceId = svc.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        services.push({
+          ...svc,
+          id: serviceId,
+          cluster_id: topic.cluster_id,
+          cluster_title: topic.cluster_title,
+          concept_id: topic.concept_id,
+          concept_name: topic.concept_name,
+          exam_domains: topic.exam_domains
+        });
+      });
+    }
+  });
+  
+  return services;
+}
+
+export function getSearchIndex() {
+  const topics = getAllTopics();
+  const services = getAllServices();
+  const questions = getPracticeQuestions();
+  
+  const index: any[] = [];
+  
+  // Index Topics
+  topics.forEach((t: any) => {
+    index.push({
+      id: `topic-${t.cluster_id}`,
+      type: 'Topic',
+      title: t.cluster_title,
+      description: `Cluster mapping to ${t.concept_name}`,
+      url: `/topics/${t.cluster_id}`,
+      tags: t.exam_domains.join(', '),
+      content: t.what_this_tests.join(' ')
+    });
+  });
+  
+  // Index Services
+  services.forEach((s: any) => {
+    index.push({
+      id: `svc-${s.id}`,
+      type: 'Service',
+      title: s.name,
+      description: s.job,
+      url: `/services/${s.id}`,
+      tags: s.cluster_title,
+      content: `${s.job} ${s.choose_when} ${s.avoid_when} ${s.trap_words}`
+    });
+  });
+  
+  return index;
 }

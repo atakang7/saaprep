@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getAllServices, getTaxonomyTree } from '../lib/data';
+
+const services = getAllServices();
+const taxonomy = getTaxonomyTree();
+
+// Group services by domain
+const grouped: Record<string, any[]> = {};
+services.forEach(svc => {
+  const domain = svc.exam_domains[0] || 'Other';
+  if (!grouped[domain]) grouped[domain] = [];
+  grouped[domain].push(svc);
+});
+---
+
+<BaseLayout title="All AWS Services | SAA-C03">
+  <div class="services-index-container">
+    <header class="index-header">
+      <h1 class="index-title">AWS Service Directory</h1>
+      <p class="index-sub">Complete catalog of required services for the SAA-C03 exam.</p>
+    </header>
+
+    <div class="domains-container">
+      {Object.keys(grouped).map(domainName => (
+        <section class="domain-section glass-card">
+          <h2 class="domain-title">{domainName}</h2>
+          <div class="services-grid">
+            {grouped[domainName].map((svc: any) => (
+              <a href={`/services/${svc.id}`} class="service-link-card">
+                <div class="svc-icon">✦</div>
+                <div class="svc-content">
+                  <h3>{svc.name}</h3>
+                  <p>{svc.job}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .services-index-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem 5rem;
+  }
+  
+  .index-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  
+  .index-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+  }
+  
+  .index-sub {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  .domains-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .domain-section {
+    padding: 2rem;
+    border-top-width: 4px;
+    border-top-color: var(--color-network);
+  }
+
+  .domain-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.5rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .service-link-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #090a0f;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    transition: all 0.2s;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .service-link-card:hover {
+    border-color: var(--color-network);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .svc-icon {
+    color: var(--color-network);
+    font-size: 1.25rem;
+  }
+
+  .svc-content h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+
+  .svc-content p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

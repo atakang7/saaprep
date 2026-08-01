@@ -48,29 +48,20 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     <section class="services-drill">
       <h2 class="section-heading">Service Deep-Dive</h2>
       <div class="service-cards-stack">
-        {topic.core_services.map((svc: any) => (
-          <article class="service-card" style={`--card-theme: ${theme.color};`}>
-            <div class="service-header">
-              <h3 class="service-name">{svc.name}</h3>
-              <p class="service-job">{svc.job}</p>
-            </div>
-            
-            <div class="service-rules">
-              <div class="rule-box rule-choose">
-                <div class="rule-label">✓ WHEN TO CHOOSE</div>
-                <p>{svc.choose_when}</p>
+        {topic.core_services.map((svc: any) => {
+          const serviceId = svc.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          return (
+            <a href={`/services/${serviceId}`} class="service-card-link" style={`--card-theme: ${theme.color};`}>
+              <div class="service-card">
+                <div class="service-header">
+                  <h3 class="service-name">{svc.name}</h3>
+                  <span class="view-details">View Deep Dive →</span>
+                </div>
+                <p class="service-job">{svc.job}</p>
               </div>
-              <div class="rule-box rule-avoid">
-                <div class="rule-label">✕ WHEN TO AVOID</div>
-                <p>{svc.avoid_when}</p>
-              </div>
-            </div>
-
-            <div class="service-traps">
-              <strong>⚠️ Exam Traps:</strong> <span>{svc.trap_words}</span>
-            </div>
-          </article>
-        ))}
+            </a>
+          );
+        })}
       </div>
     </section>
 
@@ -194,97 +185,59 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     margin-bottom: 4rem;
   }
   
+  .service-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  
   .service-card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-left: 4px solid var(--card-theme);
     border-radius: 8px;
-    padding: 2rem;
+    padding: 1.5rem 2rem;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
   }
   
-  .service-card:hover {
+  .service-card-link:hover .service-card {
     transform: translateX(4px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
     border-color: var(--card-theme);
   }
   
   .service-header {
-    margin-bottom: 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
   }
   
   .service-name {
-    font-size: 1.85rem;
+    font-size: 1.5rem;
     font-weight: 900;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+  }
+
+  .view-details {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--card-theme);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.2s;
+  }
+
+  .service-card-link:hover .view-details {
+    opacity: 1;
+    transform: translateX(0);
   }
   
   .service-job {
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: var(--text-secondary);
-    line-height: 1.6;
-  }
-
-  .service-rules {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  @media (max-width: 768px) {
-    .service-rules {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .rule-box {
-    padding: 1.25rem;
-    border-radius: 8px;
-    border: 1px solid;
-    background: rgba(0, 0, 0, 0.2);
-  }
-  
-  .rule-choose {
-    border-color: rgba(52, 211, 153, 0.3); /* Emerald */
-  }
-  
-  .rule-avoid {
-    border-color: rgba(244, 63, 94, 0.3); /* Rose */
-  }
-  
-  .rule-label {
-    font-size: 0.75rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
-    letter-spacing: 0.05em;
-  }
-  
-  .rule-choose .rule-label { color: var(--color-database); }
-  .rule-avoid .rule-label { color: var(--color-security); }
-  
-  .rule-box p {
-    font-size: 0.95rem;
     line-height: 1.5;
-    color: var(--text-secondary);
-  }
-
-  .service-traps {
-    background: rgba(251, 191, 36, 0.1); /* Amber */
-    border: 1px solid rgba(251, 191, 36, 0.3);
-    padding: 1rem 1.25rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-  }
-  
-  .service-traps strong {
-    color: var(--color-storage);
-  }
-  
-  .service-traps span {
-    color: var(--text-secondary);
   }
 
   /* TACTICS SECTION */
