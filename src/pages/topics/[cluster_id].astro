@@ -26,6 +26,9 @@ const conceptThemes: Record<string, { color: string; label: string }> = {
 };
 
 const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)", label: topic.concept_id.toUpperCase() };
+
+// Extract service names for diagram
+const serviceNames = topic.core_services.map((s: any) => s.name);
 ---
 
 <BaseLayout title={`${topic.cluster_title} - SAA-C03 Architectural Cluster`}>
@@ -56,9 +59,37 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
       </div>
     </header>
 
+    <!-- ARCHITECTURAL CLUSTER DATA PIPELINE DIAGRAM -->
+    <section class="content-block">
+      <div class="block-header-row">
+        <h2 class="block-heading">// CLUSTER ARCHITECTURE DATA FLOW</h2>
+        <span class="mono-badge">[TOPOLOGY-MAP]</span>
+      </div>
+
+      <div class="cluster-diagram-panel">
+        <div class="cluster-flow-grid">
+          {topic.core_services.map((svc: any, idx: number) => (
+            <div class="cluster-node-card">
+              <div class="node-badge">NODE 0{idx + 1}</div>
+              <div class="node-title">{svc.name}</div>
+              <p class="node-desc">{svc.job}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- ASCII PIPELINE MAP -->
+        <div class="ascii-pipeline-box">
+          <div class="ascii-lbl">SAA-C03 ARCHITECTURAL PIPELINE TOPOLOGY</div>
+          <pre class="ascii-code">
+{serviceNames.map((s: string, i: number) => `[STAGE 0${i + 1}: ${s.padEnd(22)}] ──(Integrates With)──►`).join('\n  │\n  ▼\n')} [END: PRODUCTION SAA-C03 RESILIENT ARCHITECTURE]
+          </pre>
+        </div>
+      </div>
+    </section>
+
     <!-- WHAT THIS TESTS -->
     <section class="content-block">
-      <h2 class="block-heading">What The SAA-C03 Tests</h2>
+      <h2 class="block-heading">// WHAT THE SAA-C03 TESTS</h2>
 
       <div class="blueprint-list">
         {topic.what_this_tests.map((point: string, idx: number) => (
@@ -72,7 +103,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
 
     <!-- CORE SERVICES DEEP DIVE DIRECTORY -->
     <section class="content-block">
-      <h2 class="block-heading">Services in this Cluster</h2>
+      <h2 class="block-heading">// SERVICES IN THIS CLUSTER</h2>
 
       <div class="services-list">
         {topic.core_services.map((svc: any) => {
@@ -100,7 +131,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
 
     <!-- KEYWORD SIGNALS -->
     <section class="content-block">
-      <h2 class="block-heading">Exam Keyword Mapping</h2>
+      <h2 class="block-heading">// EXAM KEYWORD MAPPING</h2>
 
       <div class="signals-list">
         {topic.signal_words.map((sw: any) => (
@@ -116,7 +147,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     <!-- SERVICE COMPARISONS & EXAM MOVES -->
     <div class="dual-block">
       <section class="content-block">
-        <h2 class="block-heading">Service vs Service</h2>
+        <h2 class="block-heading">// SERVICE VS SERVICE</h2>
         <div class="comp-stack">
           {topic.comparisons.map((comp: string) => {
             const parts = comp.split(': ');
@@ -131,7 +162,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
       </section>
 
       <section class="content-block">
-        <h2 class="block-heading">High-Yield Exam Moves</h2>
+        <h2 class="block-heading">// HIGH-YIELD EXAM MOVES</h2>
         <div class="moves-stack">
           {topic.exam_moves.map((move: string) => (
             <div class="move-item">
@@ -157,7 +188,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
 
 <style>
   .clean-page {
-    max-width: 860px;
+    max-width: 920px;
     margin: 0 auto;
     padding: 1rem 0 4rem;
   }
@@ -174,10 +205,6 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 600;
-  }
-
-  .clean-breadcrumb a:hover {
-    color: var(--text-primary);
   }
 
   .clean-breadcrumb .sep {
@@ -205,8 +232,8 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     font-size: 0.7rem;
     font-weight: 800;
     padding: 0.25rem 0.65rem;
-    border-radius: 4px;
     letter-spacing: 0.05em;
+    font-family: var(--font-mono);
   }
 
   .concept-label {
@@ -235,7 +262,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     color: var(--text-secondary);
     background: rgba(255, 255, 255, 0.03);
     padding: 0.25rem 0.65rem;
-    border-radius: 4px;
+    font-family: var(--font-mono);
   }
 
   /* CONTENT BLOCKS */
@@ -243,12 +270,92 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     margin-bottom: 3.5rem;
   }
 
+  .block-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
   .block-heading {
-    font-size: 1.4rem;
+    font-size: 1.25rem;
+    font-weight: 900;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .mono-badge {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  /* CLUSTER DIAGRAM PANEL */
+  .cluster-diagram-panel {
+    background: #090a0d;
+    border: 1px solid var(--border-subtle);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .cluster-flow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .cluster-node-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    padding: 1rem;
+  }
+
+  .node-badge {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    color: var(--color-network);
+    margin-bottom: 0.4rem;
+  }
+
+  .node-title {
+    font-size: 0.95rem;
     font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
-    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+  }
+
+  .node-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .ascii-pipeline-box {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+  }
+
+  .ascii-lbl {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+  }
+
+  .ascii-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: #040507;
+    padding: 1rem;
+    border: 1px solid var(--border-subtle);
+    overflow-x: auto;
+    line-height: 1.5;
   }
 
   /* BLUEPRINT */
@@ -288,14 +395,9 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     display: block;
     background: rgba(255, 255, 255, 0.02);
     padding: 1.5rem;
-    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
     text-decoration: none;
     color: inherit;
-    transition: background 0.15s;
-  }
-
-  .svc-row-link:hover {
-    background: rgba(255, 255, 255, 0.04);
   }
 
   .svc-row-header {
@@ -314,6 +416,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
   .link-arrow {
     font-size: 0.85rem;
     font-weight: 800;
+    font-family: var(--font-mono);
   }
 
   .svc-job {
@@ -338,9 +441,9 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
 
   .rule-chip {
     padding: 0.65rem 0.85rem;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.3);
     color: var(--text-secondary);
+    border: 1px solid var(--border-subtle);
   }
 
   .rule-chip.choose strong { color: var(--color-database); }
@@ -359,7 +462,7 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
     gap: 1rem;
     background: rgba(255, 255, 255, 0.02);
     padding: 0.85rem 1.25rem;
-    border-radius: 8px;
+    border: 1px solid var(--border-subtle);
     font-size: 0.95rem;
   }
 
@@ -371,12 +474,14 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
 
   .signal-row .arrow {
     font-weight: 900;
+    font-family: var(--font-mono);
   }
 
   .signal-row .target {
     font-weight: 800;
     color: var(--text-primary);
     flex: 1;
+    font-family: var(--font-mono);
   }
 
   /* DUAL BLOCK */
@@ -452,15 +557,10 @@ const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)"
 
   .btn-action {
     padding: 0.75rem 1.5rem;
-    border-radius: 8px;
     color: #ffffff;
     font-weight: 800;
     text-decoration: none;
     white-space: nowrap;
-    transition: opacity 0.15s;
-  }
-
-  .btn-action:hover {
-    opacity: 0.9;
+    font-family: var(--font-mono);
   }
 </style>

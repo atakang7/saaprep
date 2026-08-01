@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllServices, getPracticeQuestions } from '../../lib/data';
+import { getAllServices, getPracticeQuestions, getServiceDiagramFlow } from '../../lib/data';
 
 export async function getStaticPaths() {
   const services = getAllServices();
@@ -12,6 +12,7 @@ export async function getStaticPaths() {
 
 const { svc } = Astro.props;
 const allQuestions = getPracticeQuestions();
+const diagramFlow = getServiceDiagramFlow(svc.name);
 
 // Match questions related to this service
 const relatedQuestions = allQuestions.filter(q => 
@@ -87,9 +88,43 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
       </div>
     </header>
 
+    <!-- ARCHITECTURE DATA FLOW DIAGRAM PIPELINE -->
+    <section class="content-block">
+      <div class="block-header-row">
+        <h2 class="block-heading">// PRODUCTION ARCHITECTURE DATA FLOW</h2>
+        <span class="mono-badge">[SEQUENCE-MAP]</span>
+      </div>
+
+      <div class="diagram-pipeline-box">
+        <div class="diagram-flow-grid">
+          {diagramFlow.map((step, idx) => (
+            <div class="flow-step-card">
+              <div class="step-meta">
+                <span class="step-num">STEP {step.step}</span>
+                <span class="step-protocol">{step.protocol}</span>
+              </div>
+              <div class="step-node-title">{step.node}</div>
+              <p class="step-details">{step.details}</p>
+              {idx < diagramFlow.length - 1 && (
+                <div class="flow-arrow-indicator">──►</div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <!-- ASCII TECHNICAL TOPOLOGY MAP -->
+        <div class="ascii-topology-map">
+          <div class="ascii-lbl">TECHNICAL TOPOLOGY MAP</div>
+          <pre class="ascii-code">
+{diagramFlow.map((s, i) => `[${s.step}: ${s.node.padEnd(20)}] ──(${s.protocol})──►`).join('\n  │\n  ▼\n')} [END: AWS TARGET RESULT]
+          </pre>
+        </div>
+      </div>
+    </section>
+
     <!-- DECISION MATRIX -->
     <section class="content-block">
-      <h2 class="block-heading">Decision Logic</h2>
+      <h2 class="block-heading">// DECISION LOGIC MATRIX</h2>
 
       <div class="decision-dual">
         <div class="decision-column choose-col">
@@ -112,7 +147,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
     <!-- EXAM TRAPS & MISDIRECTIONS -->
     <section class="content-block">
-      <h2 class="block-heading">Exam Traps & Signal Keywords</h2>
+      <h2 class="block-heading">// EXAM TRAPS & SIGNAL KEYWORDS</h2>
       
       <div class="trap-panel">
         <div class="code-keywords">{svc.trap_words}</div>
@@ -126,7 +161,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
     <!-- NON-NEGOTIABLE FACTS -->
     <section class="content-block">
-      <h2 class="block-heading">Core SAA-C03 Takeaways</h2>
+      <h2 class="block-heading">// CORE SAA-C03 TAKEAWAYS</h2>
 
       <div class="facts-list">
         <div class="fact-row">
@@ -147,7 +182,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     <!-- RELATED PRACTICE QUESTIONS -->
     {relatedQuestions.length > 0 && (
       <section class="content-block">
-        <h2 class="block-heading">Practice Questions</h2>
+        <h2 class="block-heading">// PRACTICE QUESTIONS</h2>
         <div class="questions-stack">
           {relatedQuestions.map(q => (
             <a href={`/practice?q=${q.id}`} class="q-link">
@@ -174,7 +209,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
 <style>
   .clean-page {
-    max-width: 860px;
+    max-width: 920px;
     margin: 0 auto;
     padding: 1rem 0 4rem;
   }
@@ -191,10 +226,6 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     color: var(--text-secondary);
     text-decoration: none;
     font-weight: 600;
-  }
-
-  .clean-breadcrumb a:hover {
-    color: var(--text-primary);
   }
 
   .clean-breadcrumb .sep {
@@ -222,8 +253,8 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-size: 0.7rem;
     font-weight: 800;
     padding: 0.25rem 0.65rem;
-    border-radius: 4px;
     letter-spacing: 0.05em;
+    font-family: var(--font-mono);
   }
 
   .cluster-label {
@@ -264,6 +295,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-size: 0.65rem;
     font-weight: 800;
     color: var(--text-muted);
+    font-family: var(--font-mono);
     letter-spacing: 0.05em;
   }
 
@@ -278,12 +310,122 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     margin-bottom: 3.5rem;
   }
 
+  .block-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
   .block-heading {
-    font-size: 1.4rem;
+    font-size: 1.25rem;
+    font-weight: 900;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .mono-badge {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  /* DIAGRAM PIPELINE BOX */
+  .diagram-pipeline-box {
+    background: #090a0d;
+    border: 1px solid var(--border-subtle);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .diagram-flow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+    position: relative;
+  }
+
+  .flow-step-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
+    padding: 1rem;
+    position: relative;
+  }
+
+  .step-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-num {
+    font-size: 0.65rem;
+    font-family: var(--font-mono);
+    font-weight: 900;
+    color: var(--color-network);
+  }
+
+  .step-protocol {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .step-node-title {
+    font-size: 0.95rem;
     font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
-    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+  }
+
+  .step-details {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .flow-arrow-indicator {
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    z-index: 10;
+  }
+
+  @media (max-width: 768px) {
+    .flow-arrow-indicator {
+      display: none;
+    }
+  }
+
+  .ascii-topology-map {
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+  }
+
+  .ascii-lbl {
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+  }
+
+  .ascii-code {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    background: #040507;
+    padding: 1rem;
+    border: 1px solid var(--border-subtle);
+    overflow-x: auto;
+    line-height: 1.5;
   }
 
   /* DECISION DUAL */
@@ -301,8 +443,8 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
   .decision-column {
     padding: 1.5rem;
-    border-radius: 12px;
     background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
   }
 
   .column-header {
@@ -335,7 +477,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
   .trap-panel {
     background: rgba(255, 255, 255, 0.02);
     padding: 1.5rem;
-    border-radius: 12px;
+    border: 1px solid var(--border-subtle);
   }
 
   .code-keywords {
@@ -343,9 +485,9 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-size: 0.95rem;
     color: var(--color-storage);
     margin-bottom: 1.25rem;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
     padding: 0.75rem 1rem;
-    border-radius: 6px;
+    border: 1px solid var(--border-subtle);
   }
 
   .clean-list {
@@ -411,14 +553,9 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     display: block;
     background: rgba(255, 255, 255, 0.02);
     padding: 1.25rem;
-    border-radius: 10px;
+    border: 1px solid var(--border-subtle);
     text-decoration: none;
     color: inherit;
-    transition: background 0.15s;
-  }
-
-  .q-link:hover {
-    background: rgba(255, 255, 255, 0.05);
   }
 
   .q-num {
@@ -426,6 +563,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-weight: 800;
     color: var(--color-compute);
     margin-bottom: 0.35rem;
+    font-family: var(--font-mono);
   }
 
   .q-body {
@@ -439,6 +577,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
     font-size: 0.8rem;
     font-weight: 800;
     color: var(--color-compute);
+    font-family: var(--font-mono);
   }
 
   /* BOTTOM ACTION */
@@ -471,15 +610,10 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
   .btn-action {
     padding: 0.75rem 1.5rem;
-    border-radius: 8px;
     color: #ffffff;
     font-weight: 800;
     text-decoration: none;
     white-space: nowrap;
-    transition: opacity 0.15s;
-  }
-
-  .btn-action:hover {
-    opacity: 0.9;
+    font-family: var(--font-mono);
   }
 </style>
