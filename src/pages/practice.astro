@@ -348,7 +348,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       .replace(/\*\*/g, '')
       .replace(/`/g, '')
       .replace(/\s+/g, ' ')
-      .replace(/\b(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g, '\n$1: ')
+      .replace(/\b(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g, '\n\n$1:\n')
       .replace(/\n+/g, '\n')
       .trim();
   }
@@ -356,19 +356,20 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
   function structuredAiRows(text: string) {
     const lineText = aiLineText(text);
     const rows: Array<{ label: string; text: string }> = [];
+    let currentRow: { label: string; text: string } | null = null;
 
     lineText.split('\n').forEach((line) => {
       const match = line.match(/^(Verdict|Giveaway|Why|Trap|Check):\s*(.*)$/);
       if (!match) {
-        const previous = rows[rows.length - 1];
-        if (previous) previous.text = `${previous.text} ${line}`.trim();
+        if (currentRow && line.trim()) currentRow.text = `${currentRow.text} ${line.trim()}`.trim();
         return;
       }
 
       const label = match[1][0].toUpperCase() + match[1].slice(1).toLowerCase();
       const rowText = match[2].replace(/^[:\-–—\s]+/, '').trim();
 
-      if (rowText) rows.push({ label, text: rowText });
+      currentRow = { label, text: rowText };
+      rows.push(currentRow);
     });
 
     return rows.filter((row) => row.text);
@@ -848,11 +849,11 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
   }
   .ai-output-structured {
     display: grid;
-    gap: 0.65rem;
+    gap: 1rem;
   }
   .ai-output-row {
     display: block;
-    padding-bottom: 0.65rem;
+    padding-bottom: 0.9rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
   .ai-output-row:last-child {
@@ -864,7 +865,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
   }
   .ai-output-label {
     display: block;
-    margin-bottom: 0.22rem;
+    margin-bottom: 0.35rem;
     color: #8ee7c2;
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -968,7 +969,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       overflow: visible;
     }
     .ai-output-row {
-      padding-bottom: 0.6rem;
+      padding-bottom: 0.8rem;
     }
     .simulator-container {
       height: auto;
@@ -996,7 +997,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       flex: 1 1 8rem;
     }
     .ai-output-row {
-      padding-bottom: 0.55rem;
+      padding-bottom: 0.75rem;
     }
   }
 </style>

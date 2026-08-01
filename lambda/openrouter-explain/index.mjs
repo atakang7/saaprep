@@ -105,7 +105,7 @@ function aiLineText(text) {
     .replace(/\*\*/g, '')
     .replace(/`/g, '')
     .replace(/\s+/g, ' ')
-    .replace(/\b(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g, '\n$1: ')
+    .replace(/\b(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g, '\n\n$1:\n')
     .replace(/\n+/g, '\n')
     .trim();
 }
@@ -113,23 +113,25 @@ function aiLineText(text) {
 function structuredRows(text, allowFallback = false) {
   const lineText = aiLineText(text);
   const rows = [];
+  let currentRow = null;
 
   lineText.split('\n').forEach((line) => {
     const match = line.match(/^(Verdict|Giveaway|Why|Trap|Check):\s*(.*)$/);
     if (!match) {
-      if (rows.length > 0) {
-        rows[rows.length - 1].text = `${rows[rows.length - 1].text} ${line}`.trim();
+      if (currentRow && line.trim()) {
+        currentRow.text = `${currentRow.text} ${line.trim()}`.trim();
       }
       return;
     }
 
     const label = match[1][0].toUpperCase() + match[1].slice(1).toLowerCase();
     const textValue = match[2].replace(/^[:\-–—\s]+/, '').trim();
-
-    if (textValue) rows.push({ label, text: textValue });
+    currentRow = { label, text: textValue };
+    rows.push(currentRow);
   });
 
-  if (rows.length > 0) return rows;
+  const filledRows = rows.filter((row) => row.text);
+  if (filledRows.length > 0) return filledRows;
   return allowFallback && lineText ? [{ label: 'Verdict', text: lineText }] : [];
 }
 
