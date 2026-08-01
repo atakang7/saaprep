@@ -1,6 +1,7 @@
 ---
+import { ArrowRight, BookOpen } from "lucide-astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { clusterMeta, conceptStyles, summaryFor, topicById } from "../../lib/data";
+import { clusterMeta, conceptStyles, summaryFor, topicById, totalTopics, totalQuestions } from "../../lib/data";
 
 const clusters = clusterMeta();
 const byConcept = new Map<string, typeof clusters>();
@@ -11,42 +12,98 @@ for (const cluster of clusters) {
 }
 ---
 
-<BaseLayout title="Topics">
-  <div class="page-head">
-    <span class="eyebrow">Reference</span>
-    <h1>Topics</h1>
-    <p>
-      Open one to read the topic, then work the questions at the bottom of the page.
-    </p>
+<BaseLayout title="All Topics">
+  <div>
+    <!-- ═══ Hero ═══ -->
+    <section class="topics-hero page-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-glow" style="width:600px;height:600px;top:-25%;left:20%;background:var(--blue);"></div>
+
+      <div class="page-container topics-hero-inner">
+        <div class="animate-in">
+          <span class="eyebrow">Reference</span>
+          <h1>All Topics</h1>
+          <p class="topics-hero-desc">
+            {totalTopics} topics covering every corner of the SAA-C03 exam.
+            Open one to read the topic, then work the questions at the bottom.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Topic List ═══ -->
+    <section class="topics-list">
+      <div class="page-container">
+        <div class="stack-lg">
+          {[...byConcept.entries()].map(([conceptId, group]) => {
+            const style = conceptStyles[conceptId];
+            const groupQuestions = group.reduce((sum, cluster) => sum + cluster.count, 0);
+
+            return (
+              <section style={`--accent: ${style?.color ?? 'var(--teal)'};`}>
+                <div class="concept-group-header">
+                  <div>
+                    <h2>{style?.label ?? conceptId}</h2>
+                    <span class="small muted">{group.length} topics · {groupQuestions} questions</span>
+                  </div>
+                  <a href={`/concepts/${conceptId}/`} class="chip chip-accent">
+                    View concept <ArrowRight size={12} />
+                  </a>
+                </div>
+                <div class="stack">
+                  {group.map((cluster) => (
+                    <a
+                      class="topic-link"
+                      href={`/topics/${cluster.id}/`}
+                      style={`--accent: ${cluster.color}`}
+                    >
+                      <span>
+                        <b>{cluster.title}</b>
+                        <p>{(() => { const topic = topicById.get(cluster.id); return topic && summaryFor(topic); })()}</p>
+                      </span>
+                      <span class="chip">{cluster.count}</span>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   </div>
 
-  <div class="stack-lg">
-    {
-      [...byConcept.entries()].map(([conceptId, group]) => (
-        <section>
-          <div class="block-head">
-            <h2>{conceptStyles[conceptId]?.label ?? conceptId}</h2>
-            <span class="small muted">
-              {group.reduce((sum, cluster) => sum + cluster.count, 0)} questions
-            </span>
-          </div>
-          <div class="stack">
-            {group.map((cluster) => (
-              <a
-                class="topic-link"
-                href={`/topics/${cluster.id}/`}
-                style={`--accent: ${cluster.color}`}
-              >
-                <span>
-                  <b>{cluster.title}</b>
-                  <p>{(() => { const topic = topicById.get(cluster.id); return topic && summaryFor(topic); })()}</p>
-                </span>
-                <span class="chip">{cluster.count}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      ))
+  <style>
+    .topics-hero {
+      padding-top: 10rem;
+      padding-bottom: 4rem;
     }
-  </div>
+
+    .topics-hero-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .topics-hero-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 600px;
+      line-height: 1.6;
+      margin-top: 1rem;
+    }
+
+    .topics-list {
+      padding: 3rem 0 6rem;
+    }
+
+    .concept-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+  </style>
 </BaseLayout>

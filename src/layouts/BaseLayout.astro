@@ -1,23 +1,16 @@
 ---
-import { BookOpen, Layers3, Target } from "lucide-astro";
 import "../styles/global.css";
-import { totalQuestions } from "../lib/data";
+import { totalQuestions, totalTopics } from "../lib/data";
 
 interface Props {
   title: string;
+  description?: string;
+  /** If true, no nav bar is rendered (landing page). */
   bare?: boolean;
 }
 
-const { title, bare = false } = Astro.props;
+const { title, description, bare = false } = Astro.props;
 const path = Astro.url.pathname;
-
-const nav = [
-  { href: "/", label: "Search", icon: Target },
-  { href: "/topics/", label: "Topics", icon: Layers3 },
-];
-
-const isCurrent = (href: string) =>
-  href === "/" ? (path === "/" ? "page" : undefined) : path.startsWith(href) ? "page" : undefined;
 ---
 
 <!doctype html>
@@ -27,37 +20,33 @@ const isCurrent = (href: string) =>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="AWS SAA-C03 explained topic by topic, each one ending in real practice questions."
+      content={description ?? `AWS SAA-C03 explained topic by topic with ${totalQuestions.toLocaleString()} real practice questions across ${totalTopics} topics.`}
     />
     <title>{title} · SAA Prep</title>
+    <!-- No external requests — system fonts only for instant load -->
   </head>
   <body>
-    <div class="shell">
-      <aside class="rail">
-        <a class="brand" href="/">
-          <span class="brand-mark" aria-hidden="true"><BookOpen size={17} /></span>
-          <span>
-            <b>SAA Prep</b>
-            <span>{totalQuestions.toLocaleString()} questions</span>
-          </span>
-        </a>
+    {!bare && (
+      <nav class="site-nav">
+        <div class="nav-inner">
+          <a class="nav-brand" href="/">
+            <span class="nav-brand-mark">S</span>
+            <span>SAA Prep</span>
+          </a>
+          <div class="nav-links">
+            <a href="/" aria-current={path === "/" ? "page" : undefined}>Home</a>
+            <a href="/topics/" aria-current={path.startsWith("/topics") ? "page" : undefined}>Topics</a>
+          </div>
+        </div>
+      </nav>
+    )}
 
-        <nav class="rail-nav" aria-label="Main">
-          {
-            nav.map(({ href, label, icon: Icon }) => (
-              <a href={href} aria-current={isCurrent(href)}>
-                <Icon size={17} />
-                <span>{label}</span>
-              </a>
-            ))
-          }
-        </nav>
+    <slot />
 
-      </aside>
-
-      <main class="content">
-        {bare ? <slot /> : <div class="page"><slot /></div>}
-      </main>
-    </div>
+    <footer class="site-footer">
+      <div class="page-container">
+        <p>{totalQuestions.toLocaleString()} questions · {totalTopics} topics · Built for the SAA-C03</p>
+      </div>
+    </footer>
   </body>
 </html>

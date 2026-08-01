@@ -1,7 +1,9 @@
 ---
+import { ArrowLeft, BookOpen } from "lucide-astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {
   accentFor,
+  conceptStyles,
   explanationFor,
   getClassificationForQuestion,
   getTopicForQuestion,
@@ -21,68 +23,116 @@ const topic = getTopicForQuestion(question.id);
 const classification = getClassificationForQuestion(question.id);
 const explanation = explanationFor(question);
 const correct = new Set(question.answer?.labels ?? []);
+const accent = accentFor(topic?.concept_id ?? "c1");
+const concept = conceptStyles[topic?.concept_id ?? "c1"];
 ---
 
-<BaseLayout title={`Review ${question.id}`}>
-  <div style={`--accent: ${accentFor(topic?.concept_id ?? "c1")};`}>
-    <div class="page-head">
-      <span class="eyebrow">Review</span>
-      <div class="row">
-        {
-          topic && (
-            <a class="chip chip-accent" href={`/topics/${topic.cluster_id}/`}>
-              {topic.cluster_title}
-            </a>
-          )
-        }
-        {
-          classification?.primary_service_tested && (
-            <span class="chip">{classification.primary_service_tested}</span>
-          )
-        }
-        <span class="chip">{sourceLabel(question.source)}</span>
-        <span class="chip mono">{question.id}</span>
-      </div>
-      <p class="question-text" style="color: var(--ink);">{question.question}</p>
-    </div>
+<BaseLayout title={`Question ${question.id}`}>
+  <div style={`--accent: ${accent};`}>
+    <!-- ═══ Hero ═══ -->
+    <section class="question-hero page-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-glow" style={`width:400px;height:400px;top:-20%;right:20%;background:${accent};`}></div>
 
-    <div class="options">
-      {
-        question.options.map((option) => (
-          <div class="option" data-option data-correct={correct.has(option.label) ? "1" : "0"}>
-            <span class="option-label">{option.label}</span>
-            <span>{option.text}</span>
-          </div>
-        ))
-      }
-    </div>
-
-    <div class="drill-actions">
-      <button class="btn btn-primary" data-show type="button">
-        Show answer
-      </button>
-      {
-        topic && (
-          <a class="btn" href={`/topics/${topic.cluster_id}/`}>
-            Read the topic
+      <div class="page-narrow question-hero-inner">
+        {topic ? (
+          <a class="back-btn" href={`/topics/${topic.cluster_id}/#practice`}>
+            <ArrowLeft size={16} /> {topic.cluster_title}
           </a>
-        )
-      }
-    </div>
+        ) : (
+          <a class="back-btn" href="/">
+            <ArrowLeft size={16} /> Home
+          </a>
+        )}
 
-    <div class="reveal" data-reveal hidden>
-      <div class="verdict verdict-ok">Answer: {question.answer?.labels.join(", ")}</div>
-
-      {
-        explanation && (
-          <div class="explain">
-            <b>Why</b>
-            {explanation}
+        <div class="animate-in">
+          <span class="eyebrow" style={`color: ${accent};`}>Practice Question</span>
+          <div class="question-meta row">
+            {topic && (
+              <a class="chip chip-accent" href={`/topics/${topic.cluster_id}/`}>
+                <BookOpen size={12} /> {topic.cluster_title}
+              </a>
+            )}
+            {classification?.primary_service_tested && (
+              <span class="chip">{classification.primary_service_tested}</span>
+            )}
+            <span class="chip">{sourceLabel(question.source)}</span>
+            <span class="chip mono">{question.id}</span>
           </div>
-        )
-      }
-    </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ Question body ═══ -->
+    <section class="question-body">
+      <div class="page-narrow">
+        <p class="question-text">{question.question}</p>
+
+        <div class="options">
+          {question.options.map((option) => (
+            <div class="option" data-option data-correct={correct.has(option.label) ? "1" : "0"}>
+              <span class="option-label">{option.label}</span>
+              <span>{option.text}</span>
+            </div>
+          ))}
+        </div>
+
+        <div class="drill-actions">
+          <button class="btn btn-primary" data-show type="button">
+            Show Answer
+          </button>
+          {topic && (
+            <a class="btn" href={`/topics/${topic.cluster_id}/`}>
+              <BookOpen size={16} /> Read the Topic
+            </a>
+          )}
+        </div>
+
+        <div class="reveal" data-reveal hidden>
+          <div class="verdict verdict-ok">Answer: {question.answer?.labels.join(", ")}</div>
+
+          {explanation && (
+            <div class="explain">
+              <b>Why</b>
+              {explanation}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
   </div>
+
+  <style>
+    .question-hero {
+      padding-top: 10rem;
+      padding-bottom: 3rem;
+    }
+
+    .question-hero-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--accent); }
+
+    .question-meta {
+      margin-top: 1rem;
+    }
+
+    .question-body {
+      padding: 2rem 0 6rem;
+    }
+  </style>
 
   <script>
     const reveal = document.querySelector<HTMLElement>("[data-reveal]");

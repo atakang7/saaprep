@@ -1,21 +1,21 @@
 ---
-import { ArrowLeft, Shield, Zap, Database, Server, Settings, Activity } from "lucide-astro";
+import { ArrowLeft, ArrowRight, Shield, Zap, Database, Server, Settings, Activity } from "lucide-astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { clusterMeta, conceptStyles, summaryFor, topicById } from "../../lib/data";
 
 export function getStaticPaths() {
   return [
-    { params: { id: "c1" }, props: { icon: Shield, desc: "Access, Identity & Security" } },
-    { params: { id: "c2" }, props: { icon: Activity, desc: "Networking & Traffic" } },
-    { params: { id: "c3" }, props: { icon: Zap, desc: "Compute & Workloads" } },
-    { params: { id: "c4" }, props: { icon: Database, desc: "Data Storage & Archiving" } },
-    { params: { id: "c5" }, props: { icon: Server, desc: "Databases & Analytics" } },
-    { params: { id: "c6" }, props: { icon: Settings, desc: "Decoupling & Management" } },
+    { params: { id: "c1" }, props: { icon: Shield, desc: "Access, Identity & Security", tagline: "Protect access, encrypt data, isolate networks, and ensure compliance." } },
+    { params: { id: "c2" }, props: { icon: Activity, desc: "Networking & Traffic", tagline: "Route traffic, connect VPCs, deliver content at the edge." } },
+    { params: { id: "c3" }, props: { icon: Zap, desc: "Compute & Workloads", tagline: "Choose the right compute, scale dynamically, go serverless." } },
+    { params: { id: "c4" }, props: { icon: Database, desc: "Data Storage & Archiving", tagline: "Store objects, manage lifecycles, archive intelligently." } },
+    { params: { id: "c5" }, props: { icon: Server, desc: "Databases & Analytics", tagline: "Query data at scale, cache for speed, stream in real-time." } },
+    { params: { id: "c6" }, props: { icon: Settings, desc: "Decoupling & Management", tagline: "Decouple services, automate operations, govern costs." } },
   ];
 }
 
 const { id } = Astro.params;
-const { icon: Icon, desc } = Astro.props;
+const { icon: Icon, desc, tagline } = Astro.props;
 
 const concept = conceptStyles[id];
 const accent = concept?.color ?? "var(--teal)";
@@ -23,190 +23,242 @@ const label = concept?.label ?? "Concept";
 
 const allClusters = clusterMeta();
 const conceptClusters = allClusters.filter((c) => c.conceptId === id);
+const totalQ = conceptClusters.reduce((sum, c) => sum + c.count, 0);
 ---
 
-<BaseLayout title={`${label} - AWS SAA`}>
-  <div class="concept-page" style={`--accent: ${accent};`}>
-    <header class="concept-header">
-      <a class="back-link" href="/"><ArrowLeft size={16} /> Home</a>
-      
-      <div class="concept-hero">
-        <div class="concept-icon glass-icon">
-          <Icon size={48} />
+<BaseLayout title={`${label} — AWS SAA-C03`}>
+  <div style={`--accent: ${accent};`}>
+    <!-- ═══ Hero ═══ -->
+    <section class="concept-hero page-hero">
+      <div class="hero-grid-bg"></div>
+      <div class="hero-glow" style={`width:600px;height:600px;top:-30%;left:-10%;background:${accent};`}></div>
+      <div class="hero-glow" style={`width:500px;height:500px;bottom:-30%;right:-10%;background:${accent};opacity:0.15;`}></div>
+
+      <div class="page-container concept-hero-inner">
+        <a class="back-btn" href="/">
+          <ArrowLeft size={16} /> Home
+        </a>
+
+        <div class="concept-hero-content animate-in">
+          <div class="concept-hero-icon">
+            <Icon size={56} />
+          </div>
+          <div>
+            <span class="eyebrow" style={`color: ${accent};`}>Core Concept</span>
+            <h1>{label}</h1>
+            <p class="concept-hero-desc">{desc}</p>
+            <p class="concept-hero-tagline">{tagline}</p>
+          </div>
         </div>
-        <div class="concept-title-group">
-          <span class="eyebrow glow-text">Core Concept</span>
-          <h1 class="concept-title">{label}</h1>
-          <p class="concept-desc">{desc}</p>
+
+        <div class="concept-hero-stats animate-in animate-in-delay-2">
+          <div class="concept-stat">
+            <span class="concept-stat-value">{conceptClusters.length}</span>
+            <span class="concept-stat-label">Topics</span>
+          </div>
+          <div class="concept-stat">
+            <span class="concept-stat-value">{totalQ}</span>
+            <span class="concept-stat-label">Questions</span>
+          </div>
         </div>
       </div>
-    </header>
+    </section>
 
-    <main class="concept-body">
-      <div class="block-head">
-        <h2>Topics in {label}</h2>
-        <span class="chip chip-accent">{conceptClusters.length} Modules</span>
-      </div>
+    <!-- ═══ Topics Grid ═══ -->
+    <section class="concept-topics">
+      <div class="page-container">
+        <div class="block-head">
+          <h2>Topics in {label}</h2>
+          <span class="chip chip-accent">{conceptClusters.length} Modules</span>
+        </div>
 
-      <div class="topic-grid">
-        {
-          conceptClusters.map((cluster) => {
+        <div class="topic-grid">
+          {conceptClusters.map((cluster, i) => {
             const topic = topicById.get(cluster.id);
             const summary = topic ? summaryFor(topic) : "";
-            
+
             return (
-              <a class="topic-card glass-card" href={`/topics/${cluster.id}/`}>
-                <div class="card-inner">
+              <a class="topic-card" href={`/topics/${cluster.id}/`} style={`--delay: ${i * 0.06}s;`}>
+                <div class="topic-card-inner">
                   <h3>{cluster.title}</h3>
-                  <p class="topic-summary muted">{summary}</p>
-                  
-                  <div class="card-footer">
-                    <span class="chip chip-quiet">{cluster.domain}</span>
-                    <span class="small muted fw-600">{cluster.count} Practice Questions</span>
+                  <p class="topic-card-summary muted">{summary}</p>
+                  <div class="topic-card-footer">
+                    <div class="topic-card-meta">
+                      <span class="chip">{cluster.domain}</span>
+                      {cluster.count > 0 && <span class="small muted" style="font-weight:600;">{cluster.count} Questions</span>}
+                    </div>
+                    <span class="topic-card-arrow"><ArrowRight size={16} /></span>
                   </div>
                 </div>
               </a>
             );
-          })
-        }
+          })}
+        </div>
       </div>
-    </main>
+    </section>
   </div>
 
   <style>
-    .concept-page {
-      display: flex;
-      flex-direction: column;
-      gap: 3rem;
+    .concept-hero {
+      padding-top: 10rem;
       padding-bottom: 4rem;
     }
 
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 2rem;
-      color: var(--muted);
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-    .back-link:hover {
-      color: var(--ink);
-    }
-
-    .concept-header {
-      position: relative;
-      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 15%, transparent) 0%, transparent 100%);
-      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
-      border-radius: 24px;
-      padding: 3rem;
-      overflow: hidden;
-    }
-
-    .concept-hero {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
+    .concept-hero-inner {
       position: relative;
       z-index: 2;
     }
 
-    @media (max-width: 600px) {
-      .concept-hero {
-        flex-direction: column;
-        text-align: center;
-      }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 500;
+      margin-bottom: 2.5rem;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--ink); }
+
+    .concept-hero-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 2.5rem;
     }
 
-    .glass-icon {
-      width: 100px;
-      height: 100px;
+    .concept-hero-icon {
+      width: 110px;
+      height: 110px;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 24px;
-      background: color-mix(in srgb, var(--surface) 80%, transparent);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 30%, transparent);
+      border-radius: 28px;
+      background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+      border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
       color: var(--accent);
-      flex-shrink: 0;
+      box-shadow: 0 16px 40px color-mix(in srgb, var(--accent) 15%, transparent);
     }
 
-    .glow-text {
-      color: var(--accent);
-      text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 50%, transparent);
+    .concept-hero-desc {
+      font-size: 1.4rem;
+      color: var(--ink-secondary);
+      margin-top: 0.5rem;
+      font-weight: 500;
     }
 
-    .concept-title {
-      font-size: clamp(2rem, 4vw, 3rem);
-      margin: 0.5rem 0;
-      font-weight: 800;
-    }
-
-    .concept-desc {
-      font-size: 1.15rem;
+    .concept-hero-tagline {
       color: var(--muted);
+      font-size: 1.05rem;
+      margin-top: 0.5rem;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    .concept-hero-stats {
+      display: flex;
+      gap: 3rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .concept-stat-value {
+      display: block;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .concept-stat-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    @media (max-width: 640px) {
+      .concept-hero-content { flex-direction: column; align-items: center; text-align: center; }
+      .concept-hero-icon { width: 80px; height: 80px; }
+      .concept-hero-stats { justify-content: center; }
+    }
+
+    /* ═══ Topics Grid ═══ */
+    .concept-topics {
+      padding: 4rem 0 6rem;
     }
 
     .topic-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.25rem;
       margin-top: 1.5rem;
     }
 
-    .glass-card {
-      background: var(--surface);
+    .topic-card {
       border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
       text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-delay: var(--delay, 0s);
     }
 
-    .glass-card:hover {
+    .topic-card:hover {
       transform: translateY(-4px);
       border-color: var(--accent);
-      box-shadow: 0 10px 30px color-mix(in srgb, var(--accent) 15%, transparent);
+      box-shadow: 0 16px 40px color-mix(in srgb, var(--accent) 12%, transparent);
     }
 
-    .card-inner {
+    .topic-card-inner {
+      padding: 1.75rem;
       display: flex;
       flex-direction: column;
       height: 100%;
     }
 
-    .glass-card h3 {
-      font-size: 1.25rem;
+    .topic-card h3 {
+      font-size: 1.2rem;
       color: var(--ink);
       margin-bottom: 0.5rem;
     }
 
-    .topic-summary {
-      font-size: 0.95rem;
+    .topic-card-summary {
+      font-size: 0.92rem;
       line-height: 1.6;
-      margin-bottom: 1.5rem;
       flex-grow: 1;
+      margin-bottom: 1.25rem;
     }
 
-    .card-footer {
+    .topic-card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-top: 1px solid var(--line);
       padding-top: 1rem;
-      margin-top: auto;
     }
 
-    .fw-600 {
-      font-weight: 600;
+    .topic-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .chip-quiet {
-      background: var(--surface-soft);
-      border: 1px solid var(--line);
+    .topic-card-arrow {
+      color: var(--muted);
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: all 0.3s ease;
+    }
+    .topic-card:hover .topic-card-arrow {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--accent);
+    }
+
+    @media (max-width: 420px) {
+      .topic-grid { grid-template-columns: 1fr; }
     }
   </style>
 </BaseLayout>
