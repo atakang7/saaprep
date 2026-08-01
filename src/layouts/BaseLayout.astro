@@ -132,6 +132,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
           <a href={sitePath('/practice')} class="nav-item">PRACTICE</a>
           <a href={sitePath('/services')} class="nav-item">SERVICES</a>
           <a href={sitePath('/concepts')} class="nav-item">TAXONOMY</a>
+          <a href="https://github.com/atakang7/saaprep" class="nav-item github-star" target="_blank" rel="noopener noreferrer">GITHUB STAR</a>
         </nav>
       </div>
     </header>
@@ -213,6 +214,13 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     font-weight: 800;
     letter-spacing: 0.05em;
     text-decoration: none;
+  }
+
+  .github-star {
+    color: #8ee7c2;
+    border: 1px solid rgba(142, 231, 194, 0.45);
+    padding: 0.42rem 0.6rem;
+    background: rgba(16, 185, 129, 0.08);
   }
 
   .search-trigger {

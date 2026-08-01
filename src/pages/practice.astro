@@ -847,23 +847,23 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
   .ai-explanation-output li {
     margin-bottom: 0.55rem;
   }
-  .ai-output-structured {
+  :global(.ai-output-structured) {
     display: grid;
     gap: 1rem;
   }
-  .ai-output-row {
+  :global(.ai-output-row) {
     display: block;
     padding-bottom: 0.9rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .ai-output-row:last-child {
+  :global(.ai-output-row:last-child) {
     padding-bottom: 0;
     border-bottom: 0;
   }
-  .ai-output-row.is-pending .ai-output-copy {
+  :global(.ai-output-row.is-pending .ai-output-copy) {
     color: var(--text-muted);
   }
-  .ai-output-label {
+  :global(.ai-output-label) {
     display: block;
     margin-bottom: 0.35rem;
     color: #8ee7c2;
@@ -873,7 +873,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     letter-spacing: 0;
     text-transform: uppercase;
   }
-  .ai-output-copy {
+  :global(.ai-output-copy) {
     display: block;
     min-width: 0;
     color: var(--text-secondary);
@@ -881,7 +881,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     line-height: 1.45;
     overflow-wrap: anywhere;
   }
-  .ai-output-placeholder {
+  :global(.ai-output-placeholder) {
     margin: 0;
     color: var(--text-muted);
   }
@@ -968,7 +968,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       min-height: 5rem;
       overflow: visible;
     }
-    .ai-output-row {
+    :global(.ai-output-row) {
       padding-bottom: 0.8rem;
     }
     .simulator-container {
@@ -996,7 +996,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     .btn-ctrl {
       flex: 1 1 8rem;
     }
-    .ai-output-row {
+    :global(.ai-output-row) {
       padding-bottom: 0.75rem;
     }
   }
