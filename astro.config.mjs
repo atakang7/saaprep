@@ -1,5 +1,8 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  // Astro 5 configuration
+  server: {
+    port: 4321,
+    host: true
+  }
 });
