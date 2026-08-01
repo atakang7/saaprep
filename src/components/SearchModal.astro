@@ -1,0 +1,442 @@
+---
+---
+
+<div id="command-palette" class="cp-modal hidden" aria-expanded="false" role="dialog">
+  <div class="cp-backdrop" id="cp-backdrop"></div>
+  <div class="cp-dialog glass-card">
+    <div class="cp-search-bar">
+      <svg class="cp-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input 
+        type="text" 
+        id="cp-input" 
+        placeholder="Type a command, service (e.g., IAM, VPC), or exam keyword..." 
+        autocomplete="off" 
+        spellcheck="false"
+      />
+      <div class="cp-key-badge">ESC</div>
+    </div>
+
+    <div class="cp-results-container" id="cp-results">
+      <div class="cp-suggestions" id="cp-default-suggestions">
+        <div class="cp-section-title">QUICK SUGGESTIONS</div>
+        <a href="/services/iam" class="cp-item">
+          <span class="cp-item-badge badge-security">SERVICE</span>
+          <span class="cp-item-title">IAM</span>
+          <span class="cp-item-desc">Identity and Access Management</span>
+        </a>
+        <a href="/services/amazon-s3" class="cp-item">
+          <span class="cp-item-badge badge-storage">SERVICE</span>
+          <span class="cp-item-title">Amazon S3</span>
+          <span class="cp-item-desc">Simple Storage Service & Bucket Policies</span>
+        </a>
+        <a href="/topics/c2_1" class="cp-item">
+          <span class="cp-item-badge badge-network">TOPIC</span>
+          <span class="cp-item-title">VPC Foundations</span>
+          <span class="cp-item-desc">Subnets, Route Tables, IGW, NAT Gateways</span>
+        </a>
+        <a href="/practice" class="cp-item">
+          <span class="cp-item-badge badge-compute">ARENA</span>
+          <span class="cp-item-title">Launch Practice Simulator</span>
+          <span class="cp-item-desc">Start answering SAA-C03 questions</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="cp-footer">
+      <div class="cp-shortcut-hints">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> to navigate</span>
+        <span><kbd>↵</kbd> to select</span>
+        <span><kbd>ESC</kbd> to exit</span>
+      </div>
+      <div class="cp-brand-tag">SAA-C03 SPOTLIGHT</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  let fuse: Fuse<any> | null = null;
+  let rawIndex: any[] = [];
+  let selectedIndex = -1;
+
+  const palette = document.getElementById('command-palette');
+  const backdrop = document.getElementById('cp-backdrop');
+  const input = document.getElementById('cp-input') as HTMLInputElement;
+  const resultsContainer = document.getElementById('cp-results');
+  const suggestions = document.getElementById('cp-default-suggestions');
+
+  async function initFuse() {
+    if (fuse) return;
+    try {
+      const res = await fetch('/api/search.json');
+      rawIndex = await res.json();
+      
+      fuse = new Fuse(rawIndex, {
+        keys: [
+          { name: 'title', weight: 0.5 },
+          { name: 'tags', weight: 0.2 },
+          { name: 'description', weight: 0.2 },
+          { name: 'content', weight: 0.1 }
+        ],
+        threshold: 0.35,
+        includeMatches: true,
+        minMatchCharLength: 2
+      });
+    } catch (err) {
+      console.error('Failed to initialize search engine:', err);
+    }
+  }
+
+  function openPalette() {
+    palette?.classList.remove('hidden');
+    palette?.setAttribute('aria-expanded', 'true');
+    input?.focus();
+    initFuse();
+  }
+
+  function closePalette() {
+    palette?.classList.add('hidden');
+    palette?.setAttribute('aria-expanded', 'false');
+    if (input) input.value = '';
+    selectedIndex = -1;
+    if (suggestions) suggestions.style.display = 'block';
+    renderEmptyState();
+  }
+
+  function renderEmptyState() {
+    if (suggestions) suggestions.style.display = 'block';
+    const dynamicResults = document.getElementById('cp-dynamic-results');
+    if (dynamicResults) dynamicResults.remove();
+  }
+
+  function highlightMatches(text: string, matches: any[]) {
+    if (!matches || matches.length === 0) return text;
+    // Simple slice highlight for title
+    return text;
+  }
+
+  function renderResults(results: any[]) {
+    if (suggestions) suggestions.style.display = 'none';
+
+    let existingDynamic = document.getElementById('cp-dynamic-results');
+    if (existingDynamic) existingDynamic.remove();
+
+    const dynamicDiv = document.createElement('div');
+    dynamicDiv.id = 'cp-dynamic-results';
+
+    if (results.length === 0) {
+      dynamicDiv.innerHTML = `<div class="cp-no-results">No exam topics or services found. Try another term.</div>`;
+      resultsContainer?.appendChild(dynamicDiv);
+      return;
+    }
+
+    // Group results by type
+    const grouped: Record<string, any[]> = {};
+    results.forEach(res => {
+      const type = res.item.type || 'Other';
+      if (!grouped[type]) grouped[type] = [];
+      grouped[type].push(res.item);
+    });
+
+    let html = '';
+    Object.keys(grouped).forEach(groupName => {
+      html += `<div class="cp-section-title">${groupName.toUpperCase()}S</div>`;
+      grouped[groupName].forEach(item => {
+        const badgeClass = item.type === 'Service' ? 'badge-security' : 'badge-network';
+        html += `
+          <a href="${item.url}" class="cp-item cp-selectable">
+            <span class="cp-item-badge ${badgeClass}">${item.type}</span>
+            <span class="cp-item-title">${item.title}</span>
+            <span class="cp-item-desc">${item.description}</span>
+          </a>
+        `;
+      });
+    });
+
+    dynamicDiv.innerHTML = html;
+    resultsContainer?.appendChild(dynamicDiv);
+    
+    selectedIndex = -1;
+    updateSelection();
+  }
+
+  function updateSelection() {
+    const items = document.querySelectorAll('.cp-selectable');
+    items.forEach((item, idx) => {
+      if (idx === selectedIndex) {
+        item.classList.add('active');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('active');
+      }
+    });
+  }
+
+  // Event Listeners
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      if (palette?.classList.contains('hidden')) {
+        openPalette();
+      } else {
+        closePalette();
+      }
+    }
+
+    if (palette?.classList.contains('hidden')) return;
+
+    if (e.key === 'Escape') {
+      closePalette();
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const items = document.querySelectorAll('.cp-selectable');
+      if (items.length > 0) {
+        selectedIndex = (selectedIndex + 1) % items.length;
+        updateSelection();
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const items = document.querySelectorAll('.cp-selectable');
+      if (items.length > 0) {
+        selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        updateSelection();
+      }
+    } else if (e.key === 'Enter') {
+      const items = document.querySelectorAll('.cp-selectable');
+      if (selectedIndex >= 0 && selectedIndex < items.length) {
+        e.preventDefault();
+        (items[selectedIndex] as HTMLAnchorElement).click();
+      }
+    }
+  });
+
+  backdrop?.addEventListener('click', closePalette);
+
+  // Global trigger for open button
+  window.addEventListener('open-search-modal', openPalette);
+
+  let searchDebounce: any;
+  input?.addEventListener('input', (e) => {
+    const q = (e.target as HTMLInputElement).value.trim();
+    clearTimeout(searchDebounce);
+
+    if (!q) {
+      renderEmptyState();
+      return;
+    }
+
+    searchDebounce = setTimeout(() => {
+      if (fuse) {
+        const searchResults = fuse.search(q, { limit: 12 });
+        renderResults(searchResults);
+      }
+    }, 100);
+  });
+</script>
+
+<style>
+  .cp-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 12vh;
+    animation: fadeIn 0.15s ease-out;
+  }
+
+  .cp-modal.hidden {
+    display: none;
+  }
+
+  .cp-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(3, 3, 5, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .cp-dialog {
+    position: relative;
+    width: 100%;
+    max-width: 680px;
+    background: #090a10;
+    border: 1px solid rgba(255, 42, 133, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 42, 133, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin: 0 1rem;
+    animation: scaleUp 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .cp-search-bar {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .cp-search-icon {
+    color: var(--color-network);
+    flex-shrink: 0;
+  }
+
+  #cp-input {
+    flex-grow: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.15rem;
+    font-weight: 500;
+    outline: none;
+    font-family: var(--font-sans);
+  }
+
+  #cp-input::placeholder {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .cp-key-badge {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .cp-results-container {
+    max-height: 55vh;
+    overflow-y: auto;
+    padding: 1rem 1.25rem;
+  }
+
+  .cp-section-title {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin: 1rem 0 0.5rem 0.5rem;
+  }
+
+  .cp-section-title:first-child {
+    margin-top: 0.25rem;
+  }
+
+  .cp-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+    margin-bottom: 0.25rem;
+  }
+
+  .cp-item:hover, .cp-item.active {
+    background: #131622;
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .cp-item-badge {
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .badge-security { background: rgba(244, 63, 94, 0.15); color: var(--color-security); border: 1px solid var(--color-security); }
+  .badge-network { background: rgba(56, 189, 248, 0.15); color: var(--color-network); border: 1px solid var(--color-network); }
+  .badge-storage { background: rgba(251, 191, 36, 0.15); color: var(--color-storage); border: 1px solid var(--color-storage); }
+  .badge-compute { background: rgba(192, 132, 252, 0.15); color: var(--color-compute); border: 1px solid var(--color-compute); }
+
+  .cp-item-title {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .cp-item-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+  }
+
+  .cp-no-results {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .cp-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    background: #06070a;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .cp-shortcut-hints {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+  }
+
+  .cp-brand-tag {
+    font-weight: 800;
+    color: var(--color-network);
+    letter-spacing: 0.05em;
+    font-size: 0.7rem;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scaleUp {
+    from { transform: scale(0.96); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+</style>
