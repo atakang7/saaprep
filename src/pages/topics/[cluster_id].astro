@@ -28,226 +28,365 @@ const conceptThemes: Record<string, { color: string; label: string }> = {
 const theme = conceptThemes[topic.concept_id] || { color: "var(--color-network)", label: topic.concept_id.toUpperCase() };
 ---
 
-<BaseLayout title={`${topic.cluster_title} | SAA-C03`}>
+<BaseLayout title={`${topic.cluster_title} | AWS Services`}>
   <div class="topic-container">
-    <div class="breadcrumbs">
-      <a href="/concepts">← Back to Taxonomy</a>
+    <div class="nav-bar-mini">
+      <a href="/concepts" class="back-link">← Taxonomy</a>
+      <span class="topic-tag" style={`border-color: ${theme.color}; color: ${theme.color};`}>
+        {theme.label}
+      </span>
     </div>
 
-    <div class="topic-header" style={`border-top-color: ${theme.color};`}>
-      <div class="topic-meta">
-        <span class="topic-badge" style={`background: rgba(255,255,255,0.06); color: #ffffff; border: 1px solid ${theme.color};`}>
-          {theme.label}
-        </span>
-      </div>
-      <h1 class="topic-title">{topic.cluster_title}</h1>
-      <div class="domains-list">
-        {topic.exam_domains.map((d: string) => (
-          <span class="domain-tag">{d}</span>
-        ))}
-      </div>
-    </div>
+    <header class="topic-hero">
+      <h1 class="topic-header-title">{topic.cluster_title}</h1>
+      <p class="topic-description">
+        Master these services individually to conquer the {topic.exam_domains.join(', ')} domains.
+      </p>
+    </header>
 
-    <div class="section glass-card">
-      <h2>What This Tests</h2>
-      <ul class="test-points">
-        {topic.what_this_tests.map((point: string) => (
-          <li>{point}</li>
-        ))}
-      </ul>
-    </div>
-
-    <div class="section glass-card">
-      <h2>Core Services</h2>
-      <div class="services-grid">
+    <!-- SERVICE BY SERVICE DRILL -->
+    <section class="services-drill">
+      <h2 class="section-heading">Service Deep-Dive</h2>
+      <div class="service-cards-stack">
         {topic.core_services.map((svc: any) => (
-          <div class="service-block">
-            <h3 style={`color: ${theme.color};`}>{svc.name}</h3>
-            <p><strong>Job:</strong> {svc.job}</p>
-            <p class="text-success"><strong>Choose When:</strong> {svc.choose_when}</p>
-            <p class="text-danger"><strong>Avoid When:</strong> {svc.avoid_when}</p>
-            <p class="trap-words"><strong>Trap Words:</strong> {svc.trap_words}</p>
-          </div>
+          <article class="service-card" style={`--card-theme: ${theme.color};`}>
+            <div class="service-header">
+              <h3 class="service-name">{svc.name}</h3>
+              <p class="service-job">{svc.job}</p>
+            </div>
+            
+            <div class="service-rules">
+              <div class="rule-box rule-choose">
+                <div class="rule-label">✓ WHEN TO CHOOSE</div>
+                <p>{svc.choose_when}</p>
+              </div>
+              <div class="rule-box rule-avoid">
+                <div class="rule-label">✕ WHEN TO AVOID</div>
+                <p>{svc.avoid_when}</p>
+              </div>
+            </div>
+
+            <div class="service-traps">
+              <strong>⚠️ Exam Traps:</strong> <span>{svc.trap_words}</span>
+            </div>
+          </article>
         ))}
       </div>
-    </div>
+    </section>
 
-    <div class="section glass-card">
-      <h2>Signal Words & Traps</h2>
-      <table class="signals-table">
-        <thead>
-          <tr>
-            <th>If you see...</th>
-            <th>Think...</th>
-          </tr>
-        </thead>
-        <tbody>
-          {topic.signal_words.map((sw: any) => (
-            <tr>
-              <td>"{sw.phrase}"</td>
-              <td style={`color: ${theme.color}; font-weight: 700;`}>{sw.points_to}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <!-- EXAM TACTICS -->
+    <section class="tactics-section">
+      <h2 class="section-heading">Exam Tactics & Signals</h2>
+      
+      <div class="tactics-grid">
+        <!-- Signal Words -->
+        <div class="tactic-card glass-card">
+          <h3>Keyword Mapping</h3>
+          <ul class="signal-list">
+            {topic.signal_words.map((sw: any) => (
+              <li>
+                <span class="signal-phrase">"{sw.phrase}"</span>
+                <span class="signal-arrow" style={`color: ${theme.color};`}>→</span>
+                <span class="signal-target">{sw.points_to}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-    <div class="section glass-card">
-      <h2>Key Comparisons</h2>
-      <ul class="comparisons-list">
-        {topic.comparisons.map((comp: string) => (
-          <li>{comp}</li>
-        ))}
-      </ul>
-    </div>
+        <!-- Comparisons -->
+        <div class="tactic-card glass-card">
+          <h3>Service vs Service</h3>
+          <ul class="comparison-list">
+            {topic.comparisons.map((comp: string) => {
+              const [services, explanation] = comp.split(': ');
+              return (
+                <li>
+                  <strong class="comp-title" style={`color: ${theme.color};`}>{services}</strong>
+                  <p class="comp-desc">{explanation || comp}</p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </section>
 
-    <div class="section glass-card">
-      <h2>Exam Moves</h2>
-      <ul class="exam-moves-list">
+    <!-- EXAM MOVES (Summary) -->
+    <section class="moves-section glass-card" style={`border-top: 4px solid ${theme.color};`}>
+      <h2>Final Exam Moves</h2>
+      <ul class="moves-list">
         {topic.exam_moves.map((move: string) => (
           <li>{move}</li>
         ))}
       </ul>
-    </div>
+    </section>
   </div>
 </BaseLayout>
 
 <style>
   .topic-container {
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
-    padding: 1rem 0 4rem;
+    padding: 2rem 1rem 5rem;
   }
-  .breadcrumbs {
-    margin-bottom: 2rem;
+  
+  .nav-bar-mini {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
   }
-  .breadcrumbs a {
+  
+  .back-link {
     color: var(--text-secondary);
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: color 0.2s;
   }
-  .breadcrumbs a:hover {
+  
+  .back-link:hover {
     color: var(--text-primary);
   }
   
-  .topic-header {
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-top-width: 4px;
-    border-radius: 12px;
-    padding: 2.5rem 2rem;
-    margin-bottom: 2rem;
-  }
-  .topic-meta {
-    margin-bottom: 1rem;
-  }
-  .topic-badge {
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.8rem;
+  .topic-tag {
+    font-size: 0.75rem;
     font-weight: 800;
+    padding: 0.35rem 0.85rem;
+    border: 1px solid;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
     letter-spacing: 0.05em;
   }
-  .topic-title {
-    font-size: 2.5rem;
-    font-weight: 900;
-    margin-bottom: 1rem;
-    color: var(--text-primary);
-  }
-  .domains-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  .domain-tag {
-    background: #181d2a;
-    color: var(--text-secondary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    border: 1px solid var(--border-subtle);
-  }
 
-  .section {
-    padding: 2rem;
-    margin-bottom: 2rem;
-  }
-  .section h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0.75rem;
+  .topic-hero {
+    text-align: center;
+    margin-bottom: 4rem;
   }
   
-  ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  ul li {
-    position: relative;
-    padding-left: 1.5rem;
+  .topic-header-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--text-primary);
     margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+  
+  .topic-description {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .section-heading {
+    font-size: 1.75rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  /* SERVICE CARDS */
+  .service-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+  
+  .service-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--card-theme);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .service-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border-color: var(--card-theme);
+  }
+  
+  .service-header {
+    margin-bottom: 1.75rem;
+  }
+  
+  .service-name {
+    font-size: 1.85rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .service-job {
+    font-size: 1.05rem;
     color: var(--text-secondary);
     line-height: 1.6;
   }
-  ul li::before {
-    content: '→';
-    position: absolute;
-    left: 0;
-    color: var(--text-muted);
-    font-weight: bold;
+
+  .service-rules {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  @media (max-width: 768px) {
+    .service-rules {
+      grid-template-columns: 1fr;
+    }
   }
 
-  .services-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-  .service-block {
-    background: #090a0f;
+  .rule-box {
     padding: 1.25rem;
     border-radius: 8px;
-    border: 1px solid var(--border-subtle);
+    border: 1px solid;
+    background: rgba(0, 0, 0, 0.2);
   }
-  .service-block h3 {
-    font-size: 1.25rem;
+  
+  .rule-choose {
+    border-color: rgba(52, 211, 153, 0.3); /* Emerald */
+  }
+  
+  .rule-avoid {
+    border-color: rgba(244, 63, 94, 0.3); /* Rose */
+  }
+  
+  .rule-label {
+    font-size: 0.75rem;
     font-weight: 800;
     margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
   }
-  .service-block p {
-    margin-bottom: 0.5rem;
+  
+  .rule-choose .rule-label { color: var(--color-database); }
+  .rule-avoid .rule-label { color: var(--color-security); }
+  
+  .rule-box p {
     font-size: 0.95rem;
+    line-height: 1.5;
     color: var(--text-secondary);
-  }
-  .text-success {
-    color: var(--color-database) !important;
-  }
-  .text-danger {
-    color: var(--color-security) !important;
-  }
-  .trap-words {
-    color: var(--color-storage) !important;
   }
 
-  .signals-table {
-    width: 100%;
-    border-collapse: collapse;
+  .service-traps {
+    background: rgba(251, 191, 36, 0.1); /* Amber */
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
   }
-  .signals-table th, .signals-table td {
-    padding: 1rem;
-    text-align: left;
+  
+  .service-traps strong {
+    color: var(--color-storage);
+  }
+  
+  .service-traps span {
+    color: var(--text-secondary);
+  }
+
+  /* TACTICS SECTION */
+  .tactics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+  
+  @media (max-width: 768px) {
+    .tactics-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .tactic-card {
+    padding: 2rem;
+  }
+  
+  .tactic-card h3 {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .signal-list, .comparison-list, .moves-list {
+    list-style: none;
+  }
+  
+  .signal-list li {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--border-subtle);
   }
-  .signals-table th {
+  
+  .signal-list li:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .signal-phrase {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-bottom: 0.25rem;
+  }
+  
+  .signal-arrow {
+    font-weight: 900;
+    margin: 0.15rem 0;
+  }
+  
+  .signal-target {
     font-weight: 800;
     color: var(--text-primary);
-    background: #090a0f;
   }
-  .signals-table td {
-    color: var(--text-secondary);
+
+  .comparison-list li {
+    margin-bottom: 1.5rem;
+  }
+  
+  .comp-title {
+    display: block;
+    font-size: 1.05rem;
+    margin-bottom: 0.35rem;
+  }
+  
+  .comp-desc {
     font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* MOVES SECTION */
+  .moves-section {
+    padding: 2.5rem;
+  }
+  
+  .moves-section h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+  
+  .moves-list li {
+    position: relative;
+    padding-left: 1.75rem;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+  
+  .moves-list li::before {
+    content: '⚡';
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
   }
 </style>
