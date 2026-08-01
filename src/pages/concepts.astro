@@ -6,22 +6,32 @@ const taxonomy = getTaxonomyTree();
 const concepts = taxonomy.level_2_and_3.concepts;
 ---
 
-<BaseLayout title="Taxonomy Tree | SAA-C03 PRO">
-  <div class="concepts-header">
-    <h1>SAA-C03 Decision Taxonomy</h1>
-    <p>Comprehensive architectural cluster taxonomy and AWS service categorization.</p>
+<BaseLayout title="Taxonomy Tree | SAA-C03 UNICORN">
+  <div class="taxonomy-header">
+    <div class="header-badge">CURRICULUM GRAPH</div>
+    <h1 class="header-title">
+      Architectural <span class="text-gradient">Decision Taxonomy</span>
+    </h1>
+    <p class="header-sub">
+      Deep cluster breakdown of AWS services mapped directly to SAA-C03 decision lenses.
+    </p>
   </div>
 
   <div class="taxonomy-grid">
     {concepts.map((concept: any) => (
       <div class="glass-card concept-section">
-        <div class="concept-badge">{concept.id.toUpperCase()}</div>
-        <h2 class="concept-title">{concept.name}</h2>
+        <div class="concept-header">
+          <span class="concept-badge">{concept.id.toUpperCase()}</span>
+          <h2 class="concept-title">{concept.name}</h2>
+        </div>
 
-        <div class="clusters-container">
+        <div class="clusters-grid">
           {concept.clusters.map((cluster: any) => (
             <div class="cluster-card">
-              <h3 class="cluster-title">{cluster.name}</h3>
+              <div class="cluster-title-wrap">
+                <span class="cluster-icon">✦</span>
+                <h3 class="cluster-title">{cluster.name}</h3>
+              </div>
               <div class="services-pills">
                 {cluster.services.map((svc: string) => (
                   <span class="service-pill">{svc}</span>
@@ -36,16 +46,34 @@ const concepts = taxonomy.level_2_and_3.concepts;
 </BaseLayout>
 
 <style>
-  .concepts-header {
+  .taxonomy-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 3.5rem;
   }
-  .concepts-header h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+  .header-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    background: #08080d;
+    border: 1px solid var(--unicorn-pink);
+    color: var(--unicorn-pink);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 10px rgba(255, 42, 133, 0.2);
   }
-  .concepts-header p {
+  .header-title {
+    font-size: 2.75rem;
+    font-weight: 900;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+  .header-sub {
     color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 580px;
+    margin: 0 auto;
   }
   .taxonomy-grid {
     display: flex;
@@ -55,49 +83,81 @@ const concepts = taxonomy.level_2_and_3.concepts;
   .concept-section {
     padding: 2rem;
   }
+  .concept-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 1rem;
+  }
   .concept-badge {
-    display: inline-block;
-    background: rgba(99, 102, 241, 0.15);
-    color: var(--accent-cyan);
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--unicorn-cyan);
+    border: 1px solid rgba(0, 240, 255, 0.3);
     font-weight: 800;
-    padding: 0.25rem 0.75rem;
+    padding: 0.3rem 0.75rem;
     border-radius: 6px;
     font-size: 0.8rem;
-    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
   }
   .concept-title {
     font-size: 1.5rem;
+    font-weight: 800;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
   }
-  .clusters-container {
+  .clusters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.25rem;
   }
   .cluster-card {
-    background: rgba(255, 255, 255, 0.02);
+    background: #040407;
     border: 1px solid var(--border-subtle);
     padding: 1.25rem;
-    border-radius: 12px;
+    border-radius: 10px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cluster-card:hover {
+    background: #0d0d16;
+    border-color: var(--unicorn-purple);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.2);
+  }
+  .cluster-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .cluster-icon {
+    color: var(--unicorn-pink);
+    font-size: 0.9rem;
   }
   .cluster-title {
-    font-size: 1.05rem;
-    margin-bottom: 0.75rem;
-    color: var(--accent-indigo);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
   }
   .services-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
   .service-pill {
-    background: rgba(56, 189, 248, 0.1);
-    color: var(--accent-cyan);
-    border: 1px solid rgba(56, 189, 248, 0.2);
-    padding: 0.2rem 0.6rem;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--unicorn-cyan);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    padding: 0.25rem 0.65rem;
     border-radius: 6px;
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 600;
+    transition: all 0.15s ease;
+  }
+  .service-pill:hover {
+    background: var(--unicorn-cyan);
+    color: #000;
+    border-color: var(--unicorn-cyan);
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
   }
 </style>

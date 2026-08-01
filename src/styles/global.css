@@ -1,22 +1,22 @@
 :root {
-  --bg-dark: #030305;
-  --bg-card: #0a0a0f;
-  --bg-card-hover: #12121a;
-  --border-subtle: #1c1c28;
-  --border-glow: #2d2b55;
+  --bg-dark: #020204;
+  --bg-card: #08080d;
+  --bg-card-hover: #0e0e17;
+  --border-subtle: #161622;
+  --border-glow: #312e5c;
   
   --text-primary: #ffffff;
-  --text-secondary: #9ea0b6;
-  --text-muted: #56586e;
+  --text-secondary: #9aa0b8;
+  --text-muted: #52556b;
   
   --unicorn-pink: #ff2a85;
-  --unicorn-purple: #9d4edd;
-  --unicorn-violet: #7b2cbf;
+  --unicorn-purple: #a855f7;
+  --unicorn-violet: #7c3aed;
   --unicorn-cyan: #00f0ff;
   --unicorn-emerald: #00ffaa;
   
-  --gradient-unicorn: linear-gradient(135deg, #ff2a85 0%, #9d4edd 50%, #00f0ff 100%);
-  --gradient-unicorn-dark: linear-gradient(180deg, rgba(255, 42, 133, 0.08) 0%, rgba(0, 0, 0, 0) 100%);
+  --gradient-unicorn: linear-gradient(135deg, #ff2a85 0%, #a855f7 50%, #00f0ff 100%);
+  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(255, 42, 133, 0.12), transparent 60%);
   
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
   --font-mono: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
@@ -35,7 +35,7 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   overflow-x: hidden;
-  background-image: var(--gradient-unicorn-dark);
+  background-image: var(--gradient-glow);
   background-repeat: no-repeat;
   background-size: 100% 600px;
 }
@@ -45,21 +45,40 @@ a {
   text-decoration: none;
 }
 
-/* Unicorn Black Card Styling */
+/* Unicorn Dynamic Interactive Cards */
 .glass-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-unicorn);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .glass-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(255, 42, 133, 0.3);
-  box-shadow: 0 0 20px rgba(255, 42, 133, 0.15);
+  border-color: rgba(255, 42, 133, 0.4);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 30px -10px rgba(255, 42, 133, 0.25), 0 0 15px rgba(0, 240, 255, 0.15);
 }
 
-/* Text Accent */
+.glass-card:hover::before {
+  opacity: 1;
+}
+
+/* Text Accent Gradient */
 .text-gradient {
   background: var(--gradient-unicorn);
   -webkit-background-clip: text;
@@ -74,9 +93,9 @@ a {
   background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #1c1c28;
+  background: #161622;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2d2b55;
+  background: var(--unicorn-pink);
 }
