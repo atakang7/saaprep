@@ -34,11 +34,11 @@ const questions = getPracticeQuestions();
           <div class="explanation-box">
             <h4>Explanation</h4>
             <ul>
-              {q.explanation.map((exp) => (
+              {(Array.isArray(q.explanation) ? q.explanation : (q.explanation ? [q.explanation] : [])).map((exp) => (
                 <li>{exp}</li>
               ))}
             </ul>
-            {q.references.length > 0 && (
+            {Array.isArray(q.references) && q.references.length > 0 && (
               <div class="references">
                 <strong>References: </strong> {q.references.join(', ')}
               </div>

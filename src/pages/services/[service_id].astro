@@ -16,10 +16,16 @@ const allQuestions = getPracticeQuestions();
 const diagramFlow = getServiceDiagramFlow(svc.name);
 
 // Match questions related to this service
-const relatedQuestions = allQuestions.filter(q => 
-  q.question.toLowerCase().includes(svc.name.toLowerCase()) || 
-  q.explanation.some(e => e.toLowerCase().includes(svc.name.toLowerCase()))
-).slice(0, 3);
+const relatedQuestions = allQuestions.filter(q => {
+  const matchQuestion = (q.question || '').toLowerCase().includes(svc.name.toLowerCase());
+  let matchExplanation = false;
+  if (Array.isArray(q.explanation)) {
+    matchExplanation = q.explanation.some(e => (e || '').toLowerCase().includes(svc.name.toLowerCase()));
+  } else if (typeof q.explanation === 'string') {
+    matchExplanation = q.explanation.toLowerCase().includes(svc.name.toLowerCase());
+  }
+  return matchQuestion || matchExplanation;
+}).slice(0, 3);
 
 // Concept themes
 const conceptThemes: Record<string, { color: string; label: string }> = {

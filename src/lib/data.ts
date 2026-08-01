@@ -23,13 +23,17 @@ export function getPracticeQuestions(): Question[] {
             return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
           });
 
+          const explanationArr = Array.isArray(q.explanation) 
+            ? q.explanation 
+            : (typeof q.explanation === 'string' ? [q.explanation] : [`Correct Answer: ${q.answer}`]);
+
           return {
             id: q.id || index + 1,
             title: `SAA-C03 Question #${index + 1}`,
             question: q.question || '',
             options: formattedOptions,
             answer: q.answer || '',
-            explanation: q.explanation || [`Correct Answer: ${q.answer}`],
+            explanation: explanationArr,
             references: q.references || ['AWS SAA-C03 Official Exam Guide']
           };
         });
