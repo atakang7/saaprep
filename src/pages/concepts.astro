@@ -17,20 +17,9 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
 ---
 
 <BaseLayout title="Taxonomy Tree | SAA-C03">
-  <div class="compact-tree-container">
+  <div class="pure-tree-container">
     
-    <!-- COMPACT HEADER -->
-    <header class="compact-header">
-      <div class="ch-left">
-        <span class="ch-tag">[HIGH-DENSITY TAXONOMY]</span>
-        <h1 class="ch-title">// SAA-C03 TOPOLOGY TREE</h1>
-      </div>
-      <div class="ch-right">
-        <span class="ch-stat">4 DOMAINS • 6 CONCEPTS • 18 CLUSTERS • 35+ LEAVES</span>
-      </div>
-    </header>
-
-    <!-- COMPACT TREE CANVAS -->
+    <!-- PURE TREE CANVAS (NO PAGE HEADER/TITLES) -->
     <div class="compact-canvas">
       
       <!-- ROOT NODE -->
@@ -107,42 +96,10 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
 </BaseLayout>
 
 <style>
-  .compact-tree-container {
+  .pure-tree-container {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 0.5rem 0 3rem;
-  }
-
-  .compact-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .ch-tag {
-    font-size: 0.6rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    font-weight: 900;
-    margin-bottom: 0.1rem;
-    display: block;
-  }
-
-  .ch-title {
-    font-size: 1.6rem;
-    font-weight: 900;
-    font-family: var(--font-mono);
-    margin: 0;
-  }
-
-  .ch-stat {
-    font-size: 0.65rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    font-weight: 800;
+    padding: 0 0 3rem;
   }
 
   /* CANVAS */
