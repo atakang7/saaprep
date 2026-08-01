@@ -1,0 +1,179 @@
+---
+interface Props {
+  title?: string;
+  steps: {
+    step: string;
+    node: string;
+    protocol: string;
+    details: string;
+  }[];
+  color?: string;
+}
+
+const { title = "DATA FLOW PIPELINE", steps, color = "var(--color-network)" } = Astro.props;
+---
+
+<div class="visual-diagram-container">
+  <div class="vd-header">
+    <span class="vd-title">// VISUAL ARCHITECTURE FLOWCHART</span>
+    <span class="vd-badge" style={`color: ${color}; border-color: ${color};`}>LIVE DATA TRANSIT</span>
+  </div>
+
+  <!-- GRAPHICAL VISUAL FLOWCHART CANVAS -->
+  <div class="vd-canvas">
+    <div class="vd-nodes-flex">
+      {steps.map((s, idx) => (
+        <div class="vd-node-wrapper">
+          <div class="vd-card" style={`border-left: 3px solid ${color};`}>
+            <div class="vd-card-meta">
+              <span class="vd-num" style={`color: ${color};`}>STEP 0{idx + 1}</span>
+              <span class="vd-protocol">{s.protocol}</span>
+            </div>
+            <div class="vd-node-name">{s.node}</div>
+            <p class="vd-node-desc">{s.details}</p>
+          </div>
+
+          <!-- SVG VISUAL CONNECTOR ARROW -->
+          {idx < steps.length - 1 && (
+            <div class="vd-connector">
+              <svg width="40" height="24" viewBox="0 0 40 24" fill="none" class="connector-svg">
+                <line x1="0" y1="12" x2="32" y2="12" stroke={color} stroke-width="2" stroke-dasharray="3 3"/>
+                <polygon points="32,6 40,12 32,18" fill={color} />
+              </svg>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <!-- VISUAL PIPELINE SUMMARY FOOTER -->
+  <div class="vd-footer">
+    <span class="vd-foot-icon">⚡</span>
+    <span>Payload en route: <strong>CLIENT INGRESS</strong> ➔ <strong>AUTHENTICATION LAYER</strong> ➔ <strong>PROCESSING NODE</strong> ➔ <strong>PERSISTENCE TIER</strong></span>
+  </div>
+</div>
+
+<style>
+  .visual-diagram-container {
+    background: #040508;
+    border: 1px solid var(--border-subtle);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .vd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-mono);
+  }
+
+  .vd-title {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+  }
+
+  .vd-badge {
+    font-size: 0.6rem;
+    font-weight: 900;
+    padding: 0.15rem 0.45rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid;
+  }
+
+  /* GRAPHICAL FLOWCHART CANVAS */
+  .vd-canvas {
+    overflow-x: auto;
+    padding: 0.5rem 0 1.5rem;
+  }
+
+  .vd-nodes-flex {
+    display: flex;
+    align-items: center;
+    min-width: 700px;
+    gap: 0;
+  }
+
+  .vd-node-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .vd-card {
+    background: #0b0d13;
+    border: 1px solid var(--border-subtle);
+    padding: 1.15rem;
+    flex: 1;
+    min-width: 170px;
+  }
+
+  .vd-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    font-family: var(--font-mono);
+  }
+
+  .vd-num {
+    font-size: 0.65rem;
+    font-weight: 900;
+  }
+
+  .vd-protocol {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    font-weight: 700;
+  }
+
+  .vd-node-name {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.35rem;
+  }
+
+  .vd-node-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+  }
+
+  /* CONNECTOR SVG */
+  .vd-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .connector-svg {
+    display: block;
+  }
+
+  /* FOOTER */
+  .vd-footer {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+  }
+
+  .vd-foot-icon {
+    color: var(--color-storage);
+  }
+
+  .vd-footer strong {
+    color: var(--text-primary);
+  }
+</style>

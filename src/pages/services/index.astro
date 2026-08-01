@@ -22,9 +22,9 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
     
     <!-- HEADER -->
     <header class="index-header">
-      <div class="header-tag">[ARCHITECTURAL DIAGRAM FLOW DIRECTORY]</div>
+      <div class="header-tag">[GRAPHICAL ARCHITECTURE FLOW DIRECTORY]</div>
       <h1 class="index-title">// AWS SERVICE FLOW MAPS</h1>
-      <p class="index-sub">Interactive end-to-end data flow pipelines mapped to SAA-C03 exam taxonomy.</p>
+      <p class="index-sub">Visual architectural pipelines & node flowcharts mapped to SAA-C03 exam taxonomy.</p>
     </header>
 
     <!-- DIAGRAM FLOW PIPELINES BY CONCEPT -->
@@ -41,47 +41,63 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
                 <span class="ph-num">0{conceptIdx + 1}</span>
                 <span class="ph-label" style={`color: ${theme.color};`}>{theme.label}</span>
               </div>
-              <span class="ph-badge">[DATA-FLOW-MAP]</span>
+              <span class="ph-badge" style={`color: ${theme.color}; border-color: ${theme.color};`}>VISUAL PIPELINE</span>
             </div>
 
-            <!-- ARCHITECTURE DIAGRAM CANVAS -->
+            <!-- GRAPHICAL ARCHITECTURE FLOWCHART CANVAS -->
             <div class="diagram-canvas-box">
-              
-              <!-- CLUSTER FLOW STAGES -->
-              {concept.clusters.map((cluster: any, clusterIdx: number) => (
-                <div class="cluster-flow-block">
-                  <div class="cluster-flow-header">
-                    <span class="cfh-tag">STAGE 0{clusterIdx + 1}</span>
-                    <span class="cfh-name">{cluster.name}</span>
-                  </div>
+              <div class="flow-pipeline-track">
+                {concept.clusters.map((cluster: any, clusterIdx: number) => (
+                  <div class="cluster-stage-item">
+                    
+                    <!-- STAGE TITLE HEADER -->
+                    <div class="stage-tag-bar">
+                      <span class="stage-num" style={`color: ${theme.color}; border-color: ${theme.color};`}>STAGE 0{clusterIdx + 1}</span>
+                      <span class="stage-name">{cluster.name}</span>
+                    </div>
 
-                  <!-- SERVICES IN THIS STAGE PIPELINE -->
-                  <div class="flow-nodes-row">
-                    {cluster.services.map((svcName: string, svcIdx: number) => {
-                      const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                      return (
-                        <a href={`/services/${svcId}`} class="flow-node-card">
-                          <div class="fn-meta">
-                            <span class="fn-step">NODE 0{svcIdx + 1}</span>
-                            <span class="fn-type" style={`color: ${theme.color};`}>AWS SERVICE</span>
+                    <!-- VISUAL SERVICE NODES PIPELINE -->
+                    <div class="nodes-horizontal-flow">
+                      {cluster.services.map((svcName: string, svcIdx: number) => {
+                        const svcId = svcName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                        return (
+                          <div class="node-unit">
+                            <a href={`/services/${svcId}`} class="graphic-node-card" style={`border-left: 3px solid ${theme.color};`}>
+                              <div class="gn-meta">
+                                <span class="gn-id">N0{svcIdx + 1}</span>
+                                <span class="gn-badge" style={`color: ${theme.color};`}>AWS</span>
+                              </div>
+                              <div class="gn-title">{svcName}</div>
+                              <span class="gn-link">View Blueprint ➔</span>
+                            </a>
+
+                            <!-- SVG FLOW CONNECTOR ARROW -->
+                            {svcIdx < cluster.services.length - 1 && (
+                              <div class="flow-svg-connector">
+                                <svg width="32" height="20" viewBox="0 0 32 20" fill="none">
+                                  <line x1="0" y1="10" x2="24" y2="10" stroke={theme.color} stroke-width="2" stroke-dasharray="3 3"/>
+                                  <polygon points="24,5 32,10 24,15" fill={theme.color} />
+                                </svg>
+                              </div>
+                            )}
                           </div>
-                          <div class="fn-title">{svcName}</div>
-                          <span class="fn-link">View Diagram Blueprint →</span>
-                        </a>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
+
+                    <!-- STAGE-TO-STAGE SVG CONNECTOR ARROW -->
+                    {clusterIdx < concept.clusters.length - 1 && (
+                      <div class="stage-down-connector">
+                        <svg width="24" height="28" viewBox="0 0 24 28" fill="none">
+                          <line x1="12" y1="0" x2="12" y2="20" stroke={theme.color} stroke-width="2" stroke-dasharray="3 3"/>
+                          <polygon points="6,20 12,28 18,20" fill={theme.color} />
+                        </svg>
+                      </div>
+                    )}
+
                   </div>
-                </div>
-              ))}
-
-              <!-- ASCII PIPELINE MAP -->
-              <div class="ascii-flow-map">
-                <div class="ascii-header">// SAA-C03 DATA TRANSIT TOPOLOGY MAP</div>
-                <pre class="ascii-code">
-{concept.clusters.map((c: any, i: number) => `[STAGE 0${i + 1}: ${c.name.padEnd(24)}] ──(${c.services.join(' / ')})──►`).join('\n  │\n  ▼\n')} [PRODUCTION SAA-C03 ARCHITECTURE SUCCESS]
-                </pre>
+                ))}
               </div>
-
             </div>
 
           </section>
@@ -94,7 +110,7 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
 
 <style>
   .services-diagram-container {
-    max-width: 1050px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 1rem 0 5rem;
   }
@@ -163,129 +179,125 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
   }
 
   .ph-label {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-family: var(--font-mono);
     font-weight: 900;
     letter-spacing: 0.04em;
   }
 
   .ph-badge {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-family: var(--font-mono);
-    color: var(--text-muted);
+    font-weight: 900;
+    padding: 0.15rem 0.45rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid;
   }
 
   /* DIAGRAM CANVAS */
   .diagram-canvas-box {
-    background: #06070a;
+    background: #040508;
     border: 1px solid var(--border-subtle);
     padding: 1.75rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
   }
 
-  .cluster-flow-block {
+  .flow-pipeline-track {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .cluster-stage-item {
     display: flex;
     flex-direction: column;
     gap: 0.85rem;
   }
 
-  .cluster-flow-header {
+  .stage-tag-bar {
     display: flex;
     align-items: center;
     gap: 0.65rem;
   }
 
-  .cfh-tag {
-    font-size: 0.65rem;
+  .stage-num {
+    font-size: 0.6rem;
     font-family: var(--font-mono);
     font-weight: 900;
-    color: var(--color-network);
-    background: rgba(0, 229, 255, 0.08);
-    border: 1px solid var(--color-network);
     padding: 0.1rem 0.4rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid;
   }
 
-  .cfh-name {
-    font-size: 1.05rem;
+  .stage-name {
+    font-size: 1rem;
     font-weight: 800;
     color: var(--text-primary);
   }
 
-  /* NODES ROW */
-  .flow-nodes-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 0.85rem;
+  .nodes-horizontal-flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
   }
 
-  .flow-node-card {
-    background: rgba(255, 255, 255, 0.02);
+  .node-unit {
+    display: flex;
+    align-items: center;
+  }
+
+  .graphic-node-card {
+    background: #0b0d13;
     border: 1px solid var(--border-subtle);
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     text-decoration: none;
     color: inherit;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    min-width: 170px;
   }
 
-  .fn-meta {
+  .gn-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-family: var(--font-mono);
   }
 
-  .fn-step {
+  .gn-id {
     font-size: 0.6rem;
-    font-family: var(--font-mono);
     color: var(--text-muted);
     font-weight: 900;
   }
 
-  .fn-type {
+  .gn-badge {
     font-size: 0.6rem;
-    font-family: var(--font-mono);
-    font-weight: 800;
+    font-weight: 900;
   }
 
-  .fn-title {
-    font-size: 1.1rem;
+  .gn-title {
+    font-size: 1.05rem;
     font-weight: 900;
     color: var(--text-primary);
   }
 
-  .fn-link {
-    font-size: 0.75rem;
+  .gn-link {
+    font-size: 0.7rem;
     font-family: var(--font-mono);
     color: var(--text-secondary);
     font-weight: 700;
   }
 
-  /* ASCII PIPELINE MAP */
-  .ascii-flow-map {
-    border-top: 1px solid var(--border-subtle);
-    padding-top: 1.25rem;
+  .flow-svg-connector {
+    padding: 0 0.5rem;
+    display: flex;
+    align-items: center;
   }
 
-  .ascii-header {
-    font-size: 0.65rem;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    font-weight: 900;
-    margin-bottom: 0.65rem;
-  }
-
-  .ascii-code {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    background: #030406;
-    padding: 1.25rem;
-    border: 1px solid var(--border-subtle);
-    overflow-x: auto;
-    line-height: 1.55;
+  .stage-down-connector {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem 0;
   }
 </style>

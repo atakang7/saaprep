@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllServices, getPracticeQuestions, getServiceDiagramFlow } from '../../lib/data';
+import VisualArchitectureDiagram from '../../components/VisualArchitectureDiagram.astro';
 
 export async function getStaticPaths() {
   const services = getAllServices();
@@ -90,36 +91,7 @@ const spec = serviceSpecs[svc.id] || { scope: 'Regional', ha: 'Multi-AZ Compatib
 
     <!-- ARCHITECTURE DATA FLOW DIAGRAM PIPELINE -->
     <section class="content-block">
-      <div class="block-header-row">
-        <h2 class="block-heading">// PRODUCTION ARCHITECTURE DATA FLOW</h2>
-        <span class="mono-badge">[SEQUENCE-MAP]</span>
-      </div>
-
-      <div class="diagram-pipeline-box">
-        <div class="diagram-flow-grid">
-          {diagramFlow.map((step, idx) => (
-            <div class="flow-step-card">
-              <div class="step-meta">
-                <span class="step-num">STEP {step.step}</span>
-                <span class="step-protocol">{step.protocol}</span>
-              </div>
-              <div class="step-node-title">{step.node}</div>
-              <p class="step-details">{step.details}</p>
-              {idx < diagramFlow.length - 1 && (
-                <div class="flow-arrow-indicator">──►</div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <!-- ASCII TECHNICAL TOPOLOGY MAP -->
-        <div class="ascii-topology-map">
-          <div class="ascii-lbl">TECHNICAL TOPOLOGY MAP</div>
-          <pre class="ascii-code">
-{diagramFlow.map((s, i) => `[${s.step}: ${s.node.padEnd(20)}] ──(${s.protocol})──►`).join('\n  │\n  ▼\n')} [END: AWS TARGET RESULT]
-          </pre>
-        </div>
-      </div>
+      <VisualArchitectureDiagram title={`${svc.name} Data Transit Pipeline`} steps={diagramFlow} color={theme.color} />
     </section>
 
     <!-- DECISION MATRIX -->
