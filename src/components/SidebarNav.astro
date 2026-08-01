@@ -26,27 +26,27 @@ const conceptThemes: Record<string, string> = {
       <!-- CORE NAVIGATION -->
       <div class="sb-section">
         <a href="/practice" class={`sb-nav-link ${currentPath === '/practice' ? 'active' : ''}`}>
-          <span class="sb-icon">🎯</span>
+          <span class="sb-mono">[ARENA]</span>
           <span>Practice Arena</span>
         </a>
         <a href="/services" class={`sb-nav-link ${currentPath === '/services' ? 'active' : ''}`}>
-          <span class="sb-icon">📚</span>
-          <span>All Services Directory</span>
+          <span class="sb-mono">[CATALOG]</span>
+          <span>Services Directory</span>
         </a>
         <a href="/concepts" class={`sb-nav-link ${currentPath === '/concepts' ? 'active' : ''}`}>
-          <span class="sb-icon">🌳</span>
+          <span class="sb-mono">[TREE]</span>
           <span>Taxonomy Tree</span>
         </a>
       </div>
 
       <!-- DOMAINS & CLUSTERS -->
-      <div class="sb-tree-header">DECISION DOMAINS</div>
+      <div class="sb-tree-header">// DECISION DOMAINS</div>
 
       {concepts.map((concept: any) => {
         const themeColor = conceptThemes[concept.id] || "var(--color-network)";
         return (
           <details class="sb-concept-group" open>
-            <summary class="sb-concept-summary" style={`border-left-color: ${themeColor};`}>
+            <summary class="sb-concept-summary" style={`border-left: 2px solid ${themeColor};`}>
               <span class="sb-concept-name">{concept.name}</span>
               <span class="sb-arrow">▾</span>
             </summary>
@@ -58,7 +58,7 @@ const conceptThemes: Record<string, string> = {
                 return (
                   <div class="sb-cluster-item">
                     <a href={topicUrl} class={`sb-cluster-link ${isTopicActive ? 'active' : ''}`}>
-                      <span class="sb-bullet" style={`background: ${themeColor};`}></span>
+                      <span class="sb-square" style={`background: ${themeColor};`}></span>
                       <span>{cluster.name}</span>
                     </a>
 
@@ -87,92 +87,95 @@ const conceptThemes: Record<string, string> = {
 
 <style>
   .sidebar-wrapper {
-    width: 280px;
+    width: 260px;
     flex-shrink: 0;
     position: sticky;
-    top: 60px;
-    height: calc(100vh - 60px);
+    top: 53px;
+    height: calc(100vh - 53px);
     border-right: 1px solid var(--border-subtle);
-    background: #05060a;
+    background: #090a0d;
     overflow-y: auto;
   }
 
   @media (max-width: 900px) {
     .sidebar-wrapper {
-      display: none; /* Hide on mobile or integrate responsive toggle */
+      display: none;
     }
   }
 
   .sidebar-inner {
-    padding: 1.25rem 1rem 3rem;
+    padding: 1rem 0.75rem 3rem;
   }
 
   .sidebar-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 1rem;
+    padding-bottom: 0.75rem;
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-subtle);
   }
 
   .sb-title {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 900;
     color: var(--text-muted);
+    font-family: var(--font-mono);
     letter-spacing: 0.08em;
   }
 
   .sb-badge {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 900;
-    background: rgba(255, 42, 133, 0.15);
+    background: rgba(255, 42, 133, 0.1);
     color: var(--color-security);
     border: 1px solid var(--color-security);
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-family: var(--font-mono);
   }
 
   .sb-section {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    margin-bottom: 1.5rem;
+    gap: 0.25rem;
+    margin-bottom: 1.25rem;
   }
 
   .sb-nav-link {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
-    padding: 0.6rem 0.75rem;
-    border-radius: 8px;
+    gap: 0.5rem;
+    padding: 0.45rem 0.5rem;
     color: var(--text-secondary);
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     font-weight: 700;
-    transition: all 0.15s;
-  }
-
-  .sb-nav-link:hover, .sb-nav-link.active {
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--text-primary);
+    border: 1px solid transparent;
   }
 
   .sb-nav-link.active {
-    border-left: 3px solid var(--color-network);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    border-color: var(--border-subtle);
+  }
+
+  .sb-mono {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
   }
 
   .sb-tree-header {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 900;
     color: var(--text-muted);
-    letter-spacing: 0.1em;
-    margin-bottom: 0.75rem;
-    padding-left: 0.5rem;
+    font-family: var(--font-mono);
+    margin-bottom: 0.5rem;
+    padding-left: 0.25rem;
   }
 
   .sb-concept-group {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .sb-concept-summary {
@@ -180,15 +183,14 @@ const conceptThemes: Record<string, string> = {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0.65rem;
+    padding: 0.4rem 0.5rem;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 800;
     color: var(--text-primary);
-    border-left: 3px solid;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 4px;
-    margin-bottom: 0.35rem;
+    background: rgba(255, 255, 255, 0.015);
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid var(--border-subtle);
   }
 
   .sb-concept-summary::-webkit-details-marker {
@@ -202,21 +204,16 @@ const conceptThemes: Record<string, string> = {
   }
 
   .sb-arrow {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-muted);
-    transition: transform 0.2s;
-  }
-
-  details[open] .sb-arrow {
-    transform: rotate(180deg);
   }
 
   .sb-clusters-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding-left: 0.75rem;
-    margin-top: 0.35rem;
+    gap: 0.35rem;
+    padding-left: 0.5rem;
+    margin-top: 0.25rem;
   }
 
   .sb-cluster-item {
@@ -227,56 +224,43 @@ const conceptThemes: Record<string, string> = {
   .sb-cluster-link {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.35rem 0.5rem;
-    font-size: 0.8rem;
+    gap: 0.4rem;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: var(--text-secondary);
     text-decoration: none;
-    border-radius: 4px;
-    transition: color 0.15s;
-  }
-
-  .sb-cluster-link:hover, .sb-cluster-link.active {
-    color: var(--text-primary);
   }
 
   .sb-cluster-link.active {
+    color: var(--text-primary);
     font-weight: 900;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.04);
   }
 
-  .sb-bullet {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+  .sb-square {
+    width: 5px;
+    height: 5px;
     flex-shrink: 0;
   }
 
   .sb-services-sublist {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
-    padding-left: 1.25rem;
-    margin-top: 0.25rem;
-    margin-bottom: 0.5rem;
+    gap: 0.25rem;
+    padding-left: 0.85rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.4rem;
   }
 
   .sb-svc-link {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
     color: var(--text-muted);
     text-decoration: none;
-    padding: 0.15rem 0.45rem;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid transparent;
-    transition: all 0.15s;
-  }
-
-  .sb-svc-link:hover, .sb-svc-link.active {
-    color: var(--text-primary);
-    border-color: var(--border-subtle);
-    background: rgba(255, 255, 255, 0.08);
+    padding: 0.1rem 0.35rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-subtle);
   }
 
   .sb-svc-link.active {

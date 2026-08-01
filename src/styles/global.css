@@ -1,48 +1,53 @@
+/* RENDER.COM / RAZOR-SHARP DARK DESIGN SYSTEM */
+
 :root {
-  /* High-Contrast Accessible Backgrounds & Surfaces (WCAG AAA) */
-  --bg-dark: #090a0f;
-  --bg-card: #12151e;
-  --bg-card-hover: #1a1e2b;
-  
-  /* Borders */
-  --border-subtle: #262b3a;
-  --border-glow: #4f46e5;
-  
-  /* Accessible High-Contrast Text (WCAG AAA / AA) */
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1; /* Slate 300 - High Contrast against dark background */
-  --text-muted: #94a3b8;     /* Slate 400 */
-  
-  /* High Contrast Accessible Domain Colors */
-  --color-security: #f43f5e;   /* Rose 500 */
-  --color-network: #38bdf8;    /* Sky 400 */
-  --color-compute: #c084fc;    /* Purple 400 */
-  --color-storage: #fbbf24;    /* Amber 400 */
-  --color-database: #34d399;   /* Emerald 400 */
-  --color-decouple: #818cf8;   /* Indigo 400 */
-  
-  /* Gradients */
-  --gradient-unicorn: linear-gradient(135deg, #f43f5e 0%, #c084fc 50%, #38bdf8 100%);
-  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(244, 63, 94, 0.08), transparent 60%);
-  
+  /* Obsidian Base Palette */
+  --bg-dark: #07080a;
+  --bg-card: #0e0f14;
+  --bg-card-hover: #0e0f14;
+  --border-subtle: #1c1e26;
+  --border-strong: #2a2d3b;
+
+  /* Typography Colors */
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #4b5563;
+
+  /* Domain Accents */
+  --color-security: #ff2a70;
+  --color-network: #00e5ff;
+  --color-compute: #a855f7;
+  --color-storage: #f59e0b;
+  --color-database: #10b981;
+  --color-decouple: #ec4899;
+
   /* Fonts */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: SFMono-Regular, Consolas, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  border-radius: 0 !important; /* RAZOR SHARP KNIFE EDGES - NO ROUNDED CORNERS */
 }
 
-body {
+html, body {
   background-color: var(--bg-dark);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
   min-height: 100vh;
-  line-height: 1.6;
-  overflow-x: hidden;
+}
+
+/* Typography defaults */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 a {
@@ -50,46 +55,29 @@ a {
   text-decoration: none;
 }
 
-a:focus-visible, button:focus-visible {
-  outline: 2px solid var(--color-network);
-  outline-offset: 3px;
+/* ABSOLUTELY NO HOVER EFFECTS APPLICATION-WIDE */
+*:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important;
 }
 
-/* Accessible High Contrast Card Component */
+/* Sharp Card Component */
 .glass-card {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 12px;
+  border-radius: 0 !important;
   position: relative;
   overflow: hidden;
-  transition: all 0.2s ease-in-out;
-}
-
-.glass-card:hover {
-  background: var(--bg-card-hover);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-}
-
-/* Text Accent Gradient */
-.text-gradient {
-  background: var(--gradient-unicorn);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: #262b3a;
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3b4256;
+  background: #1c1e26;
 }
