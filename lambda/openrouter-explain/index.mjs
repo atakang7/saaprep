@@ -6,6 +6,7 @@ const DEFAULT_ALLOWED_ORIGINS = [
 ];
 
 const DEFAULT_MODEL = 'poolside/laguna-s-2.1:free';
+const AI_ROW_LABELS = ['Verdict', 'Giveaway', 'Why', 'Trap', 'Check'];
 const rateBuckets = new Map();
 
 function allowedOrigins() {
@@ -99,6 +100,40 @@ function parseSseEvents(buffer, onEvent) {
   return remainder;
 }
 
+function structuredRows(text) {
+  const compactText = cleanString(text, 3000)
+    .replace(/\*\*/g, '')
+    .replace(/`/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const labelPattern = /(Verdict|Giveaway|Why|Trap|Check)\s*:?\s*/g;
+  const matches = Array.from(compactText.matchAll(labelPattern));
+  const rows = [];
+
+  matches.forEach((match, index) => {
+    const label = match[1][0].toUpperCase() + match[1].slice(1).toLowerCase();
+    const start = (match.index || 0) + match[0].length;
+    const end = matches[index + 1]?.index ?? compactText.length;
+    const textValue = compactText
+      .slice(start, end)
+      .replace(/^[:\-–—\s]+/, '')
+      .trim();
+
+    if (textValue) rows.push({ label, text: textValue });
+  });
+
+  if (rows.length > 0) return rows;
+  return compactText ? [{ label: 'Verdict', text: compactText }] : [];
+}
+
+function completeRows(rows) {
+  const rowMap = new Map(rows.map((row) => [row.label.toLowerCase(), row.text]));
+  return AI_ROW_LABELS.map((label) => ({
+    label,
+    text: rowMap.get(label.toLowerCase()) || ''
+  }));
+}
+
 function buildPrompt(payload) {
   const question = cleanString(payload.question);
   const options = cleanStringArray(payload.options, 10, 1000);
@@ -183,6 +218,7 @@ async function streamOpenRouterToClient(openRouterResponse, responseStream) {
   const decoder = new TextDecoder();
   let buffer = '';
   let wroteText = false;
+  let accumulatedText = '';
 
   const handleEvent = (dataText) => {
     if (dataText === '[DONE]') return;
@@ -203,7 +239,11 @@ async function streamOpenRouterToClient(openRouterResponse, responseStream) {
     const text = chunk.choices?.[0]?.delta?.content || '';
     if (text) {
       wroteText = true;
-      writeSse(responseStream, 'delta', { text });
+      accumulatedText += text;
+      const rows = structuredRows(accumulatedText);
+      if (rows.length > 0) {
+        writeSse(responseStream, 'rows', { rows: completeRows(rows) });
+      }
     }
   };
 
@@ -215,6 +255,9 @@ async function streamOpenRouterToClient(openRouterResponse, responseStream) {
   }
 
   if (buffer.trim()) parseSseEvents(`${buffer}\n\n`, handleEvent);
+  if (accumulatedText.trim()) {
+    writeSse(responseStream, 'rows', { rows: completeRows(structuredRows(accumulatedText)) });
+  }
   writeSse(responseStream, 'done', { ok: wroteText });
 }
 

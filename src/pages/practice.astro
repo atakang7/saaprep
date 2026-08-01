@@ -248,7 +248,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     if (resetOutput) resetAiOutput();
   }
 
-  function appendSseEvent(rawEvent: string, output: HTMLElement, state: { text: string; error: string }) {
+  function appendSseEvent(rawEvent: string, output: HTMLElement, state: { text: string; error: string; hasRows: boolean }) {
     const lines = rawEvent.split(/\r?\n/);
     let eventName = 'message';
     const dataLines: string[] = [];
@@ -271,6 +271,12 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
 
     if (eventName === 'error' || payload.error) {
       state.error = payload.error || 'AI explanation failed.';
+      return;
+    }
+
+    if ((eventName === 'rows' || payload.rows) && Array.isArray(payload.rows)) {
+      state.hasRows = true;
+      renderStructuredAiRows(output, payload.rows);
       return;
     }
 
@@ -378,7 +384,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
-    const state = { text: '', error: '' };
+    const state = { text: '', error: '', hasRows: false };
     let buffer = '';
 
     while (true) {
@@ -395,7 +401,7 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
 
     if (buffer.trim()) appendSseEvent(buffer, output, state);
     if (state.error) throw new Error(state.error);
-    if (!state.text.trim()) renderAiOutput(output, 'No explanation returned.');
+    if (!state.text.trim() && !state.hasRows) renderAiOutput(output, 'No explanation returned.');
   }
 
   // Restrict the deck to one service when ?service= is present.
