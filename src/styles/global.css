@@ -389,7 +389,7 @@ p { margin: 0; }
   padding: 8rem 0 4rem;
 }
 
-.page-hero .hero-glow {
+.hero-glow {
   position: absolute;
   border-radius: 50%;
   filter: blur(120px);
