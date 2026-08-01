@@ -1,0 +1,102 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "AWS SAA-C03 Mastery Platform", 
+  description = "State-of-the-art interactive preparation engine for AWS Solutions Architect Associate exam." 
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header class="navbar">
+      <div class="nav-container">
+        <a href="/" class="brand">
+          <span class="logo-icon">⚡</span>
+          <span class="brand-text">SAA-C03 <span class="text-gradient">PRO</span></span>
+        </a>
+        <nav class="nav-links">
+          <a href="/" class="nav-item">Dashboard</a>
+          <a href="/concepts" class="nav-item">Taxonomy Tree</a>
+          <a href="/practice" class="nav-item">Exam Simulator</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <p>© 2026 AWS SAA-C03 Prep Engine • Zero filler, 100% Exam Pattern Data</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(8, 12, 20, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 800;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .nav-item {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-item:hover {
+    color: var(--text-primary);
+  }
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+    min-height: calc(100vh - 140px);
+  }
+  .footer {
+    border-top: 1px solid var(--border-subtle);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+</style>
