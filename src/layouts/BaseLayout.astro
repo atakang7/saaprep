@@ -119,7 +119,9 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     <header class="navbar">
       <div class="nav-container">
         <div class="brand-group">
-          <a href={sitePath('/')} class="brand">SAA-C03</a>
+          <a href={sitePath('/')} class="brand" aria-label="SAA-C03 home">
+            <span class="brand-mark">SAA</span><span class="brand-sub">C03</span>
+          </a>
           <span class="brand-badge">[TACTICAL-DRILL]</span>
           <a href="https://github.com/atakang7/saaprep" class="mobile-star-link" target="_blank" rel="noopener noreferrer" aria-label="Star SAA Prep on GitHub">STAR</a>
         </div>
@@ -190,13 +192,31 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
   }
 
   .brand {
-    font-weight: 900;
-    font-size: 1.1rem;
-    letter-spacing: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.18rem;
     font-family: var(--font-mono);
     color: var(--text-primary);
     text-decoration: none;
+    line-height: 1;
   }
+
+  /* The mark carries the identity; the suffix stays subordinate so "SAA"
+     reads as a logo rather than a truncated exam code. */
+  .brand-mark {
+    font-weight: 900;
+    font-size: 1.75rem;
+    letter-spacing: -0.04em;
+  }
+
+  .brand-sub {
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    color: var(--color-security);
+  }
+
+  .brand:hover .brand-sub { color: var(--text-primary); }
 
   .brand-badge {
     font-size: 0.65rem;
@@ -308,11 +328,9 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
       gap: 0.45rem;
       flex-shrink: 1;
     }
-    .brand {
-      font-size: 0.95rem;
-      letter-spacing: 0;
-      white-space: nowrap;
-    }
+    .brand { white-space: nowrap; }
+    .brand-mark { font-size: 1.3rem; }
+    .brand-sub { font-size: 0.65rem; }
     .mobile-star-link {
       display: inline-flex;
       align-items: center;

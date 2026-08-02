@@ -20,7 +20,7 @@ jobs:
     env:
       PUBLIC_SITE_URL: https://atakang7.github.io
       PUBLIC_BASE_PATH: /saaprep
-      PUBLIC_AI_EXPLAIN_ENDPOINT: https://lcctjmaonn2bdc533wsth7juxa0asnte.lambda-url.us-east-1.on.aws/
+      PUBLIC_AI_EXPLAIN_ENDPOINT: https://atakangul.com/api/explain
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
