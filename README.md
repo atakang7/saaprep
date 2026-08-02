@@ -35,8 +35,6 @@ This platform is engineered to build your "exam reflex" by focusing strictly on:
 
 ### 🗺️ Architecture Taxonomy Tree
 
-<details><summary>Click to expand full taxonomy</summary>
-
 - **Guard (Access and Data)**
   - Identity and permissions
     - IAM
@@ -182,8 +180,6 @@ This platform is engineered to build your "exam reflex" by focusing strictly on:
     - AWS Control Tower
     - Compute Savings Plans
     - Consolidated billing (AWS Organizations)
-
-</details>
 
 <!-- TREE_END -->
 

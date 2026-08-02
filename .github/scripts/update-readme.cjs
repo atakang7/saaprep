@@ -6,7 +6,7 @@ const readmeFile = path.join(__dirname, '../../README.md');
 
 const taxonomy = JSON.parse(fs.readFileSync(taxonomyFile, 'utf8'));
 
-let treeMd = '### 🗺️ Architecture Taxonomy Tree\n\n<details><summary>Click to expand full taxonomy</summary>\n\n';
+let treeMd = '### 🗺️ Architecture Taxonomy Tree\n\n';
 
 taxonomy.level_2_and_3.concepts.forEach(concept => {
   treeMd += `- **${concept.name}**\n`;
@@ -17,8 +17,6 @@ taxonomy.level_2_and_3.concepts.forEach(concept => {
     });
   });
 });
-
-treeMd += '\n</details>\n';
 
 let readme = fs.readFileSync(readmeFile, 'utf8');
 
