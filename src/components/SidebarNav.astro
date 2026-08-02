@@ -18,29 +18,7 @@ const conceptThemes: Record<string, string> = {
 
 <aside class="sidebar-wrapper" id="sidebar">
   <div class="sidebar-inner">
-    <div class="sidebar-header">
-      <span class="sb-title">STUDY BLUEPRINT</span>
-      <span class="sb-badge">SAA-C03</span>
-    </div>
-
     <nav class="sidebar-nav">
-      <!-- CORE NAVIGATION -->
-      <div class="sb-section">
-        <a href={sitePath('/practice')} class={`sb-nav-link ${currentPath === '/practice' ? 'active' : ''}`}>
-          <span class="sb-mono">[ARENA]</span>
-          <span>Practice Arena</span>
-        </a>
-        <a href={sitePath('/services')} class={`sb-nav-link ${currentPath === '/services' ? 'active' : ''}`}>
-          <span class="sb-mono">[CATALOG]</span>
-          <span>Services Directory</span>
-        </a>
-        <a href={sitePath('/concepts')} class={`sb-nav-link ${currentPath === '/concepts' ? 'active' : ''}`}>
-          <span class="sb-mono">[TREE]</span>
-          <span>Taxonomy Tree</span>
-        </a>
-      </div>
-
-      <!-- DOMAINS & CLUSTERS -->
       <div class="sb-tree-header">// DECISION DOMAINS</div>
 
       {concepts.map((concept: any) => {
@@ -105,64 +83,6 @@ const conceptThemes: Record<string, string> = {
 
   .sidebar-inner {
     padding: 1rem 0.75rem 3rem;
-  }
-
-  .sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.75rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-subtle);
-  }
-
-  .sb-title {
-    font-size: 0.65rem;
-    font-weight: 900;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    letter-spacing: 0.08em;
-  }
-
-  .sb-badge {
-    font-size: 0.6rem;
-    font-weight: 900;
-    background: rgba(255, 42, 133, 0.1);
-    color: var(--color-security);
-    border: 1px solid var(--color-security);
-    padding: 0.1rem 0.35rem;
-    font-family: var(--font-mono);
-  }
-
-  .sb-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin-bottom: 1.25rem;
-  }
-
-  .sb-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 0.5rem;
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.82rem;
-    font-weight: 700;
-    border: 1px solid transparent;
-  }
-
-  .sb-nav-link.active {
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text-primary);
-    border-color: var(--border-subtle);
-  }
-
-  .sb-mono {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
-    color: var(--text-muted);
   }
 
   .sb-tree-header {

@@ -94,6 +94,9 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     <link rel="icon" href={sitePath('/favicon.ico')} sizes="any" />
     <link rel="icon" href={sitePath('/favicon.svg')} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={sitePath('/favicon.svg')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:type" content={ogType} />
@@ -118,6 +121,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
         <div class="brand-group">
           <a href={sitePath('/')} class="brand">SAA-C03</a>
           <span class="brand-badge">[TACTICAL-DRILL]</span>
+          <a href="https://github.com/atakang7/saaprep" class="mobile-star-link" target="_blank" rel="noopener noreferrer" aria-label="Star SAA Prep on GitHub">STAR</a>
         </div>
         <nav class="nav-links">
           <button id="search-btn" class="nav-item search-trigger">
@@ -125,6 +129,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
             <span>SEARCH</span>
             <kbd class="nav-kbd">⌘K</kbd>
           </button>
+          <a href="https://github.com/atakang7/saaprep" class="nav-item github-star" target="_blank" rel="noopener noreferrer" aria-label="Star SAA Prep on GitHub">STAR ON GITHUB</a>
           
           <!-- ACCESSIBILITY CONTROLS TOOLBAR -->
           <AccessibilityToolbar />
@@ -132,7 +137,6 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
           <a href={sitePath('/practice')} class="nav-item">PRACTICE</a>
           <a href={sitePath('/services')} class="nav-item">SERVICES</a>
           <a href={sitePath('/concepts')} class="nav-item">TAXONOMY</a>
-          <a href="https://github.com/atakang7/saaprep" class="nav-item github-star" target="_blank" rel="noopener noreferrer">GITHUB STAR</a>
         </nav>
       </div>
     </header>
@@ -188,7 +192,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
   .brand {
     font-weight: 900;
     font-size: 1.1rem;
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     font-family: var(--font-mono);
     color: var(--text-primary);
     text-decoration: none;
@@ -199,6 +203,10 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     font-family: var(--font-mono);
     color: var(--text-muted);
     font-weight: 700;
+  }
+
+  .mobile-star-link {
+    display: none;
   }
 
   .nav-links {
@@ -212,11 +220,14 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     font-family: var(--font-mono);
     color: var(--text-secondary);
     font-weight: 800;
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
     text-decoration: none;
   }
 
   .github-star {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
     color: #8ee7c2;
     border: 1px solid rgba(142, 231, 194, 0.45);
     padding: 0.42rem 0.6rem;
@@ -283,6 +294,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
       gap: 0.65rem;
       padding: 0.55rem 0.75rem;
       overflow: hidden;
+      position: relative;
     }
     .brand-group {
       min-width: 0;
@@ -291,7 +303,20 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     }
     .brand {
       font-size: 0.95rem;
-      letter-spacing: 0.02em;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+    .mobile-star-link {
+      display: inline-flex;
+      align-items: center;
+      color: #8ee7c2;
+      border: 1px solid rgba(142, 231, 194, 0.45);
+      padding: 0.3rem 0.45rem;
+      background: rgba(16, 185, 129, 0.08);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 900;
+      text-decoration: none;
       white-space: nowrap;
     }
     .brand-badge,
@@ -302,14 +327,25 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     .nav-links {
       min-width: 0;
       flex-shrink: 0;
-      gap: 0.5rem;
+      gap: 0.4rem;
+    }
+    :global(.a11y-toolbar) {
+      display: none;
+    }
+    .github-star {
+      display: none;
     }
     .search-trigger {
-      display: flex;
+      display: none;
       gap: 0.35rem;
-      padding: 0.35rem 0.5rem;
+      justify-content: center;
+      width: 2.25rem;
+      padding: 0.35rem;
       font-size: 0.75rem;
       white-space: nowrap;
+    }
+    .search-trigger span {
+      display: none;
     }
   }
 </style>

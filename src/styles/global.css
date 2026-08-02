@@ -22,9 +22,12 @@
   --color-decouple: #ec4899;
 
   /* Fonts */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Roboto Mono', monospace;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-interface: 'Inter', 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-study: 'IBM Plex Sans', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-readable: 'Atkinson Hyperlegible', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: var(--font-interface);
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
 }
 
 /* ACCESSIBILITY DYNAMIC THEMES */
@@ -60,7 +63,10 @@ html[data-theme="cyan"] {
 
 /* ACCESSIBILITY FONT FAMILIES */
 html[data-font="mono"] body { font-family: var(--font-mono); }
-html[data-font="sans"] body { font-family: var(--font-sans); }
+html[data-font="interface"] body,
+html[data-font="sans"] body { font-family: var(--font-interface); }
+html[data-font="study"] body { font-family: var(--font-study); }
+html[data-font="readable"] body { font-family: var(--font-readable); }
 html[data-font="serif"] body { font-family: var(--font-serif); }
 
 *, *::before, *::after {
@@ -78,13 +84,14 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Typography defaults */
 h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 a {

@@ -121,6 +121,15 @@ import { sitePath } from '../lib/seo';
     return text;
   }
 
+  function escapeHtml(value: string) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function renderResults(results: any[]) {
     if (suggestions) suggestions.style.display = 'none';
 
@@ -145,24 +154,32 @@ import { sitePath } from '../lib/seo';
     });
 
     let html = '';
+    let itemIndex = 0;
     Object.keys(grouped).forEach(groupName => {
       html += `<div class="cp-section-title">${groupName.toUpperCase()}S</div>`;
       grouped[groupName].forEach(item => {
         const badgeClass = item.type === 'Service' ? 'badge-security' : 'badge-network';
         html += `
-          <a href="${item.url}" class="cp-item cp-selectable">
-            <span class="cp-item-badge ${badgeClass}">${item.type}</span>
-            <span class="cp-item-title">${item.title}</span>
-            <span class="cp-item-desc">${item.description}</span>
+          <a href="${escapeHtml(item.url)}" class="cp-item cp-selectable" data-cp-index="${itemIndex}">
+            <span class="cp-item-badge ${badgeClass}">${escapeHtml(item.type)}</span>
+            <span class="cp-item-title">${escapeHtml(item.title)}</span>
+            <span class="cp-item-desc">${escapeHtml(item.description)}</span>
           </a>
         `;
+        itemIndex += 1;
       });
     });
 
     dynamicDiv.innerHTML = html;
     resultsContainer?.appendChild(dynamicDiv);
     
-    selectedIndex = -1;
+    selectedIndex = itemIndex > 0 ? 0 : -1;
+    dynamicDiv.querySelectorAll('.cp-selectable').forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        selectedIndex = Number((item as HTMLElement).dataset.cpIndex || 0);
+        updateSelection();
+      });
+    });
     updateSelection();
   }
 
@@ -209,9 +226,10 @@ import { sitePath } from '../lib/seo';
       }
     } else if (e.key === 'Enter') {
       const items = document.querySelectorAll('.cp-selectable');
-      if (selectedIndex >= 0 && selectedIndex < items.length) {
+      if (items.length > 0) {
         e.preventDefault();
-        (items[selectedIndex] as HTMLAnchorElement).click();
+        const targetIndex = selectedIndex >= 0 && selectedIndex < items.length ? selectedIndex : 0;
+        (items[targetIndex] as HTMLAnchorElement).click();
       }
     }
   });
@@ -245,7 +263,7 @@ import { sitePath } from '../lib/seo';
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    width: 100%;
     height: 100vh;
     z-index: 9999;
     display: flex;
@@ -335,7 +353,7 @@ import { sitePath } from '../lib/seo';
     font-size: 0.7rem;
     font-weight: 900;
     color: var(--text-muted);
-    letter-spacing: 0.1em;
+    letter-spacing: 0;
     margin: 1rem 0 0.5rem 0.5rem;
   }
 
@@ -367,7 +385,7 @@ import { sitePath } from '../lib/seo';
     font-weight: 900;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
     flex-shrink: 0;
   }
 
@@ -428,7 +446,7 @@ import { sitePath } from '../lib/seo';
   .cp-brand-tag {
     font-weight: 800;
     color: var(--color-network);
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
     font-size: 0.7rem;
   }
 
