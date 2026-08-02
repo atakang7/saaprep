@@ -31,6 +31,164 @@ This platform is engineered to build your "exam reflex" by focusing strictly on:
 
 <br/>
 
+<!-- TREE_START -->
+
+### 🗺️ Architecture Taxonomy Tree
+
+<details><summary>Click to expand full taxonomy</summary>
+
+- **Guard (Access and Data)**
+  - Identity and permissions
+    - IAM
+    - IAM Identity Center
+    - Organizations SCPs
+    - Cognito
+  - Encryption and secrets
+    - KMS
+    - CloudHSM
+    - Secrets Manager
+    - Parameter Store
+    - Macie
+    - S3 Server-Side Encryption (SSE)
+  - Network/application protection
+    - WAF
+    - Shield
+    - Security Groups
+    - NACLs
+    - Network Firewall
+  - Audit, detection, compliance
+    - CloudTrail
+    - GuardDuty
+    - Security Hub
+    - Inspector
+    - Config
+    - AWS X-Ray
+    - CloudWatch Logs Insights
+- **Connect (Traffic)**
+  - VPC foundations
+    - VPCs
+    - Subnets
+    - Route Tables
+    - Internet Gateways
+    - NAT Gateways
+    - NAT Instance
+    - Elastic IP (EIP)
+  - Private AWS access
+    - VPC Endpoints (Gateway, Interface)
+    - PrivateLink
+  - Load balancing, DNS, edge
+    - Route 53
+    - CloudFront
+    - Global Accelerator
+    - ALB
+    - NLB
+    - GLB
+  - Hybrid and multi-VPC networking
+    - Site-to-Site VPN
+    - Direct Connect
+    - Transit Gateway
+    - VPC peering
+    - AWS VPN CloudHub
+    - AWS Resource Access Manager (RAM)
+- **Run (Compute)**
+  - Compute choice
+    - EC2
+    - Elastic Beanstalk
+    - EC2 Spot Instances
+    - EC2 Reserved Instances
+    - EC2 Placement Groups
+    - AWS CloudFormation
+  - Scaling
+    - Auto Scaling Groups (ASG)
+    - Launch Templates
+    - Amazon CloudWatch
+    - Elastic Load Balancing (ELB)
+  - Serverless
+    - Lambda
+    - Lambda reserved concurrency
+    - Compute Savings Plans
+  - Containers and APIs
+    - ECS
+    - EKS
+    - Fargate
+    - API Gateway
+- **Store (Data)**
+  - Storage shape
+    - EBS
+    - EFS
+    - FSx
+    - EC2 instance store
+  - S3 lifecycle/archive/protection
+    - S3 Storage Classes
+    - Lifecycle Rules
+    - Object Lock
+    - S3 Versioning
+    - S3 Multipart Upload
+    - S3 Reduced Redundancy Storage (RRS)
+  - Backup and migration
+    - AWS Backup
+    - DataSync
+    - Snow Family
+    - Amazon EBS snapshots
+    - AWS Storage Gateway
+  - Hybrid storage
+    - Storage Gateway
+    - AWS Storage Gateway File Gateway
+    - AWS Storage Gateway Volume Gateway (cached)
+    - AWS Storage Gateway Volume Gateway (stored)
+- **Remember and query data (Databases & Analytics)**
+  - Relational databases
+    - RDS
+    - Aurora
+    - RDS Multi-AZ
+    - RDS Read Replicas
+    - RDS Proxy
+    - AWS DMS
+  - NoSQL
+    - DynamoDB
+  - Cache
+    - ElastiCache
+    - DAX
+    - Amazon ElastiCache for Memcached
+  - Search
+    - OpenSearch
+  - Analytics and streaming
+    - Redshift
+    - Athena
+    - EMR
+    - Kinesis
+    - Glue
+    - Amazon Data Firehose
+- **Decouple and operate (Architecture & Management)**
+  - Messaging
+    - SQS
+    - SNS
+    - Amazon SES (Simple Email Service)
+  - Events & Workflows
+    - EventBridge
+    - Step Functions
+    - Amazon SWF (Simple Workflow Service)
+  - DR and availability
+    - Route 53 routing
+    - Multi-Region setups
+    - Amazon EC2 AMIs (Amazon Machine Images)
+    - Elastic Load Balancing (ELB)
+    - Amazon RDS
+    - Amazon S3
+  - Cost and governance
+    - Cost Explorer
+    - AWS Budgets
+    - Organizations
+    - AWS Control Tower
+    - Compute Savings Plans
+    - Consolidated billing (AWS Organizations)
+
+</details>
+
+<!-- TREE_END -->
+
+<br/>
+
 ## ⚡ Tech Stack
 
 - **[Astro](https://astro.build/)**: Static site generation for extreme performance.
