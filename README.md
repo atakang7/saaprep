@@ -1,43 +1,65 @@
-# Astro Starter Kit: Minimal
+<div align="center">
+  
+  <h1>🛡️ AWS Certified Solutions Architect – Associate (SAA-C03)</h1>
+  <p><strong>A high-signal, distraction-free technical reference and tactical drill platform.</strong></p>
 
-```sh
-npm create astro@latest -- --template minimal
-```
+  <p>
+    <a href="https://atakang7.github.io/saaprep/"><b>Live Platform</b></a> •
+    <a href="#the-approach"><b>The Approach</b></a> •
+    <a href="#tech-stack"><b>Tech Stack</b></a> •
+    <a href="#local-development"><b>Local Dev</b></a>
+  </p>
+  
+  <br/>
+</div>
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## 🎯 The Approach
 
-## 🚀 Project Structure
+This platform is engineered to build your "exam reflex" by focusing strictly on:
 
-Inside of your Astro project, you'll see the following folders and files:
+1. **Interactive Practice Arena**: Test your knowledge against hundreds of realistic scenario questions with immediate AI-driven explanations.
+2. **Service Routing**: Fast, factual breakdowns of AWS core services, highlighting exactly when to choose them, when to avoid them, and common exam trap words.
+3. **Architecture Taxonomy**: A curated visual index classifying all SAA-C03 domains, clusters, and services for high-speed concept mapping.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+<br/>
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## ⚡ Tech Stack
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- **[Astro](https://astro.build/)**: Static site generation for extreme performance.
+- **AWS Lambda & OpenRouter**: Backs the AI coach, streaming real-time, context-aware explanations via Server-Sent Events (SSE).
+- **Vanilla CSS**: Global theme tokens, scoped styling, and responsive fluid layout.
 
-Any static assets, like images, can be placed in the `public/` directory.
+<br/>
 
-## 🧞 Commands
+## 🚀 Local Development
 
-All commands are run from the root of the project, from a terminal:
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/atakang7/saaprep.git
+   cd saaprep
+   ```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-## 👀 Want to learn more?
+3. **Start the local development server:**
+   ```bash
+   npm run dev
+   ```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+<br/>
+
+## 🎨 Design Philosophy
+
+- 🚫 **No generic fluff:** Only verified facts linked directly to official AWS documentation.
+- 🚀 **Zero latency:** Static rendering and minimalist payload.
+- 🕶️ **Dark-mode native:** Designed for deep work and minimal eye strain.
+
+<br/>
+
+<div align="center">
+  <hr>
+  <sub>Built for the command-line native. Train the AWS decision reflex.</sub>
+</div>

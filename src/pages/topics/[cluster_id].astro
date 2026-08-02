@@ -2,19 +2,30 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getAllTopics, getCanonicalServiceId } from '../../lib/data';
 import { absoluteUrl, breadcrumbJsonLd, normalizeSiteUrl, sitePath, topicDescription } from '../../lib/seo';
+import { getTopicSlug } from '../../lib/data';
 
 export async function getStaticPaths() {
   const data = getAllTopics();
+  const paths: any[] = [];
   
-  return data.map((topic: any) => ({
-    params: { cluster_id: topic.cluster_id },
-    props: { topic }
-  }));
+  data.forEach((topic: any) => {
+    paths.push({
+      params: { cluster_id: topic.cluster_id },
+      props: { topic, isCanonical: false }
+    });
+    
+    paths.push({
+      params: { cluster_id: getTopicSlug(topic.cluster_title) },
+      props: { topic, isCanonical: true }
+    });
+  });
+  
+  return paths;
 }
 
-const { topic } = Astro.props;
+const { topic, isCanonical } = Astro.props;
 const siteUrl = normalizeSiteUrl(Astro.site);
-const canonicalPath = `/topics/${topic.cluster_id}`;
+const canonicalPath = `/topics/${getTopicSlug(topic.cluster_title)}`;
 const description = topicDescription(topic);
 
 // Re-use theme mapping

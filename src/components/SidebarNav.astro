@@ -1,5 +1,5 @@
 ---
-import { getTaxonomyTree, getTaxonomyEntryHref } from '../lib/data';
+import { getTaxonomyTree, getTaxonomyEntryHref, getTopicSlug } from '../lib/data';
 import { sitePath, stripSiteBase } from '../lib/seo';
 
 const taxonomy = getTaxonomyTree();
@@ -32,7 +32,7 @@ const conceptThemes: Record<string, string> = {
 
             <div class="sb-clusters-list">
               {concept.clusters.map((cluster: any) => {
-                const topicUrl = `/topics/${cluster.id}`;
+                const topicUrl = `/topics/${getTopicSlug(cluster.name)}`;
                 const isTopicActive = currentPath === topicUrl;
                 return (
                   <div class="sb-cluster-item">
@@ -67,9 +67,10 @@ const conceptThemes: Record<string, string> = {
   .sidebar-wrapper {
     width: 260px;
     flex-shrink: 0;
-    position: sticky;
+    position: fixed;
     top: 49px;
-    height: calc(100vh - 49px);
+    left: 0;
+    bottom: 0;
     border-right: 1px solid var(--border-subtle);
     background: #050608;
     overflow-y: auto;

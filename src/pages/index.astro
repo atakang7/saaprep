@@ -60,10 +60,7 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
   <section class="hero-section">
     <div class="hero-copy">
       <div class="hero-badge">SAA-C03 TACTICAL DRILL</div>
-      <h1 class="hero-title">Train the AWS decision reflex.</h1>
-      <p class="hero-lede">
-        Scenario questions, service routing, and exam-weighted lenses built for fast elimination practice.
-      </p>
+      <h1 class="hero-title">AWS Certified Solutions Architect – Associate (SAA-C03)</h1>
 
       <div class="hero-cta-group">
         <a href={sitePath('/practice')} class="btn btn-primary">Start Practice →</a>
@@ -103,11 +100,7 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
         {sampleOptions.map((option: string) => (
           <div class={`preview-option ${option.trim().toUpperCase().startsWith(`${sampleAnswerLetter}.`) ? 'is-answer' : ''}`}>{option}</div>
         ))}
-      </div>
-      <div class="preview-coach">
-        <span>AI COACH</span>
-        <p>Spot the requirement words, eliminate the tempting service, then verify against the AWS reference.</p>
-      </div>
+      
       <a href={samplePracticeHref} class="preview-action">Solve this question →</a>
     </div>
   </section>

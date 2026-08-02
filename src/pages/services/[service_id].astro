@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getAllServices, getPracticeQuestions, questionMatchesService, getCanonicalServiceId, normalizeServiceId } from '../../lib/data';
+import { getAllServices, getPracticeQuestions, questionMatchesService, getCanonicalServiceId, normalizeServiceId, getTopicSlug } from '../../lib/data';
 import { absoluteUrl, breadcrumbJsonLd, normalizeSiteUrl, serviceDescription, sitePath } from '../../lib/seo';
 
 export async function getStaticPaths() {
@@ -61,7 +61,7 @@ const structuredData = [
   breadcrumbJsonLd(
     [
       { name: 'AWS Services', url: '/services' },
-      { name: svc.cluster_title, url: `/topics/${svc.cluster_id}` },
+      { name: svc.cluster_title, url: `/topics/${getTopicSlug(svc.cluster_title)}` },
       { name: svc.name, url: canonicalPath }
     ],
     siteUrl
@@ -106,7 +106,7 @@ const structuredData = [
     <nav class="clean-breadcrumb">
       <a href={sitePath('/services')}>Services</a>
       <span class="sep">/</span>
-      <a href={sitePath(`/topics/${svc.cluster_id}`)}>{svc.cluster_title}</a>
+      <a href={sitePath(`/topics/${getTopicSlug(svc.cluster_title)}`)}>{svc.cluster_title}</a>
       <span class="sep">/</span>
       <span class="current">{svc.name}</span>
     </nav>

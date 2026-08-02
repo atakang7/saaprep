@@ -260,6 +260,13 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     width: 100%;
     max-width: 100%;
     min-height: calc(100vh - 49px);
+    padding-left: 260px;
+  }
+
+  @media (max-width: 900px) {
+    .app-layout {
+      padding-left: 0;
+    }
   }
 
   .main-content {

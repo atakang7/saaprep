@@ -44,65 +44,7 @@ export function getPracticeQuestions(): Question[] {
     }
   }
 
-  // Fallback to markdown loading
-  const filePath = path.resolve(process.cwd(), '01_AWS_Fundamentals.md');
-  if (!fs.existsSync(filePath)) return [];
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  
-  const questions: Question[] = [];
-  const rawQuestions = fileContent.split(/### Question \d+/).slice(1);
-  
-  rawQuestions.forEach((qBlock, index) => {
-    const lines = qBlock.trim().split('\n');
-    const questionTextLines: string[] = [];
-    const options: string[] = [];
-    let answer = '';
-    const explanationLines: string[] = [];
-    const referencesLines: string[] = [];
-    
-    let state: 'question' | 'answer' | 'explanation' | 'references' = 'question';
-    
-    lines.forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('**Answer:')) {
-        answer = trimmed.replace(/\*\*Answer:\s*/, '').replace(/\*\*/, '').trim();
-        state = 'explanation';
-        return;
-      }
-      if (trimmed.startsWith('**References:**')) {
-        const refsStr = trimmed.replace(/\*\*References:\*\*\s*/, '');
-        referencesLines.push(...refsStr.split(',').map(r => r.trim()));
-        state = 'references';
-        return;
-      }
-      
-      if (state === 'question') {
-        if (/^[A-E]\.\s/.test(trimmed)) {
-          options.push(trimmed);
-        } else if (!trimmed.startsWith('<details>') && !trimmed.startsWith('<summary>') && !trimmed.startsWith('---')) {
-          if (trimmed.length > 0) questionTextLines.push(trimmed);
-        }
-      } else if (state === 'explanation') {
-        if (trimmed.startsWith('- ')) {
-          explanationLines.push(trimmed.replace(/^- /, ''));
-        }
-      }
-    });
-    
-    if (questionTextLines.length > 0) {
-      questions.push({
-        id: index + 1,
-        title: `Question ${index + 1}`,
-        question: questionTextLines.join(' '),
-        options,
-        answer,
-        explanation: explanationLines,
-        references: referencesLines
-      });
-    }
-  });
-  
-  return questions;
+  return [];
 }
 
 export function getTaxonomyTree() {
@@ -165,6 +107,10 @@ export function getCanonicalServiceId(name: string): string {
   );
 
   return preferredAlias ? normalizeServiceId(preferredAlias[0]) : normalized;
+}
+
+export function getTopicSlug(clusterTitle: string): string {
+  return clusterTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
 export function getTaxonomyEntryHref(name: string, clusterId: string): string {
@@ -265,7 +211,7 @@ export function getSearchIndex() {
       type: 'Topic',
       title: t.cluster_title,
       description: topicDescription(t),
-      url: sitePath(`/topics/${t.cluster_id}`),
+      url: sitePath(`/topics/${getTopicSlug(t.cluster_title)}`),
       tags: t.exam_domains.join(', '),
       content: t.what_this_tests.join(' ')
     });

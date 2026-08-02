@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getTaxonomyTree, getTaxonomyEntryHref, normalizeServiceId } from '../lib/data';
+import { getTaxonomyTree, getTaxonomyEntryHref, normalizeServiceId, getTopicSlug } from '../lib/data';
 import { absoluteUrl, normalizeSiteUrl, sitePath } from '../lib/seo';
 
 const taxonomy = getTaxonomyTree();
@@ -29,7 +29,7 @@ const structuredData = {
       hasDefinedTerm: concept.clusters.map((cluster: any) => ({
         '@type': 'DefinedTerm',
         name: cluster.name,
-        url: absoluteUrl(`/topics/${cluster.id}`, siteUrl)
+        url: absoluteUrl(`/topics/${getTopicSlug(cluster.name)}`, siteUrl)
       }))
     }
   }))
@@ -93,7 +93,7 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
                       <div class="cl-head">
                         <span class="indent-code">│  </span>
                         <span class="cl-symbol">{isLastCluster ? '└──' : '├──'}</span>
-                        <a href={sitePath(`/topics/${cluster.id}`)} class="cl-box">
+                        <a href={sitePath(`/topics/${getTopicSlug(cluster.name)}`)} class="cl-box">
                           <span class="cl-name">{cluster.name}</span>
                           <span class="cl-tag">TOPIC →</span>
                         </a>
