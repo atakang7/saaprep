@@ -20,15 +20,29 @@ let treeMd = '### 🗺️ Architecture Taxonomy Tree\n\n';
 
 taxonomy.level_2_and_3.concepts.forEach(concept => {
   const conceptId = getTopicSlug(concept.name);
-  treeMd += `- **[${concept.name}](${baseUrl}/concepts#${conceptId})**\n`;
+  treeMd += `<details>\n`;
+  treeMd += `  <summary><b><a href="${baseUrl}/concepts#${conceptId}">${concept.name}</a></b></summary>\n`;
+  treeMd += `  <ul>\n`;
+  
   concept.clusters.forEach(cluster => {
     const topicSlug = getTopicSlug(cluster.name);
-    treeMd += `  - [${cluster.name}](${baseUrl}/topics/${topicSlug})\n`;
+    treeMd += `    <li>\n`;
+    treeMd += `      <details>\n`;
+    treeMd += `        <summary><a href="${baseUrl}/topics/${topicSlug}">${cluster.name}</a></summary>\n`;
+    treeMd += `        <ul>\n`;
+    
     cluster.services.forEach(service => {
       const serviceSlug = getCanonicalServiceId(service);
-      treeMd += `    - [${service}](${baseUrl}/services/${serviceSlug})\n`;
+      treeMd += `          <li><a href="${baseUrl}/services/${serviceSlug}">${service}</a></li>\n`;
     });
+    
+    treeMd += `        </ul>\n`;
+    treeMd += `      </details>\n`;
+    treeMd += `    </li>\n`;
   });
+  
+  treeMd += `  </ul>\n`;
+  treeMd += `</details>\n\n`;
 });
 
 let readme = fs.readFileSync(readmeFile, 'utf8');
