@@ -379,6 +379,9 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     const contentType = res.headers.get('content-type') || '';
 
     if (!res.ok) {
+      if (res.status === 429) {
+        throw new Error('Too many requests — wait a few seconds, then hit Regenerate.');
+      }
       const data = await res.json().catch(async () => ({ error: await res.text().catch(() => '') }));
       throw new Error(data.error || `AI request failed (${res.status})`);
     }
@@ -567,10 +570,22 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       if (runId === aiRunId) setAiStatus('Complete');
     } catch (error) {
       if (runId !== aiRunId) return;
-      aiOutput.replaceChildren(error instanceof DOMException && error.name === 'AbortError'
-        ? 'AI explanation stopped.'
-        : (error instanceof Error ? error.message : 'AI explanation failed.'));
-      setAiStatus(error instanceof DOMException && error.name === 'AbortError' ? 'Stopped' : 'Needs retry');
+
+      const aborted = error instanceof DOMException && error.name === 'AbortError';
+      // A rate-limited request is rejected at the edge, and that response
+      // carries no CORS headers — so cross-origin it surfaces as an opaque
+      // TypeError rather than a readable 429. Name it for what it almost
+      // always is instead of showing "Failed to fetch".
+      const blocked = error instanceof TypeError;
+
+      aiOutput.replaceChildren(
+        aborted
+          ? 'AI explanation stopped.'
+          : blocked
+            ? 'Too many requests — wait a few seconds, then hit Regenerate.'
+            : (error instanceof Error ? error.message : 'AI explanation failed.')
+      );
+      setAiStatus(aborted ? 'Stopped' : blocked ? 'Rate limited' : 'Needs retry');
     } finally {
       window.clearTimeout(timeoutId);
       if (runId === aiRunId) {
