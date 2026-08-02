@@ -13,8 +13,6 @@
   <p>
     <a href="https://atakang7.github.io/saaprep/"><b>Launch Platform</b></a> •
     <a href="#architecture-taxonomy-tree"><b>Taxonomy Tree</b></a> •
-    <a href="#tech-stack"><b>Tech Stack</b></a> •
-    <a href="#local-development"><b>Local Dev</b></a>
   </p>
   
   <br/>
