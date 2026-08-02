@@ -1,7 +1,15 @@
 <div align="center">
+  <img src="./public/og-image.svg" alt="SAA Prep Platform Banner" width="100%" />
+  <br/><br/>
   
   <h1>🛡️ AWS Certified Solutions Architect – Associate (SAA-C03)</h1>
   <p><strong>A high-signal, distraction-free technical reference and tactical drill platform.</strong></p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Astro-Static_Site-FF5D01?style=for-the-badge&logo=astro&logoColor=white" alt="Astro" />
+    <img src="https://img.shields.io/badge/AWS-SAA--C03-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white" alt="AWS SAA-C03" />
+    <img src="https://img.shields.io/badge/License-MIT-10B981?style=for-the-badge" alt="License MIT" />
+  </p>
 
   <p>
     <a href="https://atakang7.github.io/saaprep/"><b>Live Platform</b></a> •
