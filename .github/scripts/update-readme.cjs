@@ -6,14 +6,27 @@ const readmeFile = path.join(__dirname, '../../README.md');
 
 const taxonomy = JSON.parse(fs.readFileSync(taxonomyFile, 'utf8'));
 
+const baseUrl = 'https://atakang7.github.io/saaprep';
+
+function getTopicSlug(title) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+function getCanonicalServiceId(serviceName) {
+  return serviceName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
 let treeMd = '### 🗺️ Architecture Taxonomy Tree\n\n';
 
 taxonomy.level_2_and_3.concepts.forEach(concept => {
-  treeMd += `- **${concept.name}**\n`;
+  const conceptId = getTopicSlug(concept.name);
+  treeMd += `- **[${concept.name}](${baseUrl}/concepts#${conceptId})**\n`;
   concept.clusters.forEach(cluster => {
-    treeMd += `  - ${cluster.name}\n`;
+    const topicSlug = getTopicSlug(cluster.name);
+    treeMd += `  - [${cluster.name}](${baseUrl}/topics/${topicSlug})\n`;
     cluster.services.forEach(service => {
-      treeMd += `    - ${service}\n`;
+      const serviceSlug = getCanonicalServiceId(service);
+      treeMd += `    - [${service}](${baseUrl}/services/${serviceSlug})\n`;
     });
   });
 });
