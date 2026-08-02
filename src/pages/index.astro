@@ -59,49 +59,17 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
 <BaseLayout title={DEFAULT_TITLE} description={description} canonicalPath="/" structuredData={structuredData}>
   <section class="hero-section">
     <div class="hero-copy">
-      <div class="hero-badge">SAA-C03 TACTICAL DRILL</div>
+      <div class="hero-badge">SAA-C03 EXAM PREPARATION</div>
       <h1 class="hero-title">AWS Certified Solutions Architect – Associate (SAA-C03)</h1>
+      <p class="hero-lede">
+        A high-signal, distraction-free technical reference and tactical drill platform. Master the AWS decision reflex with verified exam scenarios and zero fluff.
+      </p>
 
       <div class="hero-cta-group">
-        <a href={sitePath('/practice')} class="btn btn-primary">Start Practice →</a>
+        <a href={sitePath('/practice')} class="btn btn-primary">Launch Practice Simulator →</a>
         <a href={sitePath('/services')} class="btn btn-secondary">Open Service Map</a>
+        <a href={sitePath('/concepts')} class="btn btn-secondary">View Taxonomy</a>
       </div>
-
-      <div class="metrics-strip">
-        <div>
-          <strong>{questions.length}</strong>
-          <span>questions</span>
-        </div>
-        <div>
-          <strong>4</strong>
-          <span>lenses</span>
-        </div>
-        <div>
-          <strong>{concepts.length}</strong>
-          <span>domains</span>
-        </div>
-      </div>
-
-      <div class="flow-strip" aria-label="Recommended study flow">
-        <span>1 Drill</span>
-        <span>2 AI review</span>
-        <span>3 Service page</span>
-        <span>4 Taxonomy route</span>
-      </div>
-    </div>
-
-    <div class="drill-preview" aria-label="Practice question preview">
-      <div class="preview-topline">
-        <span>LIVE DRILL</span>
-        <span>{sampleQuestion?.id || 'SAA-C03'}</span>
-      </div>
-      <h2>{sampleQuestion?.question || 'Which AWS service best matches the stated requirement?'}</h2>
-      <div class="preview-options">
-        {sampleOptions.map((option: string) => (
-          <div class={`preview-option ${option.trim().toUpperCase().startsWith(`${sampleAnswerLetter}.`) ? 'is-answer' : ''}`}>{option}</div>
-        ))}
-      
-      <a href={samplePracticeHref} class="preview-action">Solve this question →</a>
     </div>
   </section>
 
@@ -133,17 +101,16 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
     justify-content: flex-start;
   }
   .hero-section {
-    display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(340px, 1.1fr);
-    gap: 1.4rem;
-    align-items: center;
-    min-height: clamp(430px, calc(100vh - 230px), 560px);
-    padding: 1.25rem 0 1.65rem;
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: clamp(350px, calc(100vh - 350px), 480px);
+    padding: 2.5rem 0 3rem;
+    max-width: 800px;
   }
   .hero-copy {
-    max-width: 620px;
-    min-width: 0;
+    width: 100%;
   }
   .hero-badge {
     display: inline-block;
@@ -158,19 +125,18 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
     margin-bottom: 0.85rem;
   }
   .hero-title {
-    max-width: 590px;
-    font-size: 4.35rem;
+    font-size: 3.85rem;
     font-weight: 900;
-    line-height: 0.98;
-    margin-bottom: 0.85rem;
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
     overflow-wrap: break-word;
   }
   .hero-lede {
-    max-width: 520px;
+    max-width: 680px;
     color: var(--text-secondary);
-    font-size: 0.98rem;
-    line-height: 1.45;
-    margin-bottom: 1.05rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 2rem;
   }
   .hero-cta-group {
     display: flex;
@@ -208,136 +174,6 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
     border-color: var(--color-network);
   }
 
-  .metrics-strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    max-width: 460px;
-    min-width: 0;
-    border: 1px solid var(--border-subtle);
-    background: rgba(255, 255, 255, 0.025);
-  }
-  .metrics-strip div {
-    padding: 0.72rem 0.85rem;
-    border-right: 1px solid var(--border-subtle);
-  }
-  .metrics-strip div:last-child {
-    border-right: 0;
-  }
-  .metrics-strip strong {
-    display: block;
-    color: var(--text-primary);
-    font-size: 1.25rem;
-    font-weight: 900;
-    line-height: 1;
-  }
-  .metrics-strip span {
-    display: block;
-    margin-top: 0.28rem;
-    color: var(--text-secondary);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-  }
-  .flow-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-    max-width: 540px;
-    margin-top: 0.7rem;
-  }
-  .flow-strip span {
-    border: 1px solid var(--border-subtle);
-    background: rgba(255, 255, 255, 0.025);
-    color: var(--text-secondary);
-    padding: 0.36rem 0.52rem;
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 800;
-    white-space: nowrap;
-  }
-  .drill-preview {
-    min-width: 0;
-    max-width: 100%;
-    border: 1px solid var(--border-subtle);
-    background: #0d0f16;
-    box-shadow: 0 18px 56px rgba(0, 0, 0, 0.24);
-    padding: 0.95rem;
-  }
-  .preview-topline {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    padding-bottom: 0.65rem;
-    margin-bottom: 0.75rem;
-    border-bottom: 1px dashed var(--border-subtle);
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 900;
-  }
-  .preview-topline span {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .drill-preview h2 {
-    margin: 0 0 0.75rem;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    line-height: 1.38;
-  }
-  .preview-options {
-    display: grid;
-    gap: 0.55rem;
-    margin-bottom: 0.75rem;
-  }
-  .preview-option {
-    min-width: 0;
-    border: 1px solid var(--border-subtle);
-    background: rgba(255, 255, 255, 0.025);
-    color: var(--text-secondary);
-    padding: 0.62rem 0.75rem;
-    font-size: 0.82rem;
-    line-height: 1.32;
-    overflow-wrap: anywhere;
-  }
-  .preview-option.is-answer {
-    border-color: var(--color-network);
-    color: #8ee7c2;
-    background: rgba(0, 229, 255, 0.06);
-  }
-  .preview-coach {
-    border-left: 3px solid var(--color-security);
-    background: rgba(255, 43, 124, 0.055);
-    padding: 0.7rem 0.85rem;
-  }
-  .preview-coach span {
-    display: block;
-    margin-bottom: 0.24rem;
-    color: var(--color-security);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 900;
-  }
-  .preview-coach p {
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    line-height: 1.38;
-  }
-  .preview-action {
-    display: block;
-    margin-top: 0.75rem;
-    border: 1px solid rgba(142, 231, 194, 0.45);
-    color: #8ee7c2;
-    background: rgba(16, 185, 129, 0.08);
-    padding: 0.62rem 0.75rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 900;
-    text-align: center;
-    text-decoration: none;
-  }
 
   .section-container {
     margin-bottom: 2rem;
@@ -399,34 +235,13 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
     line-height: 1.42;
   }
   @media (max-width: 1100px) {
-    .hero-section {
-      grid-template-columns: 1fr;
-      min-height: 0;
-    }
-    .hero-copy {
-      max-width: none;
-    }
-    .drill-preview {
-      max-width: 760px;
-    }
     .hero-title {
-      font-size: 3.45rem;
+      font-size: 3.25rem;
     }
   }
   @media (max-width: 760px) {
     .hero-section {
       padding-top: 1.2rem;
-    }
-    .metrics-strip {
-      grid-template-columns: 1fr;
-      max-width: none;
-    }
-    .metrics-strip div {
-      border-right: 0;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-    .metrics-strip div:last-child {
-      border-bottom: 0;
     }
     .section-heading {
       display: block;
@@ -438,21 +253,10 @@ const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(samp
     }
     .hero-title {
       font-size: 2.25rem;
-      line-height: 1.05;
+      line-height: 1.1;
     }
     .hero-lede {
-      font-size: 0.9rem;
-      overflow-wrap: anywhere;
-    }
-    .flow-strip {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .flow-strip span {
-      white-space: normal;
-      text-align: center;
-    }
-    .drill-preview h2 {
+      font-size: 1rem;
       overflow-wrap: anywhere;
     }
   }
