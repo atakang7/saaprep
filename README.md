@@ -23,44 +23,7 @@
 <!-- TREE_START -->
 <!-- TREE_END -->
 
-<br/>
-
-## ⚡ Tech Stack
-
-- **[Astro](https://astro.build/)**: Static site generation for extreme performance.
-- **Vanilla CSS**: Global theme tokens, scoped styling, and responsive fluid layout.
-
-<br/>
-
-## 🚀 Local Development
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/atakang7/saaprep.git
-   cd saaprep
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Start the local development server:**
-   ```bash
-   npm run dev
-   ```
-
-<br/>
-
-##  Design Philosophy
-
-- 🚫 **No generic fluff:** Only verified facts linked directly to official AWS documentation.
-- 🚀 **Zero latency:** Static rendering and minimalist payload.
-- 🕶️ **Dark-mode native:** Designed for deep work and minimal eye strain.
-
-<br/>
 
 <div align="center">
-  <hr>
   <sub>Built for the command-line native. Train the AWS decision reflex.</sub>
 </div>
