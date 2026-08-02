@@ -26,7 +26,6 @@ This platform is engineered to build your "exam reflex" by focusing strictly on:
 ## ⚡ Tech Stack
 
 - **[Astro](https://astro.build/)**: Static site generation for extreme performance.
-- **AWS Lambda & OpenRouter**: Backs the AI coach, streaming real-time, context-aware explanations via Server-Sent Events (SSE).
 - **Vanilla CSS**: Global theme tokens, scoped styling, and responsive fluid layout.
 
 <br/>
@@ -51,7 +50,7 @@ This platform is engineered to build your "exam reflex" by focusing strictly on:
 
 <br/>
 
-## 🎨 Design Philosophy
+##  Design Philosophy
 
 - 🚫 **No generic fluff:** Only verified facts linked directly to official AWS documentation.
 - 🚀 **Zero latency:** Static rendering and minimalist payload.
