@@ -39,6 +39,20 @@ Values below come from `.env.example`.
 | `PUBLIC_BASE_PATH` | `/saaprep` | Route prefix. |
 | `PUBLIC_AI_EXPLAIN_ENDPOINT` | `https://atakangul.com/api/explain` | Remote explanation API; empty disables Explain. |
 
+## Deploy
+
+```text
++--------------+  PR  +--------+  runs  +---------------+
+| pull request | ----> | ci.yml | -----> | npm run build |
++--------------+       +--------+        +---------------+
+
++------+  push  +------------+  writes  +-------+  deploys  +--------------+
+| main | ------> | deploy.yml | -------> | dist/ | --------> | GitHub Pages |
++------+         +------------+          +-------+           +--------------+
+```
+
+Set the repository's Pages source to GitHub Actions; `deploy.yml` builds with the values in `.env.example`.
+
 ## Limits
 
 - Question content may be outdated; verify with AWS documentation.
