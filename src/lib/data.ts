@@ -19,25 +19,25 @@ export function getPracticeQuestions(): Question[] {
     throw new Error('questions.json must contain a non-empty array');
   }
   return rawData.map((q: any, index: number) => {
-          const formattedOptions = (q.options || []).map((opt: string, optIdx: number) => {
-            if (/^[A-E]\.\s/.test(opt)) return opt;
-            return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
-          });
+    const formattedOptions = (q.options || []).map((opt: string, optIdx: number) => {
+      if (/^[A-E]\.\s/.test(opt)) return opt;
+      return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
+    });
 
-          const explanationArr = Array.isArray(q.explanation) 
-            ? q.explanation 
-            : (typeof q.explanation === 'string' ? [q.explanation] : [`Correct Answer: ${q.answer}`]);
+    const explanationArr = Array.isArray(q.explanation)
+      ? q.explanation
+      : (typeof q.explanation === 'string' ? [q.explanation] : [`Correct Answer: ${q.answer}`]);
 
-          return {
-            id: q.id || index + 1,
-            title: `SAA-C03 Question #${index + 1}`,
-            question: q.question || '',
-            options: formattedOptions,
-            answer: q.answer || '',
-            explanation: explanationArr,
-            references: q.references || ['AWS SAA-C03 Official Exam Guide']
-          };
-        })
+    return {
+      id: q.id || index + 1,
+      title: `SAA-C03 Question #${index + 1}`,
+      question: q.question || '',
+      options: formattedOptions,
+      answer: q.answer || '',
+      explanation: explanationArr,
+      references: q.references || ['AWS SAA-C03 Official Exam Guide']
+    };
+  });
 }
 
 export function getTaxonomyTree() {
