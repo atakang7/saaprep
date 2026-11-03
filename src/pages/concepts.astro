@@ -55,16 +55,13 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
 >
   <div class="pure-tree-container">
     
-    <!-- PURE TREE CANVAS (NO PAGE HEADER/TITLES) -->
     <div class="compact-canvas">
       
-      <!-- ROOT NODE -->
       <div class="tree-root-bar">
         <span class="tb-badge">ROOT</span>
         <h1 class="tb-title">🌲 SAA-C03 ARCHITECTURAL EXAM TAXONOMY</h1>
       </div>
 
-      <!-- COMPACT BRANCHES LIST -->
       <div class="tree-branches-list">
         {concepts.map((concept: any, cIdx: number) => {
           const theme = conceptThemes[concept.id] || { color: "#00e5ff", label: concept.id.toUpperCase(), icon: "✦" };
@@ -73,7 +70,6 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
           return (
             <div class="compact-branch-block">
               
-              <!-- CONCEPT LEVEL 1 BRANCH HEADER -->
               <div class="c-head-row">
                 <span class="c-symbol">{isLastConcept ? '└──' : '├──'}</span>
                 <div class="c-pill" style={`border-left: 3px solid ${theme.color};`}>
@@ -83,7 +79,6 @@ const conceptThemes: Record<string, { color: string; label: string; icon: string
                 </div>
               </div>
 
-              <!-- LEVEL 2 CLUSTERS & LEVEL 3 SERVICES -->
               <div class="c-children-list">
                 {concept.clusters.map((cluster: any, clIdx: number) => {
                   const isLastCluster = clIdx === concept.clusters.length - 1;

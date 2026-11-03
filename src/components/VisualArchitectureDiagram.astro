@@ -19,7 +19,6 @@ const { title = "DATA FLOW PIPELINE", steps, color = "var(--color-network)" } = 
     <span class="vd-badge" style={`color: ${color}; border-color: ${color};`}>LIVE DATA TRANSIT</span>
   </div>
 
-  <!-- GRAPHICAL VISUAL FLOWCHART CANVAS -->
   <div class="vd-canvas">
     <div class="vd-nodes-flex">
       {steps.map((s, idx) => (
@@ -33,7 +32,6 @@ const { title = "DATA FLOW PIPELINE", steps, color = "var(--color-network)" } = 
             <p class="vd-node-desc">{s.details}</p>
           </div>
 
-          <!-- SVG VISUAL CONNECTOR ARROW -->
           {idx < steps.length - 1 && (
             <div class="vd-connector">
               <svg width="40" height="24" viewBox="0 0 40 24" fill="none" class="connector-svg">
@@ -47,7 +45,6 @@ const { title = "DATA FLOW PIPELINE", steps, color = "var(--color-network)" } = 
     </div>
   </div>
 
-  <!-- VISUAL PIPELINE SUMMARY FOOTER -->
   <div class="vd-footer">
     <span class="vd-foot-icon">⚡</span>
     <span>Payload en route: <strong>CLIENT INGRESS</strong> ➔ <strong>AUTHENTICATION LAYER</strong> ➔ <strong>PROCESSING NODE</strong> ➔ <strong>PERSISTENCE TIER</strong></span>

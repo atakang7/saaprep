@@ -50,10 +50,6 @@ const domainColors: Record<string, string> = {
   "Performance": "var(--color-network)",
   "Cost": "var(--color-storage)"
 };
-const sampleQuestion = questions[0];
-const sampleOptions = sampleQuestion?.options?.slice(0, 3) || [];
-const sampleAnswerLetter = String(sampleQuestion?.answer || '').trim().charAt(0).toUpperCase();
-const samplePracticeHref = `${sitePath('/practice')}?q=${encodeURIComponent(sampleQuestion?.id || '')}`;
 ---
 
 <BaseLayout title={DEFAULT_TITLE} description={description} canonicalPath="/" structuredData={structuredData}>

@@ -382,8 +382,15 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       if (res.status === 429) {
         throw new Error('Too many requests — wait a few seconds, then hit Regenerate.');
       }
-      const data = await res.json().catch(async () => ({ error: await res.text().catch(() => '') }));
-      throw new Error(data.error || `AI request failed (${res.status})`);
+      const body = await res.text().catch(() => '');
+      let detail = '';
+      try {
+        const data = JSON.parse(body);
+        if (typeof data.error === 'string') detail = data.error;
+      } catch {
+        // Non-JSON error responses use the HTTP status below.
+      }
+      throw new Error(detail || `AI request failed (${res.status})`);
     }
 
     if (!res.body || !contentType.includes('text/event-stream')) {
@@ -414,7 +421,6 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     if (!state.text.trim() && !state.hasRows) renderAiOutput(output, 'No explanation returned.');
   }
 
-  // Restrict the deck to one service when ?service= is present.
   let blocks = allBlocks;
   if (serviceParam) {
     const matching = allBlocks.filter(b =>
@@ -435,7 +441,6 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       if (countEl) countEl.textContent =
         `${matching.length} question${matching.length === 1 ? '' : 's'}`;
     } else {
-      // Nothing matched — say so instead of silently showing the full bank.
       const empty = document.getElementById('filter-empty');
       const emptyName = document.getElementById('empty-name');
       if (empty) empty.style.display = 'flex';
@@ -547,7 +552,11 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
     const controller = new AbortController();
     aiController = controller;
     const runId = ++aiRunId;
-    const timeoutId = window.setTimeout(() => controller.abort(), 45000);
+    let timedOut = false;
+    const timeoutId = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 45000);
     const payload = getQuestionPayload(parent);
 
     aiButton.textContent = 'Stop';
@@ -572,20 +581,16 @@ getAllServices().forEach((s: any) => { serviceNames[s.id] = s.name; });
       if (runId !== aiRunId) return;
 
       const aborted = error instanceof DOMException && error.name === 'AbortError';
-      // A rate-limited request is rejected at the edge, and that response
-      // carries no CORS headers — so cross-origin it surfaces as an opaque
-      // TypeError rather than a readable 429. Name it for what it almost
-      // always is instead of showing "Failed to fetch".
-      const blocked = error instanceof TypeError;
-
-      aiOutput.replaceChildren(
-        aborted
+      const connectionError = error instanceof TypeError;
+      const message = timedOut
+        ? 'AI request timed out after 45 seconds.'
+        : aborted
           ? 'AI explanation stopped.'
-          : blocked
-            ? 'Too many requests — wait a few seconds, then hit Regenerate.'
-            : (error instanceof Error ? error.message : 'AI explanation failed.')
-      );
-      setAiStatus(aborted ? 'Stopped' : blocked ? 'Rate limited' : 'Needs retry');
+          : connectionError
+            ? 'Connection failed. Check your network or try again later.'
+            : (error instanceof Error ? error.message : 'AI explanation failed.');
+      aiOutput.replaceChildren(message);
+      setAiStatus(timedOut ? 'Timed out' : aborted ? 'Stopped' : connectionError ? 'Connection error' : 'Needs retry');
     } finally {
       window.clearTimeout(timeoutId);
       if (runId === aiRunId) {
