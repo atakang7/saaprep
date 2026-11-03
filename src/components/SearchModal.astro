@@ -61,7 +61,7 @@ import { sitePath } from '../lib/seo';
   import Fuse from 'fuse.js';
 
   let fuse: Fuse<any> | null = null;
-  let rawIndex: any[] = [];
+  let loadPromise: Promise<void> | null = null;
   let selectedIndex = -1;
 
   const palette = document.getElementById('command-palette');
@@ -73,24 +73,46 @@ import { sitePath } from '../lib/seo';
 
   async function initFuse() {
     if (fuse) return;
-    try {
-      const res = await fetch(searchUrl);
-      rawIndex = await res.json();
-      
-      fuse = new Fuse(rawIndex, {
-        keys: [
-          { name: 'title', weight: 0.5 },
-          { name: 'tags', weight: 0.2 },
-          { name: 'description', weight: 0.2 },
-          { name: 'content', weight: 0.1 }
-        ],
-        threshold: 0.35,
-        includeMatches: true,
-        minMatchCharLength: 2
-      });
-    } catch (err) {
-      console.error('Failed to initialize search engine:', err);
-    }
+    if (loadPromise) return loadPromise;
+
+    loadPromise = (async () => {
+      try {
+        const res = await fetch(searchUrl, { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) throw new Error(`Search index request failed (${res.status})`);
+        const index = await res.json();
+        if (!Array.isArray(index)) throw new Error('Search index is not an array');
+
+        fuse = new Fuse(index, {
+          keys: [
+            { name: 'title', weight: 0.5 },
+            { name: 'tags', weight: 0.2 },
+            { name: 'description', weight: 0.2 },
+            { name: 'content', weight: 0.1 }
+          ],
+          threshold: 0.35,
+          includeMatches: true,
+          minMatchCharLength: 2
+        });
+
+        const query = input?.value.trim();
+        if (query) renderResults(fuse.search(query, { limit: 12 }));
+      } catch (error) {
+        console.error('Search index could not load:', error);
+        if (palette && !palette.classList.contains('hidden')) {
+          if (suggestions) suggestions.style.display = 'none';
+          resultsContainer?.querySelector('#cp-dynamic-results')?.remove();
+          const notice = document.createElement('div');
+          notice.id = 'cp-dynamic-results';
+          notice.className = 'cp-no-results';
+          notice.textContent = 'Search is unavailable. Close and reopen to retry.';
+          resultsContainer?.appendChild(notice);
+        }
+      } finally {
+        loadPromise = null;
+      }
+    })();
+
+    return loadPromise;
   }
 
   function openPalette() {
@@ -113,12 +135,6 @@ import { sitePath } from '../lib/seo';
     if (suggestions) suggestions.style.display = 'block';
     const dynamicResults = document.getElementById('cp-dynamic-results');
     if (dynamicResults) dynamicResults.remove();
-  }
-
-  function highlightMatches(text: string, matches: any[]) {
-    if (!matches || matches.length === 0) return text;
-    // Simple slice highlight for title
-    return text;
   }
 
   function escapeHtml(value: string) {
@@ -145,7 +161,6 @@ import { sitePath } from '../lib/seo';
       return;
     }
 
-    // Group results by type
     const grouped: Record<string, any[]> = {};
     results.forEach(res => {
       const type = res.item.type || 'Other';
@@ -156,7 +171,7 @@ import { sitePath } from '../lib/seo';
     let html = '';
     let itemIndex = 0;
     Object.keys(grouped).forEach(groupName => {
-      html += `<div class="cp-section-title">${groupName.toUpperCase()}S</div>`;
+      html += `<div class="cp-section-title">${escapeHtml(groupName.toUpperCase())}S</div>`;
       grouped[groupName].forEach(item => {
         const badgeClass = item.type === 'Service' ? 'badge-security' : 'badge-network';
         html += `
@@ -195,7 +210,6 @@ import { sitePath } from '../lib/seo';
     });
   }
 
-  // Event Listeners
   document.addEventListener('keydown', (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
@@ -236,10 +250,9 @@ import { sitePath } from '../lib/seo';
 
   backdrop?.addEventListener('click', closePalette);
 
-  // Global trigger for open button
   window.addEventListener('open-search-modal', openPalette);
 
-  let searchDebounce: any;
+  let searchDebounce: ReturnType<typeof setTimeout> | undefined;
   input?.addEventListener('input', (e) => {
     const q = (e.target as HTMLInputElement).value.trim();
     clearTimeout(searchDebounce);
