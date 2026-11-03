@@ -64,18 +64,14 @@ function getCanonicalServiceId(name) {
   return preferredAlias ? normalizeServiceId(preferredAlias[0]) : normalized;
 }
 
-function readJson(relativePath, fallback) {
-  try {
-    return JSON.parse(fs.readFileSync(new URL(relativePath, import.meta.url), 'utf-8'));
-  } catch {
-    return fallback;
-  }
+function readJson(relativePath) {
+  return JSON.parse(fs.readFileSync(new URL(relativePath, import.meta.url), 'utf-8'));
 }
 
 function getCanonicalServicePaths() {
   const paths = new Set();
-  const topics = readJson('./topic-pages.json', []);
-  const taxonomy = readJson('./taxonomy-tree.json', null);
+  const topics = readJson('./topic-pages.json');
+  const taxonomy = readJson('./taxonomy-tree.json');
 
   topics.forEach((topic) => {
     (topic.core_services || []).forEach((service) => {
@@ -116,7 +112,7 @@ export default defineConfig({
         return true;
       },
       serialize: (item) => {
-        const pathname = new URL(item.url).pathname;
+        const pathname = stripBasePath(new URL(item.url).pathname, basePath);
         const isIndexableHub = ['/', '/practice', '/concepts', '/services'].includes(pathname.replace(/\/$/, '') || '/');
 
         return {
