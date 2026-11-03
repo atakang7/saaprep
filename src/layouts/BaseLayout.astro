@@ -115,6 +115,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
     ))}
   </head>
   <body>
+    <!-- EXTREME LEFT-TO-RIGHT FULL-WIDTH NAVBAR -->
     <header class="navbar">
       <div class="nav-container">
         <div class="brand-group">
@@ -132,6 +133,7 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
           </button>
           <a href="https://github.com/atakang7/saaprep" class="nav-item github-star" target="_blank" rel="noopener noreferrer" aria-label="Star SAA Prep on GitHub">STAR ON GITHUB</a>
           
+          <!-- ACCESSIBILITY CONTROLS TOOLBAR -->
           <AccessibilityToolbar />
 
           <a href={sitePath('/practice')} class="nav-item">PRACTICE</a>
@@ -141,9 +143,12 @@ const serializeJsonLd = (item: Record<string, unknown>) =>
       </div>
     </header>
 
+    <!-- EXTREME FULL-WIDTH LAYOUT CONTAINER -->
     <div class="app-layout">
+      <!-- SIDEBAR AT EXTREME LEFT -->
       <SidebarNav />
 
+      <!-- MAIN CONTENT AREA -->
       <main class="main-content">
         <slot />
       </main>
