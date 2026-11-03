@@ -86,12 +86,14 @@ const structuredData = [
 >
   <div class="clean-page">
     
+    <!-- BREADCRUMB -->
     <nav class="clean-breadcrumb">
       <a href={sitePath('/concepts')}>Taxonomy Tree</a>
       <span class="sep">/</span>
       <span class="current">{topic.cluster_title}</span>
     </nav>
 
+    <!-- HEADER -->
     <header class="clean-hero">
       <div class="hero-tags">
         <span class="pill-badge" style={`color: ${theme.color}; background: rgba(255,255,255,0.04);`}>
@@ -109,6 +111,7 @@ const structuredData = [
       </div>
     </header>
 
+    <!-- CORE SERVICES ROUTING DIRECTORY -->
     <section class="content-block">
       <h2 class="block-heading">// ROUTE TO THE RIGHT SERVICE</h2>
 
@@ -126,6 +129,7 @@ const structuredData = [
       </div>
     </section>
 
+    <!-- KEYWORD SIGNALS -->
     <section class="content-block compact-block">
       <h2 class="block-heading">// FAST ROUTING SIGNALS</h2>
 
@@ -140,6 +144,7 @@ const structuredData = [
       </div>
     </section>
 
+    <!-- BOTTOM ACTION -->
     <div class="bottom-action">
       <div>
         <h3>Mastered {topic.cluster_title}?</h3>

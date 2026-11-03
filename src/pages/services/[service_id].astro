@@ -102,6 +102,7 @@ const structuredData = [
 >
   <div class="clean-page">
     
+    <!-- BREADCRUMB -->
     <nav class="clean-breadcrumb">
       <a href={sitePath('/services')}>Services</a>
       <span class="sep">/</span>
@@ -110,6 +111,7 @@ const structuredData = [
       <span class="current">{svc.name}</span>
     </nav>
 
+    <!-- HEADER -->
     <header class="clean-hero">
       <div class="hero-tags">
         <span class="pill-badge" style={`color: ${theme.color}; background: rgba(255,255,255,0.04);`}>
@@ -129,6 +131,7 @@ const structuredData = [
         </a>
       )}
 
+      <!-- SPECIFICATION INLINE ROW -->
       <div class="spec-row">
         <div class="spec-col">
           <span class="spec-lbl">SCOPE</span>
@@ -145,6 +148,7 @@ const structuredData = [
       </div>
     </header>
 
+    <!-- DECISION MATRIX -->
     <section class="content-block">
       <h2 class="block-heading">// DECISION LOGIC MATRIX</h2>
 
@@ -167,6 +171,7 @@ const structuredData = [
       </div>
     </section>
 
+    <!-- EXAM TRAPS & MISDIRECTIONS -->
     <section class="content-block">
       <h2 class="block-heading">// EXAM TRAPS & SIGNAL KEYWORDS</h2>
       
@@ -175,6 +180,7 @@ const structuredData = [
       </div>
     </section>
 
+    <!-- OFFICIAL AWS REFERENCE -->
     <section class="content-block">
       <h2 class="block-heading">// OFFICIAL AWS REFERENCE</h2>
       <div class="aws-reference-box">
@@ -199,6 +205,7 @@ const structuredData = [
       </div>
     </section>
 
+    <!-- SERVICE-SCOPED TAKEAWAYS -->
     {serviceTakeaways.length > 0 && (
       <section class="content-block">
         <h2 class="block-heading">// {svc.name.toUpperCase()} TAKEAWAYS</h2>
@@ -214,6 +221,7 @@ const structuredData = [
       </section>
     )}
 
+    <!-- RELATED PRACTICE QUESTIONS -->
     {relatedQuestions.length > 0 && (
       <section class="content-block">
         <h2 class="block-heading">// PRACTICE QUESTIONS</h2>
@@ -229,6 +237,7 @@ const structuredData = [
       </section>
     )}
 
+    <!-- CTA -->
     {relatedQuestions.length > 0 && (
       <div class="bottom-action">
         <div>

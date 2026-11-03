@@ -14,31 +14,37 @@ export interface Question {
 
 export function getPracticeQuestions(): Question[] {
   const jsonPath = path.resolve(process.cwd(), 'questions.json');
-  const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-  if (!Array.isArray(rawData) || rawData.length === 0) {
-    throw new Error('questions.json must contain a non-empty array');
+  if (fs.existsSync(jsonPath)) {
+    try {
+      const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      if (Array.isArray(rawData) && rawData.length > 0) {
+        return rawData.map((q: any, index: number) => {
+          const formattedOptions = (q.options || []).map((opt: string, optIdx: number) => {
+            if (/^[A-E]\.\s/.test(opt)) return opt;
+            return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
+          });
+
+          const explanationArr = Array.isArray(q.explanation) 
+            ? q.explanation 
+            : (typeof q.explanation === 'string' ? [q.explanation] : [`Correct Answer: ${q.answer}`]);
+
+          return {
+            id: q.id || index + 1,
+            title: `SAA-C03 Question #${index + 1}`,
+            question: q.question || '',
+            options: formattedOptions,
+            answer: q.answer || '',
+            explanation: explanationArr,
+            references: q.references || ['AWS SAA-C03 Official Exam Guide']
+          };
+        });
+      }
+    } catch (e) {
+      console.error('Error parsing questions.json:', e);
+    }
   }
 
-  return rawData.map((q: any, index: number) => {
-    const formattedOptions = (q.options || []).map((opt: string, optIdx: number) => {
-      if (/^[A-E]\.\s/.test(opt)) return opt;
-      return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
-    });
-
-    const explanationArr = Array.isArray(q.explanation)
-      ? q.explanation
-      : (typeof q.explanation === 'string' ? [q.explanation] : [`Correct Answer: ${q.answer}`]);
-
-    return {
-      id: q.id || index + 1,
-      title: `SAA-C03 Question #${index + 1}`,
-      question: q.question || '',
-      options: formattedOptions,
-      answer: q.answer || '',
-      explanation: explanationArr,
-      references: q.references || ['AWS SAA-C03 Official Exam Guide']
-    };
-  });
+  return [];
 }
 
 export function getTaxonomyTree() {
