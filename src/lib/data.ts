@@ -14,11 +14,11 @@ export interface Question {
 
 export function getPracticeQuestions(): Question[] {
   const jsonPath = path.resolve(process.cwd(), 'questions.json');
-  if (fs.existsSync(jsonPath)) {
-    try {
-      const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-      if (Array.isArray(rawData) && rawData.length > 0) {
-        return rawData.map((q: any, index: number) => {
+  const rawData = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+  if (!Array.isArray(rawData) || rawData.length === 0) {
+    throw new Error('questions.json must contain a non-empty array');
+  }
+  return rawData.map((q: any, index: number) => {
           const formattedOptions = (q.options || []).map((opt: string, optIdx: number) => {
             if (/^[A-E]\.\s/.test(opt)) return opt;
             return `${String.fromCharCode(65 + optIdx)}. ${opt}`;
@@ -37,14 +37,7 @@ export function getPracticeQuestions(): Question[] {
             explanation: explanationArr,
             references: q.references || ['AWS SAA-C03 Official Exam Guide']
           };
-        });
-      }
-    } catch (e) {
-      console.error('Error parsing questions.json:', e);
-    }
-  }
-
-  return [];
+        })
 }
 
 export function getTaxonomyTree() {
